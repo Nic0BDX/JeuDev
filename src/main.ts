@@ -1,5 +1,6 @@
 import "./style.css";
 import { explore } from "./world";
+import { openDex } from "./dex";
 
 export const GAME_NAME = "Aetheris";
 document.title = GAME_NAME;
@@ -45,6 +46,7 @@ function render() {
 app.addEventListener("click", event => {
   const target = (event.target as HTMLElement).closest<HTMLButtonElement>("button[data-page]");
   if (!target) return;
+  if (target.dataset.page === "codex") { openDex(app, undefined, render); return; }
   if (target.dataset.page === "new") {
     try { explore(app, settings, render); } catch { render(); alert("WebGL is unavailable."); }
     return;
