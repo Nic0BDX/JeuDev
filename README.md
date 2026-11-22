@@ -23,3 +23,7 @@ La première quête commence à Skyspire City. Suivre le lieu indiqué dans le H
 La sauvegarde locale versionnée conserve la position, la caméra, l’heure, l’équipe, le sac, la découverte et les quêtes. Elle est écrite périodiquement, au retour au titre et via Save. Les combats en cours reprennent au dernier état enregistré. Effacer les données du site efface la partie.
 
 Le [guide artistique](ART_DIRECTION.md) référence les captures Chromium et les images. Les tests en émulation de viewport mobile couvrent la disposition et le parcours de reprise. Les FPS sur appareil réel restent à mesurer.
+
+## Mesurer les performances
+
+Ajoute `?performance=1` à l’URL du jeu, puis ouvre une aventure. Le compteur affiche la moyenne des FPS, le 95e percentile du temps entre images et le nombre d’appels de rendu sur des fenêtres de cinq secondes. En qualité Auto, parcours Skyspire City puis traverse plusieurs limites de chunks. Relève le modèle d’appareil, le navigateur et plusieurs fenêtres de mesure pour comparer avec les objectifs de 60 FPS sur ordinateur et 30 FPS sur mobile.
