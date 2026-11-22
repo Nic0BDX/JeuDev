@@ -6,7 +6,7 @@ import { mountCharacterMarkers } from "./character-markers";
 import { openDex } from "./dex";
 import { ambience, writeSave, type Save } from "./save";
 import { nearestSite, newJourney, openBag, visit } from "./quests";
-import { chapter, destination, newChronicle, playScene, siteLabel } from "./story";
+import { chapter, destination, restoreChronicle, playScene, siteLabel } from "./story";
 import { discover, openMap, type Exploration } from "./map";
 import { battle, newParty, speciesOf, maxHp } from "./combat";
 
@@ -99,7 +99,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   if(resume)actor.position.fromArray(resume.position);
   const party=resume?.party??newParty();
   const journey=resume?.journey??newJourney();
-  const chronicle=resume?.chronicle??newChronicle();
+  const chronicle=restoreChronicle(resume?.chronicle);
   const exploration:Exploration=resume?.exploration??{discovered:[],x:actor.position.x,z:actor.position.z};
   fauna.setCompanion(speciesOf(party.team[0]));
   fauna.showCompanion(chronicle.next>0);

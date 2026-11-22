@@ -16,6 +16,7 @@
   },
   "scenes": [
     {
+      "id": "rescue-florix",
       "chapter": 1,
       "title": "La créature blessée",
       "location": "skyspire-habitat",
@@ -48,6 +49,7 @@
       "name": true
     },
     {
+      "id": "wild-mossling",
       "chapter": 1,
       "title": "La créature blessée",
       "location": "skyspire-cave",
@@ -63,6 +65,7 @@
       }
     },
     {
+      "id": "first-crystal",
       "chapter": 1,
       "title": "La créature blessée",
       "location": "skyspire-resource",
@@ -75,6 +78,7 @@
       "crystal": true
     },
     {
+      "id": "kaels-challenge",
       "chapter": 2,
       "title": "Les Bois de Verdalia",
       "location": "verdalia-habitat",
@@ -104,6 +108,7 @@
       }
     },
     {
+      "id": "verdalia-portal",
       "chapter": 2,
       "title": "Les Bois de Verdalia",
       "location": "verdalia-ruin",
@@ -119,6 +124,7 @@
       ]
     },
     {
+      "id": "elaras-mission",
       "chapter": 3,
       "title": "Skyspire City",
       "location": "skyspire-village",
@@ -154,6 +160,7 @@
       ]
     },
     {
+      "id": "embercrest-village",
       "chapter": 4,
       "title": "Embercrest, les Hauts Plateaux",
       "location": "embercrest-village",
@@ -165,6 +172,7 @@
       ]
     },
     {
+      "id": "crater-vent",
       "chapter": 4,
       "title": "La Forge du Cratère",
       "location": "embercrest-cave",
@@ -185,6 +193,7 @@
       }
     },
     {
+      "id": "volflare-and-cubs",
       "chapter": 4,
       "title": "La Forge du Cratère",
       "location": "embercrest-cave",
@@ -206,6 +215,7 @@
       "gift": "embera"
     },
     {
+      "id": "vaels-document",
       "chapter": 5,
       "title": "Le premier agent de l’Ordre",
       "location": "embercrest-tower",
@@ -229,6 +239,7 @@
       ]
     },
     {
+      "id": "kaels-confession",
       "chapter": 6,
       "title": "Azuremere, le Pays des lacs",
       "location": "azuremere-cave",
@@ -256,6 +267,7 @@
       ]
     },
     {
+      "id": "glacelle",
       "chapter": 6,
       "title": "La Grotte des Reflets",
       "location": "azuremere-cave",
@@ -272,6 +284,7 @@
       "shard": "crystal"
     },
     {
+      "id": "noctiris-help",
       "chapter": 7,
       "title": "Frostveil Peaks, la Couronne de neige",
       "location": "frostveil-cave",
@@ -291,6 +304,7 @@
       ]
     },
     {
+      "id": "zephowls-flight",
       "chapter": 7,
       "title": "L’Épreuve du Vent",
       "location": "frostveil-tower",
@@ -312,6 +326,7 @@
       "shard": "wind"
     },
     {
+      "id": "meet-maelys",
       "chapter": 8,
       "title": "Coralreach Coast, les Rivages de saphir",
       "location": "coralreach-village",
@@ -331,6 +346,7 @@
       ]
     },
     {
+      "id": "eclipse-outpost",
       "chapter": 8,
       "title": "L’infiltration",
       "location": "coralreach-ruin",
@@ -347,6 +363,7 @@
       }
     },
     {
+      "id": "free-tidera",
       "chapter": 8,
       "title": "L’infiltration",
       "location": "coralreach-ruin",
@@ -359,6 +376,7 @@
       "shard": "water"
     },
     {
+      "id": "elaras-secret",
       "chapter": 9,
       "title": "La vérité d’Elara",
       "location": "skyspire-village",
@@ -395,6 +413,7 @@
       "travel": "celestial-statue"
     },
     {
+      "id": "watchers-revelation",
       "chapter": 10,
       "title": "Les Ruines célestes",
       "location": "celestial-statue",
@@ -422,6 +441,7 @@
       ]
     },
     {
+      "id": "vaels-umbrel",
       "chapter": 11,
       "title": "L’assaut d’Elara",
       "location": "celestial-habitat",
@@ -450,6 +470,7 @@
       }
     },
     {
+      "id": "vaels-terrabram",
       "chapter": 11,
       "title": "L’assaut d’Elara",
       "location": "celestial-habitat",
@@ -466,6 +487,7 @@
       }
     },
     {
+      "id": "collector",
       "chapter": 11,
       "title": "Le Collecteur",
       "location": "celestial-habitat",
@@ -483,6 +505,7 @@
       }
     },
     {
+      "id": "elaras-aurelyn",
       "chapter": 11,
       "title": "L’assaut d’Elara",
       "location": "celestial-habitat",
@@ -499,6 +522,7 @@
       }
     },
     {
+      "id": "heart-approach",
       "chapter": 11,
       "title": "L’assaut d’Elara",
       "location": "celestial-habitat",
@@ -510,6 +534,7 @@
       ]
     },
     {
+      "id": "final-choice",
       "chapter": 12,
       "title": "Le choix",
       "location": "celestial-cave",

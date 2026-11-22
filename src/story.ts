@@ -6,16 +6,24 @@ import {portrait} from "./characters";
 import {battle,createMember,maxHp,type Party} from "./combat";
 
 type Ending="guardian"|"release";
-export type Chronicle={next:number;hero:string;shards:string[];ending?:Ending};
+export type Chronicle={next:number;checkpoint?:string;hero:string;shards:string[];ending?:Ending};
 type Scene={
-  chapter:number;title:string;location:string;lines:string[][];
+  id:string;chapter:number;title:string;location:string;lines:string[][];
   name?:boolean;crystal?:boolean;shard?:string;gift?:string;travel?:string;ending?:boolean;
   puzzle?:{question:string;options:string[];answer:number};
   battle?:{id:string;level:number;owner?:string;alias?:string;acceptLoss?:boolean;mixed?:boolean};
 };
 const story:Scene[]=narrative.scenes;
 const places=regions.flatMap<typeof regions[number]["locations"][number]>(r=>r.locations);
-export const newChronicle=():Chronicle=>({next:0,hero:"",shards:[]});
+export function restoreChronicle(saved?:Chronicle):Chronicle {
+  if(!saved)return {next:0,checkpoint:story[0].id,hero:"",shards:[]};
+  const ending=saved.ending==="guardian"||saved.ending==="release"?saved.ending:undefined;
+  const marked=story.findIndex(scene=>scene.id===saved.checkpoint);
+  const legacy=Number.isInteger(saved.next)?Math.max(0,Math.min(story.length-1,saved.next)):0;
+  const next=ending?story.length:marked>=0?marked:legacy;
+  const shards=Array.isArray(saved.shards)?[...new Set(saved.shards.filter(shard=>story.some(scene=>scene.shard===shard)))]:[];
+  return {next,checkpoint:story[next]?.id,hero:typeof saved.hero==="string"?saved.hero.slice(0,24):"",shards,ending};
+}
 export const chapter=(state:Chronicle)=>story[state.next];
 export const destination=(state:Chronicle)=>places.find(place=>place.id===chapter(state)?.location);
 export const siteLabel=(id:string,name:string)=>narrative.placeNames[id as keyof typeof narrative.placeNames]??name;
@@ -60,6 +68,7 @@ export function playScene(host:HTMLElement,state:Chronicle,party:Party,finish:(s
     }
     if(ending)state.ending=ending;
     state.next++;
+    state.checkpoint=story[state.next]?.id;
     if(dialog.open){handoff=true;dialog.close();}
     finish(scene,true);
   }
