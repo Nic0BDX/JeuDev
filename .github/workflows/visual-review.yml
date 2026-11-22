@@ -98,6 +98,20 @@ jobs:
                 return canvas && canvas.width > 0 && canvas.height > 0;
               });
               await page.screenshot({path: 'captures/streaming-' + name + '.png'});
+              await page.evaluate(({x, z}) => {
+                const save = JSON.parse(localStorage.getItem('aetheris.save'));
+                save.position = [x, 5, z];
+                save.vertical = 0;
+                save.glide = false;
+                localStorage.setItem('aetheris.save', JSON.stringify(save));
+              }, {"x":88,"z":33});
+              await page.reload();
+              await page.getByRole('button', {name: 'Continue'}).click();
+              await page.getByRole('button', {name: 'Interact', exact: true}).click();
+              await page.getByRole('dialog').getByRole('heading', {name: 'Dr Elara Voss'}).waitFor();
+              await capture('elara', true);
+              await page.getByRole('button', {name: 'Proceed'}).click();
+              await page.getByText('Grande Chercheuse · Skyspire City · 145 coins').waitFor();
               await page.close();
             }
           } finally {
