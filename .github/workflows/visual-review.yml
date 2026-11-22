@@ -204,6 +204,19 @@ jobs:
                 await page.waitForFunction(() => JSON.parse(localStorage.getItem('aetheris.save')).chronicle.checkpoint === 'volflare-and-cubs');
               }
               await page.close();
+              const unsupported = await browser.newPage({viewport: {width, height}});
+              await unsupported.addInitScript(() => {
+                const original = HTMLCanvasElement.prototype.getContext;
+                HTMLCanvasElement.prototype.getContext = function(type, ...args) {
+                  return type.startsWith('webgl') ? null : original.call(this, type, ...args);
+                };
+              });
+              await unsupported.goto('http://127.0.0.1:5173/');
+              await unsupported.getByRole('button', {name: 'New Adventure'}).click();
+              await unsupported.getByRole('alert').getByRole('button', {name: 'Try again'}).waitFor();
+              if (await unsupported.evaluate(() => document.activeElement.textContent) !== 'Try again') throw new Error('Graphics fallback did not receive focus');
+              await unsupported.screenshot({path: 'captures/webgl-error-' + name + '.png'});
+              await unsupported.close();
             }
           } finally {
             await browser.close();

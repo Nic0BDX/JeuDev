@@ -56,7 +56,22 @@ app.addEventListener("click", event => {
     const save=readSave();
     if(target.dataset.page==="continue"&&!save)return;
     if(target.dataset.page==="new"&&save&&!confirm(settings.language==="fr"?"Remplacer l’aventure sauvegardée ?":"Replace your saved adventure?"))return;
-    try { explore(app, settings, render, target.dataset.page==="continue"?save:undefined); } catch { render(); alert("WebGL is unavailable."); }
+    try { explore(app, settings, render, target.dataset.page==="continue"?save:undefined); } catch {
+      render();
+      const notice=document.createElement("section");
+      notice.className="panel launch-error";
+      notice.setAttribute("role","alert");
+      const message=document.createElement("p");
+      message.textContent=settings.language==="fr"
+        ?"Le monde 3D n’a pas pu démarrer. Vérifie l’accélération graphique du navigateur, puis réessaie."
+        :"The 3D world could not start. Check that graphics acceleration is enabled in your browser, then try again.";
+      const retry=document.createElement("button");
+      retry.dataset.page=target.dataset.page;
+      retry.textContent=settings.language==="fr"?"Réessayer":"Try again";
+      notice.append(message,retry);
+      app.querySelector(".screen")?.append(notice);
+      retry.focus();
+    }
     return;
   }
   page = target.dataset.page as Page;
