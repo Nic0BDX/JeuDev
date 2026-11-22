@@ -1,0 +1,614 @@
+{
+  "world": "L’Aether nourrit les créatures, fait pousser les forêts et garde les îles en l’air. Le courant faiblit, des îles descendent et des créatures paisibles deviennent agressives.",
+  "acts": [
+    "L’Appel",
+    "Les Éclats",
+    "Le Cœur"
+  ],
+  "placeNames": {
+    "skyspire-habitat": "Verdant Cascade Valley · Cascade",
+    "skyspire-cave": "Verdant Cascade Valley · Sentier des fougères",
+    "skyspire-resource": "Verdant Cascade Valley · Gisement",
+    "embercrest-cave": "Forge du Cratère",
+    "azuremere-cave": "Grotte des Reflets",
+    "coralreach-ruin": "Avant-poste de l’Éclipse",
+    "celestial-cave": "Cœur de l’Aether"
+  },
+  "scenes": [
+    {
+      "chapter": 1,
+      "title": "La créature blessée",
+      "location": "skyspire-habitat",
+      "lines": [
+        [
+          "narrator",
+          "Près de la cascade de Verdant Cascade Valley, un cri monte des fougères. Une branche retient la patte de Florix. Un cristal bleu pulse à son cou."
+        ],
+        [
+          "hero",
+          "Hé, doucement… Je ne te veux aucun mal."
+        ],
+        [
+          "florix",
+          "(Recule, puis renifle le sac du héros.)"
+        ],
+        [
+          "hero",
+          "Tu as faim ? Tiens, prends."
+        ],
+        [
+          "florix",
+          "(Mange, puis pose sa tête sur le genou du héros.)"
+        ],
+        [
+          "hero",
+          "D’accord. Tu viens avec moi."
+        ]
+      ],
+      "name": true
+    },
+    {
+      "chapter": 1,
+      "title": "La créature blessée",
+      "location": "skyspire-cave",
+      "lines": [
+        [
+          "narrator",
+          "Un Mossling sauvage surgit sur le sentier. Florix se place à tes côtés."
+        ]
+      ],
+      "battle": {
+        "id": "mossling",
+        "level": 2
+      }
+    },
+    {
+      "chapter": 1,
+      "title": "La créature blessée",
+      "location": "skyspire-resource",
+      "lines": [
+        [
+          "narrator",
+          "Tu ramasses ton premier cristal. Celui de Florix lui répond par un bref éclat."
+        ]
+      ],
+      "crystal": true
+    },
+    {
+      "chapter": 2,
+      "title": "Les Bois de Verdalia",
+      "location": "verdalia-habitat",
+      "lines": [
+        [
+          "narrator",
+          "Un grand arbre est desséché d’un seul côté. Kael poursuit un Pyrowl blessé."
+        ],
+        [
+          "kael",
+          "Tu es sur mon chemin. Dégage."
+        ],
+        [
+          "hero",
+          "Ta créature est fatiguée. Tu devrais la laisser se reposer."
+        ],
+        [
+          "kael",
+          "Je n’ai pas besoin de tes conseils. Combat, maintenant."
+        ]
+      ],
+      "battle": {
+        "id": "pyrowl",
+        "level": 5,
+        "owner": "Kael",
+        "acceptLoss": true
+      }
+    },
+    {
+      "chapter": 2,
+      "title": "Les Bois de Verdalia",
+      "location": "verdalia-ruin",
+      "lines": [
+        [
+          "narrator",
+          "Kael s’éloigne furieux. Une silhouette violette, Noctiri, disparaît entre les arbres."
+        ],
+        [
+          "narrator",
+          "Le cristal de Florix illumine le vieux portail et révèle un chemin vers Skyspire City."
+        ]
+      ]
+    },
+    {
+      "chapter": 3,
+      "title": "Skyspire City",
+      "location": "skyspire-village",
+      "lines": [
+        [
+          "narrator",
+          "Une alerte retentit dans la capitale. Une île vient de bouger dans le ciel."
+        ],
+        [
+          "elara",
+          "Ce cristal… Où l’as-tu trouvé ?"
+        ],
+        [
+          "hero",
+          "C’est Florix qui le portait."
+        ],
+        [
+          "elara",
+          "Alors l’Aether t’a déjà choisi. Je dois être honnête avec toi : le ciel s’affaiblit, et nous ne savons pas pourquoi."
+        ],
+        [
+          "hero",
+          "Je peux aider ?"
+        ],
+        [
+          "elara",
+          "Il existe quatre Éclats d’Aether, gardés par les plus anciennes créatures de ce monde. Si tu les réunis, nous pourrons stabiliser le ciel."
+        ],
+        [
+          "narrator",
+          "Elara te confie un Dex et une carte. Kael décide de chercher un Éclat de son côté."
+        ]
+      ]
+    },
+    {
+      "chapter": 4,
+      "title": "Embercrest, les Hauts Plateaux",
+      "location": "embercrest-village",
+      "lines": [
+        [
+          "narrator",
+          "Les habitants parlent de volcans agités et de machines installées par des hommes en capes grises. Leurs traces mènent à la Forge du Cratère."
+        ]
+      ]
+    },
+    {
+      "chapter": 4,
+      "title": "La Forge du Cratère",
+      "location": "embercrest-cave",
+      "lines": [
+        [
+          "narrator",
+          "La chaleur monte dans la forge. Il faut ouvrir une sortie pour protéger les petits de Volflare."
+        ]
+      ],
+      "puzzle": {
+        "question": "Quel dispositif actionner en premier ?",
+        "options": [
+          "Ouvrir l’évent pour relâcher la pression",
+          "Fermer les deux conduits",
+          "Ajouter du combustible"
+        ],
+        "answer": 0
+      }
+    },
+    {
+      "chapter": 4,
+      "title": "La Forge du Cratère",
+      "location": "embercrest-cave",
+      "lines": [
+        [
+          "narrator",
+          "Les petits gagnent l’abri. Le rugissement de Volflare s’apaise."
+        ],
+        [
+          "hero",
+          "Tout va bien, on ne veut pas te faire de mal."
+        ],
+        [
+          "narrator",
+          "Volflare remet l’Éclat de Feu. Un Embera choisit de te rejoindre."
+        ]
+      ],
+      "shard": "fire",
+      "gift": "embera"
+    },
+    {
+      "chapter": 5,
+      "title": "Le premier agent de l’Ordre",
+      "location": "embercrest-tower",
+      "lines": [
+        [
+          "vael",
+          "Le garçon au renard. Elara Voss avait raison, tu es plus tenace que prévu."
+        ],
+        [
+          "hero",
+          "Elara ? Qu’est-ce que tu veux dire ?"
+        ],
+        [
+          "vael",
+          "Rien qui te concerne encore. Rentre chez toi."
+        ],
+        [
+          "narrator",
+          "Vael s’enfuit. Parmi les débris, tu trouves un document portant le sceau de Skyspire City."
+        ]
+      ]
+    },
+    {
+      "chapter": 6,
+      "title": "Azuremere, le Pays des lacs",
+      "location": "azuremere-cave",
+      "lines": [
+        [
+          "narrator",
+          "Les cristaux des rives se fanent. Dans la Grotte des Reflets, Kael est blessé après avoir affronté Glacelle."
+        ],
+        [
+          "kael",
+          "Ne me regarde pas comme ça."
+        ],
+        [
+          "hero",
+          "Tu aurais dû m’attendre."
+        ],
+        [
+          "kael",
+          "Je n’attends personne. Mes parents… leur île est tombée. J’ai tout vu. Je n’étais pas assez fort."
+        ],
+        [
+          "hero",
+          "Alors faisons-le ensemble."
+        ]
+      ]
+    },
+    {
+      "chapter": 6,
+      "title": "La Grotte des Reflets",
+      "location": "azuremere-cave",
+      "lines": [
+        [
+          "narrator",
+          "Kael accepte de faire équipe. Glacelle garde l’Éclat de Cristal."
+        ]
+      ],
+      "battle": {
+        "id": "glacelle",
+        "level": 12
+      },
+      "shard": "crystal"
+    },
+    {
+      "chapter": 7,
+      "title": "Frostveil Peaks, la Couronne de neige",
+      "location": "frostveil-cave",
+      "lines": [
+        [
+          "narrator",
+          "Une avalanche sépare le groupe. Noctiri éclaire la grotte d’une lueur violette."
+        ],
+        [
+          "hero",
+          "Tu es là depuis le début, n’est-ce pas ?"
+        ],
+        [
+          "noctiri",
+          "(Incline la tête, silencieuse.)"
+        ]
+      ]
+    },
+    {
+      "chapter": 7,
+      "title": "L’Épreuve du Vent",
+      "location": "frostveil-tower",
+      "lines": [
+        [
+          "narrator",
+          "Zephowl trace une boucle dans le ciel. Il attend que tu suives son rythme."
+        ]
+      ],
+      "puzzle": {
+        "question": "Zephowl s’élève, marque une pause, puis plonge. Quel mouvement reproduire ?",
+        "options": [
+          "Plonger aussitôt",
+          "Monter, attendre, puis descendre",
+          "Rester immobile"
+        ],
+        "answer": 1
+      },
+      "shard": "wind"
+    },
+    {
+      "chapter": 8,
+      "title": "Coralreach Coast, les Rivages de saphir",
+      "location": "coralreach-village",
+      "lines": [
+        [
+          "maelys",
+          "Trois caisses scellées, chaque nuit, vers l’île du nord. Personne ne sait ce qu’il y a dedans."
+        ],
+        [
+          "hero",
+          "On peut les suivre ?"
+        ],
+        [
+          "maelys",
+          "J’ai une nacelle qui vole presque. Montez."
+        ]
+      ]
+    },
+    {
+      "chapter": 8,
+      "title": "L’infiltration",
+      "location": "coralreach-ruin",
+      "lines": [
+        [
+          "narrator",
+          "La nacelle se pose près de l’avant-poste. Des réservoirs envoient l’Aether liquide vers Skyspire. Vael garde la salle où Tidera est retenu."
+        ]
+      ],
+      "battle": {
+        "id": "voltine",
+        "level": 18,
+        "owner": "Vael"
+      }
+    },
+    {
+      "chapter": 8,
+      "title": "L’infiltration",
+      "location": "coralreach-ruin",
+      "lines": [
+        [
+          "narrator",
+          "Tu ouvres la cellule de Tidera. Libre, le dragon d’eau te confie son Éclat."
+        ]
+      ],
+      "shard": "water"
+    },
+    {
+      "chapter": 9,
+      "title": "La vérité d’Elara",
+      "location": "skyspire-village",
+      "lines": [
+        [
+          "hero",
+          "J’ai trouvé un document avec ton sceau, Elara. L’Ordre travaille pour toi."
+        ],
+        [
+          "elara",
+          "Je voulais te le dire plus tard."
+        ],
+        [
+          "hero",
+          "Pourquoi ?"
+        ],
+        [
+          "elara",
+          "Parce que l’Aether est en train de mourir. Si personne ne fait rien, tout le ciel s’effondrera. J’ai concentré ce qui restait sur Skyspire pour sauver au moins une partie de l’humanité."
+        ],
+        [
+          "kael",
+          "Tu as laissé les autres régions mourir !"
+        ],
+        [
+          "elara",
+          "J’ai fait un choix. Je le referais."
+        ],
+        [
+          "narrator",
+          "Les gardes arrivent. Noctiri brise les fenêtres et vous fait fuir. Maëlys vous emmène en nacelle vers les ruines célestes."
+        ]
+      ],
+      "travel": "celestial-statue"
+    },
+    {
+      "chapter": 10,
+      "title": "Les Ruines célestes",
+      "location": "celestial-statue",
+      "lines": [
+        [
+          "narrator",
+          "Les quatre Éclats s’illuminent et dessinent un chemin dans le ciel."
+        ],
+        [
+          "watcher",
+          "Cela fait trois cents ans que personne n’avait atteint ce lieu."
+        ],
+        [
+          "hero",
+          "L’Aether disparaît. Pouvez-vous l’arrêter ?"
+        ],
+        [
+          "watcher",
+          "L’Aether ne disparaît pas. Il est retenu. Et ce que vous appelez un renard cristal est bien plus que cela."
+        ],
+        [
+          "narrator",
+          "Florix est un Éclat vivant. Noctiri est un fragment d’Aether corrompu par la peur des humains, qui cherche à te protéger."
+        ]
+      ]
+    },
+    {
+      "chapter": 11,
+      "title": "L’assaut d’Elara",
+      "location": "celestial-habitat",
+      "lines": [
+        [
+          "elara",
+          "Écarte-toi, je t’en prie. Je ne veux pas te blesser."
+        ],
+        [
+          "hero",
+          "Tu me demandes de laisser le monde mourir."
+        ],
+        [
+          "elara",
+          "Je te demande de laisser vivre ceux qui peuvent encore être sauvés."
+        ],
+        [
+          "narrator",
+          "Vael protège le Collecteur avec ses créatures."
+        ]
+      ],
+      "battle": {
+        "id": "umbrel",
+        "level": 24,
+        "owner": "Vael"
+      }
+    },
+    {
+      "chapter": 11,
+      "title": "L’assaut d’Elara",
+      "location": "celestial-habitat",
+      "lines": [
+        [
+          "narrator",
+          "Vael envoie sa dernière créature pour couvrir le Collecteur."
+        ]
+      ],
+      "battle": {
+        "id": "terrabram",
+        "level": 24,
+        "owner": "Vael"
+      }
+    },
+    {
+      "chapter": 11,
+      "title": "Le Collecteur",
+      "location": "celestial-habitat",
+      "lines": [
+        [
+          "narrator",
+          "Le Collecteur s’active et détourne l’énergie du Cœur. Il faut l’arrêter avant qu’il ne vide les réserves."
+        ]
+      ],
+      "battle": {
+        "id": "bedrock",
+        "level": 27,
+        "alias": "Le Collecteur",
+        "mixed": true
+      }
+    },
+    {
+      "chapter": 11,
+      "title": "L’assaut d’Elara",
+      "location": "celestial-habitat",
+      "lines": [
+        [
+          "narrator",
+          "Elara ordonne à son Aurelyn de défendre la machine."
+        ]
+      ],
+      "battle": {
+        "id": "aurelyn",
+        "level": 29,
+        "owner": "Elara"
+      }
+    },
+    {
+      "chapter": 11,
+      "title": "L’assaut d’Elara",
+      "location": "celestial-habitat",
+      "lines": [
+        [
+          "narrator",
+          "Elara s’effondre. Kael te protège d’une explosion. Maëlys le tire hors de la zone tandis que tu avances seul vers le Cœur."
+        ]
+      ]
+    },
+    {
+      "chapter": 12,
+      "title": "Le choix",
+      "location": "celestial-cave",
+      "lines": [
+        [
+          "watcher",
+          "Tu peux fusionner l’Aether avec ta propre vie, et devenir son gardien pour toujours. Ou tu peux le rendre libre, et le monde devra apprendre à vivre sans que quelqu’un le contrôle."
+        ],
+        [
+          "hero",
+          "Et Florix ?"
+        ],
+        [
+          "florix",
+          "(Pose sa tête sur le bras du héros.)"
+        ],
+        [
+          "watcher",
+          "Il ira là où tu iras."
+        ]
+      ],
+      "ending": true
+    }
+  ],
+  "endings": {
+    "guardian": "Tu deviens le Gardien de l’Aether. Le monde retrouve son équilibre. Florix reste auprès de toi.",
+    "release": "L’Aether est rendu à chaque créature. Les îles tiennent et les habitants apprennent à partager le courant. Florix et Noctiri disparaissent dans la lumière, puis se retrouvent des années plus tard au pied de la cascade."
+  },
+  "epilogue": "Elara travaille avec les habitants des régions comme simple chercheuse. Kael protège Verdalia et Maëlys ouvre son atelier à Coralreach. Le ciel est de nouveau bleu.",
+  "cinematics": [
+    {
+      "title": "Intro, le monde en danger",
+      "seconds": 40,
+      "shots": "Survol des îles, île qui descend, titre"
+    },
+    {
+      "title": "La créature blessée",
+      "seconds": 25,
+      "shots": "Cristal de Florix, regard qui se lève"
+    },
+    {
+      "title": "Combat contre Kael",
+      "seconds": 20,
+      "shots": "Pyrowl en vol, silhouette de Noctiri"
+    },
+    {
+      "title": "Arrivée à Skyspire",
+      "seconds": 30,
+      "shots": "Travelling vers la cité, halo"
+    },
+    {
+      "title": "Volflare apaisé",
+      "seconds": 25,
+      "shots": "Flammes qui s’éteignent, petits qui s’approchent"
+    },
+    {
+      "title": "La confession de Kael",
+      "seconds": 30,
+      "shots": "Plan fixe, feu de camp"
+    },
+    {
+      "title": "L’avalanche de Frostveil",
+      "seconds": 25,
+      "shots": "Neige, lueur violette"
+    },
+    {
+      "title": "L’infiltration",
+      "seconds": 30,
+      "shots": "Nacelle de nuit, réservoirs"
+    },
+    {
+      "title": "La trahison d’Elara",
+      "seconds": 35,
+      "shots": "Dialogue, éclairage froid"
+    },
+    {
+      "title": "L’arrivée aux Ruines célestes",
+      "seconds": 30,
+      "shots": "Chemin lumineux"
+    },
+    {
+      "title": "Le Collecteur",
+      "seconds": 30,
+      "shots": "Machine géante, ciel sombre"
+    },
+    {
+      "title": "Le choix A",
+      "seconds": 40,
+      "shots": "Cœur, lumière dorée"
+    },
+    {
+      "title": "Le choix B",
+      "seconds": 40,
+      "shots": "Lumière, remontée des îles"
+    },
+    {
+      "title": "Épilogue",
+      "seconds": 45,
+      "shots": "Personnages dans leurs régions, générique"
+    }
+  ]
+}

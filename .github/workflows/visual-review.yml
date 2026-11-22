@@ -103,16 +103,20 @@ jobs:
                 const save = JSON.parse(localStorage.getItem('aetheris.save'));
                 save.position = [x, 5, z];
                 save.vertical = 0;
+                save.chronicle = {next: 5, hero: "Ari", shards: []};
                 save.glide = false;
                 localStorage.setItem('aetheris.save', JSON.stringify(save));
               }, {"x":88,"z":33});
               await page.reload();
               await page.getByRole('button', {name: 'Continue'}).click();
               await page.getByRole('button', {name: 'Interact', exact: true}).click();
-              await page.getByRole('dialog').getByRole('heading', {name: 'Dr Elara Voss'}).waitFor();
+              await page.getByRole('dialog').getByRole('heading', {name: 'Chapitre 3 · Skyspire City'}).waitFor();
+              await page.getByRole('button', {name: 'Suivant'}).click();
+              await page.getByText('Ce cristal… Où l’as-tu trouvé ?').waitFor();
               await capture('elara', true);
-              await page.getByRole('button', {name: 'Proceed'}).click();
-              await page.getByText('Grande Chercheuse · Skyspire City · 145 coins').waitFor();
+              for (let line = 0; line < 5; line++) await page.getByRole('button', {name: 'Suivant'}).click();
+              await page.getByRole('button', {name: 'Poursuivre'}).click();
+              await page.waitForFunction(() => JSON.parse(localStorage.getItem('aetheris.save')).chronicle.next === 6);
               await page.close();
             }
           } finally {

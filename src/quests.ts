@@ -12,9 +12,9 @@ export const objective=(journey:Journey)=>places.find(place=>place.id===main.ste
 export function nearestSite(x:number,y:number,z:number){
   return places.filter(place=>Math.hypot(place.x-x,place.z-z)<13&&(place.y===null||Math.abs(place.y-y)<10)).sort((a,b)=>Math.hypot(a.x-x,a.z-z)-Math.hypot(b.x-x,b.z-z))[0];
 }
-export function visit(journey:Journey,party:Party,site:typeof places[number]){
+export function visit(journey:Journey,party:Party,site:typeof places[number],advanceMain=true){
   const notices:string[]=[];
-  if(objective(journey)?.id===site.id){
+  if(advanceMain&&objective(journey)?.id===site.id){
     journey.step++;
     party.coins+=25;
     notices.push(journey.step===main.steps.length?"The Call of Skyspire complete.":"Objective complete · "+(objective(journey)?.name??""));

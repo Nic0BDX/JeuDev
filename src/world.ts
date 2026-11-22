@@ -5,7 +5,8 @@ import { characterAt, openCharacters } from "./characters";
 import { mountCharacterMarkers } from "./character-markers";
 import { openDex } from "./dex";
 import { ambience, writeSave, type Save } from "./save";
-import { nearestSite, newJourney, objective, openBag, visit } from "./quests";
+import { nearestSite, newJourney, openBag, visit } from "./quests";
+import { chapter, destination, newChronicle, playScene, siteLabel } from "./story";
 import { discover, openMap, type Exploration } from "./map";
 import { battle, newParty, speciesOf, maxHp } from "./combat";
 
@@ -98,6 +99,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   if(resume)actor.position.fromArray(resume.position);
   const party=resume?.party??newParty();
   const journey=resume?.journey??newJourney();
+  const chronicle=resume?.chronicle??newChronicle();
   const exploration:Exploration=resume?.exploration??{discovered:[],x:actor.position.x,z:actor.position.z};
   fauna.setCompanion(speciesOf(party.team[0]));
   let fighting=false,overlay=false,lastBattle=0;
@@ -227,7 +229,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   function save(){
     if(fighting)return false;
     const p=actor.position;
-    return writeSave({version:1,party,journey,exploration,position:[p.x,p.y,p.z],yaw,pitch,vertical,energy,time,glide,hp:playerHp});
+    return writeSave({version:1,party,journey,chronicle,exploration,position:[p.x,p.y,p.z],yaw,pitch,vertical,energy,time,glide,hp:playerHp});
   }
   window.addEventListener("pagehide",save,options);
   document.addEventListener("visibilitychange",()=>{if(document.hidden)save();},options);
@@ -248,8 +250,23 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     if(code==="KeyE"){
       const p=actor.position;const site=nearestSite(p.x,p.y,p.z);
       if(!site){startBattle();return;}
+      if(destination(chronicle)?.id===site.id){
+        overlay=true;held.clear();
+        playScene(host,chronicle,party,(scene,advanced)=>{
+          closeOverlay();
+          if(!advanced)return;
+          if(scene.crystal&&!journey.looted.includes(site.id)){journey.crystals++;journey.looted.push(site.id);}
+          if(scene.travel){
+            const point=regions.flatMap<typeof regions[number]["locations"][number]>(r=>r.locations).find(place=>place.id===scene.travel);
+            if(point){actor.position.set(point.x,(point.y??terrain(point.x,point.z))+1,point.z);vertical=0;glide=false;}
+          }
+          notify(scene.shard?"Éclat d’Aether obtenu · "+chronicle.shards.length+"/4":chronicle.ending?"Épilogue terminé":"Récit mis à jour");
+          save();
+        });
+        return;
+      }
       const interactWithSite=()=>{
-        const result=visit(journey,party,site);
+        const result=visit(journey,party,site,false);
         if(result){notify(result);save();}
         if(site.kind==="village"){overlay=true;held.clear();openBag(host,party,journey,closeOverlay,site);}
         else closeOverlay();
@@ -263,7 +280,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     }
     if(code==="KeyP"){notify(save()?"Adventure saved.":"Save unavailable.");return;}
     if(code==="KeyI"){overlay=true;held.clear();openBag(host,party,journey,closeOverlay);return;}
-    if(code==="KeyL"){notify("Field mail · "+(objective(journey)?.name??"Skyspire thanks you for your service."));return;}
+    if(code==="KeyL"){notify("Field mail · "+(destination(chronicle)?.name??"Skyspire thanks you for your service."));return;}
     if(code==="Digit1"&&party.berries){const lead=party.team[0];party.berries--;lead.hp=Math.min(maxHp(lead),lead.hp+Math.ceil(35*(lead.affinity>=25?1.05:1)));lead.affinity=Math.min(100,lead.affinity+2);notify("Berry used · "+speciesOf(lead).name);return;}
     if(code==="KeyB"){
       if(!target){notify("No creature in scanner range");return;}
@@ -390,9 +407,9 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     exploration.x=p.x;exploration.z=p.z;
     const site=discover(exploration,p.y);
     if(site)notify("Discovered · "+site.name);
-    const destination=objective(journey);
-    const distance=destination?Math.round(Math.hypot(destination.x-p.x,destination.z-p.z)/5)*5:0;
-    const objectiveName=destination?destination.name+" · "+distance+" m":"Complete";
+    const storyPlace=destination(chronicle);
+    const distance=storyPlace?Math.round(Math.hypot(storyPlace.x-p.x,storyPlace.z-p.z)/5)*5:0;
+    const objectiveName=storyPlace?"Ch. "+chapter(chronicle).chapter+" · "+siteLabel(storyPlace.id,storyPlace.name)+" · "+distance+" m · "+chronicle.shards.length+"/4 Éclats":"Épilogue terminé";
     if(lastObjective!==objectiveName){lastObjective=objectiveName;questTrack.textContent=objectiveName;}
     const berryLabel="Berry ×"+party.berries;
     if(lastBerry!==berryLabel){lastBerry=berryLabel;berry.textContent=berryLabel;}
@@ -400,7 +417,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     if(lastHeading!==yaw){lastHeading=yaw;compass.style.transform="rotate("+(-yaw)+"rad)";}
     if(time>=mapNext){drawMinimap(p.x,p.z);mapCount.textContent=exploration.discovered.length+"/64";mapNext=time+.2;}
     if(nearby?.species.behavior==="aggressive" && nearby.sprite.position.distanceTo(p)<2.5)startBattle();
-    const placeName=nearest(p.x,p.z).name;
+    const placeName=p.x<30&&p.x>-120&&p.z>0&&p.z<140?"Verdant Cascade Valley":nearest(p.x,p.z).name;
     if(placeName!==placeLabel){placeLabel=placeName;info.textContent=placeName;}
     const timeLabel=String(Math.floor(hour)).padStart(2,"0")+":"+String(Math.floor(hour%1*60)).padStart(2,"0")+" · "+weather;
     if(timeLabel!==weatherLabel){weatherLabel=timeLabel;clock.textContent=timeLabel;}

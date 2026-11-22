@@ -32,4 +32,4 @@ Mesure de référence sur GitHub Actions, Chromium headless et rendu logiciel Sw
 
 M8 : résolution Auto adaptative, repères groupés, génération des chunks répartie entre images. En CI SwiftShader, 43,7 FPS en 16:9 et 57,6 FPS en portrait ; test de traversée réussi. [Build](https://github.com/Nic0BDX/JeuDev/actions/runs/45015954707) · [Parcours](https://github.com/Nic0BDX/JeuDev/actions/runs/45015954702).
 
-Narration : planche des six personnages intégrée. Rencontres et emplacements provisoires ; scénario et dialogues à renseigner à partir du PDF. Prologue vidéo reporté.
+Narration : six personnages et trame jouable en douze chapitres. Les mini-épreuves utilisent l’interface de dialogue et le Collecteur réemploie la simulation de combat. Les 14 cinématiques restent à produire.

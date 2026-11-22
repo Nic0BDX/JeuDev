@@ -45,7 +45,7 @@
       "x": 1134,
       "y": 91
     },
-    "location": "embercrest-village"
+    "location": "verdalia-habitat"
   },
   {
     "id": "maelys",
@@ -61,7 +61,7 @@
       "x": 127,
       "y": 585
     },
-    "location": "suncrest-village"
+    "location": "coralreach-village"
   },
   {
     "id": "vael",
@@ -77,7 +77,7 @@
       "x": 622,
       "y": 583
     },
-    "location": "frostveil-ruin"
+    "location": "embercrest-tower"
   },
   {
     "id": "watcher",
@@ -93,6 +93,6 @@
       "x": 1128,
       "y": 586
     },
-    "location": "celestial-ruin"
+    "location": "celestial-statue"
   }
 ]
