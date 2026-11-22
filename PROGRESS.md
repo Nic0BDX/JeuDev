@@ -27,3 +27,5 @@ M6 validé par [GitHub Actions](https://github.com/Nic0BDX/JeuDev/actions/runs/4
 M7 validé par [GitHub Actions](https://github.com/Nic0BDX/JeuDev/actions/runs/45014759166). [Sac photographié en jeu](https://github.com/Nic0BDX/JeuDev/actions/runs/45014759152).
 
 M8 : [build](https://github.com/Nic0BDX/JeuDev/actions/runs/45014907681) et [reprise après rechargement](https://github.com/Nic0BDX/JeuDev/actions/runs/45014907686) validés en Chromium. Mesure des FPS sur appareil réel à faire.
+
+Mesure de référence sur GitHub Actions, Chromium headless et rendu logiciel SwiftShader, à Skyspire City pendant cinq secondes. Format desktop 1440 × 810 : 11,9 FPS, p95 100,1 ms et 66 appels de rendu. Format mobile émulé 390 × 844, qualité Auto basse : 57 FPS, p95 16,8 ms et 35 appels. Le compteur `?performance=1` est prêt pour la mesure sur appareil réel. [Build](https://github.com/Nic0BDX/JeuDev/actions/runs/45015522037) · [Mesures CI](https://github.com/Nic0BDX/JeuDev/actions/runs/45015521989).
