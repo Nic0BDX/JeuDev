@@ -1,74 +1,59 @@
-/* Landscape framing follows the 1672 × 941 reference. */
-@media (min-width: 850px) and (min-aspect-ratio: 3/2) {
-  .illustrated-title {
-    --frame-width: min(100vw, calc(100svh * 1672 / 941));
-    --frame-height: calc(var(--frame-width) * 941 / 1672);
-    position: absolute;
-    inset: 50% auto auto 50%;
-    translate: -50% -50%;
-    width: var(--frame-width);
-    height: var(--frame-height);
-    margin: 0;
-    background: #092351 url("/assets/title-reference.png") center / 100% 100%;
+﻿.illustrated-title {
+  background: #143875 url("/title-landscape.png") left center / cover no-repeat;
+}
+@media (min-width:850px) and (min-aspect-ratio:3/2) {
+  .screen.illustrated-title {
+    position:absolute;
+    inset:0;
+    width:100%;
+    max-width:none;
+    min-height:100%;
+    margin:0;
+    display:grid;
+    grid-template-columns:minmax(40%,1fr) minmax(24rem,39%);
+    grid-template-rows:minmax(5rem, .8fr) auto minmax(2rem,.55fr);
+    align-content:center;
+    padding:clamp(2rem,5vw,6rem);
+    background-position:center;
   }
-
-  .illustrated-title header,
-  .illustrated-title nav button:not([data-page="characters"]) > * {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
+  .illustrated-title header {
+    grid-area:1 / 2;
+    align-self:end;
+    text-align:center;
+    margin-bottom:clamp(1rem,3vh,2.3rem);
   }
-
-  .illustrated-title nav button:not([data-page="characters"]) {
-    --x: 63.9%;
-    --w: 28%;
-    position: absolute;
-    left: var(--x);
-    top: var(--y);
-    width: var(--w);
-    height: var(--h, 7.5%);
-    min-height: 0;
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    color: transparent;
-    background: transparent;
-    box-shadow: none;
-    backdrop-filter: none;
-    clip-path: polygon(6% 0, 94% 0, 100% 50%, 94% 100%, 6% 100%, 0 50%);
+  .illustrated-title h1 {
+    font-size:clamp(3.75rem,7.2vw,9rem);
+    color:#fff9eb;
+    text-shadow:0 3px #243a7e,0 0 1.4rem #65dfff,0 .35rem 1.3rem #142b65;
   }
-
-  .illustrated-title nav button[data-page="new"] { --x: 60.5%; --w: 32.4%; --y: 31.6%; --h: 9.2%; }
-  .illustrated-title [data-page="continue"] { --y: 42.3%; }
-  .illustrated-title [data-page="codex"] { --y: 51.4%; }
-  .illustrated-title [data-page="map"] { --y: 60.4%; }
-  .illustrated-title [data-page="settings"] { --y: 69.5%; }
-  .screen.illustrated-title nav button:not([data-page="characters"])::before {
-    content: none;
+  .illustrated-title nav {
+    grid-area:2 / 2;
+    width:min(100%,30rem);
+    margin-inline:auto;
+    padding-inline:1.5rem;
+    filter:drop-shadow(0 .15rem .5rem #152c60aa);
   }
-  .screen.illustrated-title nav button:not([data-page="characters"]):is(:hover, :focus-visible, :first-child) {
-    color: transparent;
+  .illustrated-title nav button {
+    font-family:Cinzel,Georgia,serif;
+    font-size:clamp(1rem,1.57vw,1.48rem);
   }
-  .illustrated-title nav button:disabled { background: #07183170; opacity: 1; }
-  .illustrated-title nav button:not(:disabled):hover,
-  .illustrated-title nav button:focus-visible {
-    background: #97eaff2b;
-    box-shadow: inset 0 0 1.25rem #8beeff;
+  .illustrated-title nav button:first-child {
+    margin-inline:-.85rem;
+    min-height:clamp(3rem,8vh,4.7rem);
   }
-  .illustrated-title [data-page="characters"] {
-    position: absolute;
-    left: 2%;
-    bottom: 2%;
-    min-height: 2.75rem;
-    font-size: .9rem;
+  .illustrated-title nav button[data-page="characters"] {
+    justify-self:center;
+    width:min(100%,13rem);
+    min-height:2.75rem;
+    font:600 .88rem system-ui,sans-serif;
   }
 }
 
-@media (max-width: 580px) {
+@media (max-width:849px), (max-aspect-ratio:3/2) {
+  .screen.illustrated-title { background:none; }
   .landscape:has(+ .illustrated-title)::before {
-    background: url("/assets/title-reference.png") left center / auto 100% no-repeat;
-    animation: none;
+    background: url("/title-landscape.png") 25% center / cover no-repeat;
+    animation:none;
   }
 }

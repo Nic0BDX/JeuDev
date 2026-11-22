@@ -4,7 +4,7 @@ import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 type Height = (x: number, z: number) => number;
 type Part = { geometry: T.BufferGeometry; color: number };
 
-function painted(parts: Part[]) {
+export function painted(parts: Part[]) {
   for (const part of parts) {
     if (part.geometry.index) {
       const expanded = part.geometry.toNonIndexed();
@@ -52,9 +52,12 @@ function movingWater(width: number, height: number, waterfall: boolean) {
       "#include <color_fragment>", `#include <color_fragment>
       vec2 p = waterPosition.xy;
       ${waterfall ? `
-      float flow = sin(p.x * 7. + sin(p.y * .6 + clock * 3.) * .7);
-      float streak = pow(.5 + .5 * sin(p.y * 2.7 + clock * 11. + flow), 6.);
-      diffuseColor.rgb *= mix(vec3(.15,.65,.76), vec3(.83,.97,1.), .28 + .24 * flow + .42 * streak);
+      float channel = .50 + .28 * sin(p.x*11. + sin(p.x*5.)*2.) + .14*sin(p.x*27.);
+      float curtain = sin(p.x*3.7 + p.y*.2 + sin(p.y*.42+clock)*.36);
+      float streak = pow(.5+.5*sin(p.y*3.2 + clock*13. + channel*8.),5.);
+      float foam = 1.-smoothstep(-6.4,-4.7,p.y);
+      float white = clamp(channel*.54+curtain*.08+streak*.31+foam*.62,0.,1.);
+      diffuseColor.rgb *= mix(vec3(.035,.44,.63),vec3(.88,.99,1.),white);
       ` : `
       float fade = 1. - smoothstep(65., 175., waterDepth);
       float wave = sin(p.x * .56 + p.y * .28 + clock * 1.5)
@@ -91,6 +94,36 @@ export function mountValley(scene: T.Scene, ground: Height, sea: number, random:
     scene.add(rock);
   }
 
+  const terraces: Part[] = [];
+  for(let i=0;i<12;i++){
+    const x=-55+i*3.5,z=-44+Math.sin(i*1.2)*3;
+    const height=9+random(i,45)*7;
+    const base=ground(x,z)-2;
+    const stone=[0x7585a0,0x8b94ac,0x657a97][i%3];
+    terraces.push({geometry:new T.CylinderGeometry(2.2,3.2,height,6)
+      .scale(1,1,1.42).rotateY(random(i,46)*Math.PI).translate(x,base+height/2,z),color:stone});
+    terraces.push({geometry:new T.IcosahedronGeometry(1,1)
+      .scale(2.6,1.15,3.7).translate(x,base+height,z),color:i%3===0?0x9cab57:0x628f54});
+  }
+  const backdrop: Part[] = [];
+  for(let i=0;i<13;i++){
+    const x=(i-6)*66,z=-345-random(i,47)*115;
+    const height=24+random(i,48)*33;
+    const ridge=new T.IcosahedronGeometry(1,0).rotateY(random(i,49)*Math.PI);
+    const vertices=ridge.attributes.position;
+    for(let j=0;j<vertices.count;j++){
+      const y=vertices.getY(j);
+      const pointed=(y+.9)/1.8;
+      vertices.setX(j,vertices.getX(j)*(1-pointed*.53)+pointed*.33);
+      vertices.setY(j,y*(.88+random(i,j%3)*.18));
+    }
+    ridge.computeVertexNormals();
+    backdrop.push({geometry:ridge.scale(56,height,40).translate(x,height*.37,z),color:i%3===0?0x8c9bbd:0x6b8caa});
+  }
+  const scenery=new T.Mesh(painted([...terraces,...backdrop]),new T.MeshLambertMaterial({vertexColors:true,flatShading:true}));
+  scenery.name="Verdant escarpments and distant ridgeline";
+  scene.add(scenery);
+
   const stoneMaterial = new T.MeshLambertMaterial({color: 0xffffff, flatShading: true});
   const stones = new T.InstancedMesh(new T.CylinderGeometry(.9, 1, .18, 6), stoneMaterial, 148);
   const dummy = new T.Object3D();
@@ -98,7 +131,7 @@ export function mountValley(scene: T.Scene, ground: Height, sea: number, random:
   for (let i = 0; i < stones.count; i++) {
     const z = 19 - Math.floor(i / 4) * 2.05;
     const x = Math.sin((12 - z) / 22) * 5 + (i % 4 - 1.5) * 1.44;
-    dummy.position.set(x, ground(x,z) + .2, z);
+    dummy.position.set(x, ground(x,z) + .065, z);
     dummy.rotation.set((ground(x,z-1)-ground(x,z+1)) * .5, random(i,4) * 2, (ground(x+1,z)-ground(x-1,z)) * .5);
     dummy.scale.set(.84 + random(i,3)*.15, 1, .92 + random(i,2)*.22);
     dummy.updateMatrix();
@@ -130,6 +163,33 @@ export function mountValley(scene: T.Scene, ground: Height, sea: number, random:
   }
   flowers.name = "Verdant meadow";
   scene.add(flowers);
+
+  const positions: number[] = [];
+  for (const [x,z,bend,height] of [[-.18,0,-.2,.62],[.12,.09,.19,.82],[0,-.13,.03,.53]]) {
+    positions.push(x-.07,0,z, x+.07,0,z, x+bend,height,z+.04);
+  }
+  const blades = new T.BufferGeometry();
+  blades.setAttribute("position",new T.Float32BufferAttribute(positions,3));
+  blades.computeVertexNormals();
+  const tip = new T.Color(0xc6dc62);
+  const grass = new T.InstancedMesh(blades,new T.MeshLambertMaterial({side:T.DoubleSide}),1800);
+  let grassCount=0;
+  for (let i=0; i<grass.count; i++) {
+    const z=29-random(i,33)*110;
+    const path=Math.sin((12-z)/22)*5;
+    const x=path+(i%2===0?1:-1)*(3.2+random(i,34)**1.55*39);
+    const y=ground(x,z);
+    if (y<sea+.8) continue;
+    dummy.position.set(x,y-.07,z);
+    dummy.rotation.set(0,random(i,36)*Math.PI*2,0);
+    dummy.scale.set(.85,.48+random(i,35)*.85,.85);
+    dummy.updateMatrix();
+    grass.setMatrixAt(grassCount,dummy.matrix);
+    grass.setColorAt(grassCount++,stoneTint.set(0x356f32).lerp(tip,random(i,37)));
+  }
+  grass.count=grassCount;
+  grass.name="Trailside grass";
+  scene.add(grass);
 
   const castleParts: Part[] = [];
   const ivory = 0xe1d9cc, blue = 0x5f7bc0, gold = 0xffd17e;

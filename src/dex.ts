@@ -17,7 +17,7 @@ export function openDex(host:HTMLElement,party:Party|undefined,close:()=>void){
   const caught=(id:string)=>party?.caught.includes(id)??false;
   const typeColor=(type:string)=>types[type as keyof typeof types].color;
   function portrait(id:string,type:string){
-    return `<span class="portrait" style="--type:${typeColor(type)}"><span aria-hidden="true">${typeIcons[type]}</span><img src="/sprites/${id}.png" alt="" loading="lazy"></span>`;
+    return `<span class="portrait" style="--type:${typeColor(type)}"><span aria-hidden="true">${typeIcons[type]}</span><img src="/assets/reference-crops/creatures/${id}.webp" alt="" loading="lazy"></span>`;
   }
   function grid(){
     const rows=catalogue.filter(c=>(!filter||c.type===filter)&&c.name.toLowerCase().includes(query)&&(tab!==1||caught(c.id)));

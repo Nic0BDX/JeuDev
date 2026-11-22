@@ -29,7 +29,7 @@ function render() {
   const words = labels[settings.language === "fr" ? "fr" : "en"];
   document.documentElement.lang = settings.language === "fr" ? "fr" : "en";
   const active = buttons.indexOf(page);
-  const illustratedTitle = page === "title" && settings.language !== "fr";
+  const illustratedTitle = page === "title";
   app.innerHTML = `<div class="landscape" aria-hidden="true"></div>
     <section class="screen${illustratedTitle ? " illustrated-title" : ""}">
       <header><div class="crest" aria-hidden="true">✧</div><h1>${GAME_NAME}</h1></header>
