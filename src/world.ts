@@ -1,5 +1,6 @@
 import * as T from "three";
 import regions from "./data/regions.json";
+import { wildlife } from "./wildlife";
 
 const SIZE = 96;
 const SEA = -6;
@@ -56,6 +57,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   const actor = new T.Mesh(new T.CapsuleGeometry(.43,1.02,4,8),new T.MeshLambertMaterial({color:0x5e399f}));
   actor.position.set(0,terrain(0,0)+1,12);
   scene.add(actor);
+  const fauna=wildlife(scene,nearest,surface,sample);
 
   const material = new T.MeshLambertMaterial({vertexColors:true,flatShading:true});
   const leaves = new T.ConeGeometry(1,3,5);
@@ -198,7 +200,8 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     sun.intensity=day*2;
     const chunk=Math.floor(p.x/SIZE)+","+Math.floor(p.z/SIZE);
     if(chunk!==lastChunk){lastChunk=chunk;stream();}
-    info.textContent=nearest(p.x,p.z).name;
+    const nearby=fauna.update(p,dt,time,hour,weather);
+    info.textContent=nearest(p.x,p.z).name+(nearby?' · '+nearby.species.name+' Lv.'+nearby.level:'');
     clock.textContent=String(Math.floor(hour)).padStart(2,"0")+":"+String(Math.floor(hour%1*60)).padStart(2,"0")+" · "+weather;
     energyBar.value=energy;
     renderer.render(scene,camera);
@@ -208,6 +211,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   const dispose=()=>{
     cancelAnimationFrame(raf);
     listeners.abort();
+    fauna.dispose();
     scene.traverse(node=>{if(node instanceof T.Mesh){node.geometry.dispose();const mats=Array.isArray(node.material)?node.material:[node.material];mats.forEach(mat=>mat.dispose());}});
     renderer.dispose();
   };
