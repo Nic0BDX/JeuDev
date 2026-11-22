@@ -25,3 +25,5 @@ M5 validé par [GitHub Actions](https://github.com/Nic0BDX/JeuDev/actions/runs/4
 M6 validé par [GitHub Actions](https://github.com/Nic0BDX/JeuDev/actions/runs/45014628519). [Carte](https://github.com/Nic0BDX/JeuDev/actions/runs/45014409308) et [minimap](https://github.com/Nic0BDX/JeuDev/actions/runs/45014628543) vérifiées en Chromium.
 
 M7 validé par [GitHub Actions](https://github.com/Nic0BDX/JeuDev/actions/runs/45014759166). [Sac photographié en jeu](https://github.com/Nic0BDX/JeuDev/actions/runs/45014759152).
+
+M8 : [build](https://github.com/Nic0BDX/JeuDev/actions/runs/45014907681) et [reprise après rechargement](https://github.com/Nic0BDX/JeuDev/actions/runs/45014907686) validés en Chromium. Mesure des FPS sur appareil réel à faire.

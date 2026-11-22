@@ -15,7 +15,7 @@ jobs:
       - run: npm install
       - run: npm install --no-save --package-lock=false playwright
       - run: npx playwright install --with-deps chromium
-      - name: Capture and verify save reload
+      - name: Capture each screen and verify save reload
         run: |
           npm run dev -- --host 127.0.0.1 > /tmp/aetheris-vite.log 2>&1 &
           for attempt in {1..30}; do
@@ -31,9 +31,41 @@ jobs:
               const page = await browser.newPage({viewport: {width, height}, isMobile: name === 'mobile', hasTouch: name === 'mobile', reducedMotion: 'reduce'});
               await page.goto('http://127.0.0.1:5173/');
               await page.getByRole('heading', {name: 'Aetheris'}).waitFor();
+              await page.evaluate(() => document.fonts.ready);
+              const capture = async (screen, preview = false) => {
+                await page.screenshot({path: 'captures/' + screen + '-' + name + '.png'});
+                if (!preview) return;
+                const cdp = await page.context().newCDPSession(page);
+                const shot = await cdp.send('Page.captureScreenshot', {format: 'jpeg', quality: 48, clip: {x: 0, y: 0, width, height, scale: .45}});
+                for (const [i, chunk] of shot.data.match(/.{1,5000}/g).entries()) console.log('AETHERIS_' + screen + '_' + name + '_' + i + ' ' + chunk);
+                await cdp.detach();
+              };
+              await capture('title', true);
+              await page.getByRole('button', {name: 'Creature Codex'}).click();
+              await page.locator('.species-detail').getByRole('heading', {name: 'Florix'}).waitFor();
+              await capture('dex');
+              await page.getByRole('button', {name: 'Species Compendium'}).click();
+              await page.getByRole('heading', {name: 'Grand Species Compendium'}).waitFor();
+              if (await page.locator('.poster-type').count() !== 9) throw new Error('Expected nine type rows');
+              await capture('compendium');
+              await page.getByRole('button', {name: 'Close'}).click();
+              await page.getByRole('button', {name: 'World Map'}).click();
+              await page.locator('.world-atlas').getByText('0/64 discovered · 0%').waitFor();
+              if (await page.locator('.map-marker').count() !== 64) throw new Error('Expected 64 locations');
+              await capture('map');
+              await page.getByRole('button', {name: 'Close'}).click();
+              await page.getByRole('button', {name: 'Settings'}).click();
+              await page.getByRole('heading', {name: 'Settings'}).waitFor();
+              await capture('settings', true);
+              await page.getByRole('button', {name: 'Back'}).click();
               await page.getByRole('button', {name: 'New Adventure'}).click();
               await page.locator('.world canvas').waitFor();
               await page.locator('.quest-track').getByText('The Call of Skyspire').waitFor();
+              await capture('hud', true);
+              await page.getByRole('button', {name: 'Bag', exact: true}).click();
+              await page.getByText('Field Bag · 120 coins').waitFor();
+              await capture('bag');
+              await page.locator('[data-bag="close"]').click();
               await page.getByRole('button', {name: 'Save game'}).click();
               await page.getByText('Adventure saved.').waitFor();
               const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('aetheris.save')));
@@ -43,12 +75,7 @@ jobs:
               await page.locator('.world canvas').waitFor();
               const resumed = await page.evaluate(() => JSON.parse(localStorage.getItem('aetheris.save')));
               if (JSON.stringify(resumed.position) !== JSON.stringify(saved.position)) throw new Error('Resume changed position');
-              await page.locator('.team-hud').getByText('Party · 3/6').waitFor();
-              await page.evaluate(() => document.fonts.ready);
-              await page.screenshot({path: 'captures/continue-' + name + '.png'});
-              const cdp = await page.context().newCDPSession(page);
-              const preview = await cdp.send('Page.captureScreenshot', {format: 'jpeg', quality: 48, clip: {x: 0, y: 0, width, height, scale: .45}});
-              for (const [i, chunk] of preview.data.match(/.{1,5000}/g).entries()) console.log('AETHERIS_' + name + '_' + i + ' ' + chunk);
+              await capture('continue');
               await page.close();
             }
           } finally {
@@ -57,6 +84,6 @@ jobs:
           JS
       - uses: actions/upload-artifact@v4
         with:
-          name: aetheris-continue
+          name: aetheris-visual-review
           path: captures/
           if-no-files-found: error

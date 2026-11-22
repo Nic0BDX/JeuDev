@@ -57,3 +57,7 @@
 @media(max-width:540px){.quest-track{right:.55rem;top:11rem;max-width:47vw;font-size:.8rem;padding:.4rem .5rem}}
 
 .energy-hud{display:grid;gap:.12rem}.energy-hud label{display:flex;margin:0;gap:.35rem;font-size:.78rem;line-height:1.1}.energy-hud label span{width:.9rem;text-align:center}.energy-hud .player-hp{accent-color:#82c46a}.energy-hud .player-energy{accent-color:#79e9ff}
+
+.landscape::before{animation:title-landscape-drift 26s ease-in-out infinite alternate}
+@keyframes title-landscape-drift{from{transform:scale(1)}to{transform:scale(1.035) translateX(.35vw)}}
+@media(pointer:coarse){.quick-items{bottom:13.4rem}}
