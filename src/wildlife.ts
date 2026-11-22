@@ -1,4 +1,5 @@
 import * as T from "three";
+import { creatureGeometry } from "./creature-art";
 import species from "./data/creatures.json";
 import types from "./data/types.json";
 
@@ -6,43 +7,24 @@ const weatherType: Record<string,string> = {Rain:"Water",Storm:"Wind",Snow:"Crys
 
 type Species = typeof species[number];
 type Biome = { id:string };
-type Wild = { species:Species; sprite:T.Sprite; origin:T.Vector3; level:number };
-const sprites = new Map<string,T.SpriteMaterial>();
-function spriteMaterial(creature:Species) {
-  const old = sprites.get(creature.id);
-  if(old) return old;
-  const canvas=document.createElement("canvas");
-  canvas.width=128;canvas.height=128;
-  const g=canvas.getContext("2d")!;
-  const color=types[creature.type as keyof typeof types].color;
-  const index=creature.no % 4;
-  g.strokeStyle="#182946";g.lineWidth=5;g.lineJoin="round";
-  g.fillStyle=color;
-  g.beginPath();
-  g.moveTo(24,67);g.lineTo(18+index*4,17);g.lineTo(51,44);g.lineTo(77,44);g.lineTo(106-index*4,17);g.lineTo(104,67);
-  g.quadraticCurveTo(130,109,86,115);g.quadraticCurveTo(64,124,40,115);g.quadraticCurveTo(0,109,24,67);
-  g.closePath();g.fill();g.stroke();
-  g.fillStyle="#fff4df";
-  g.beginPath();g.ellipse(64,96,24,17,0,0,Math.PI*2);g.fill();
-  for(const x of [45,83]){
-    g.fillStyle="#17233e";g.beginPath();g.ellipse(x,75,7,11,0,0,Math.PI*2);g.fill();
-    g.fillStyle="white";g.beginPath();g.arc(x-2,72,2.5,0,Math.PI*2);g.fill();
-  }
-  g.fillStyle="#ca5765";g.beginPath();g.arc(64,91,7,0,Math.PI);g.fill();
-  const texture=new T.CanvasTexture(canvas);texture.colorSpace=T.SRGBColorSpace;
-  const material=new T.SpriteMaterial({map:texture,alphaTest:.12});
-  sprites.set(creature.id,material);
-  new T.TextureLoader().load("/"+"sprites/"+creature.id+".png",map=>{
-    map.colorSpace=T.SRGBColorSpace;material.map?.dispose();material.map=map;material.needsUpdate=true;
-  },undefined,()=>{});
-  return material;
-}
+type Wild = { species:Species; sprite:T.Mesh; origin:T.Vector3; level:number };
 
 export function wildlife(scene:T.Scene, regionAt:(x:number,z:number)=>Biome, floor:(x:number,z:number,y:number)=>number, random:(x:number,z:number)=>number) {
   const wild = new Map<string,Wild[]>();
+  const models = new Map<string,T.BufferGeometry>();
+  const material = new T.MeshLambertMaterial({vertexColors:true});
+  function geometry(creature:Species) {
+    let model=models.get(creature.id);
+    if(!model){
+      const tint=types[creature.type as keyof typeof types].color;
+      model=creatureGeometry(creature.id,creature.type,new T.Color(tint).getHex());
+      models.set(creature.id,model);
+    }
+    return model;
+  }
   const size=48;
-  const companion=new T.Sprite(spriteMaterial(species[0]));
-  companion.scale.set(2.5,2.5,1);
+  const companion=new T.Mesh(geometry(species[0]),material);
+  companion.scale.setScalar(1.05);
   scene.add(companion);
   let initialized=false;
   return {
@@ -59,8 +41,8 @@ export function wildlife(scene:T.Scene, regionAt:(x:number,z:number)=>Biome, flo
         const group=Array.from({length:2},(_,i)=>{
           const wx=(x+.2+random(x+i,z)*.6)*size,wz=(z+.2+random(x,z+i+1)*.6)*size;
           const creature=available[Math.floor(random(x*5+i,z*13)*available.length)]??species[0];
-          const sprite=new T.Sprite(spriteMaterial(creature));
-          sprite.scale.set(3,3,1);
+          const sprite=new T.Mesh(geometry(creature),material);
+          sprite.rotation.y=(random(wx,wz)-.5)*1.6;
           const origin=new T.Vector3(wx,floor(wx,wz,p.y)+1.25,wz);
           sprite.position.copy(origin);
           scene.add(sprite);
@@ -100,8 +82,8 @@ export function wildlife(scene:T.Scene, regionAt:(x:number,z:number)=>Biome, flo
       return closest;
     },
     showCompanion(visible:boolean){companion.visible=visible;},
-    setCompanion(creature:Species){companion.material=spriteMaterial(creature);},
+    setCompanion(creature:Species){companion.geometry=geometry(creature);},
     remove(target:Wild){for(const group of wild.values()){const index=group.indexOf(target);if(index>=0){scene.remove(target.sprite);group.splice(index,1);break;}}},
-    dispose(){for(const material of sprites.values()){material.map?.dispose();material.dispose();}sprites.clear();}
+    dispose(){scene.remove(companion);for(const group of wild.values())group.forEach(creature=>scene.remove(creature.sprite));models.forEach(model=>model.dispose());material.dispose();}
   };
 }

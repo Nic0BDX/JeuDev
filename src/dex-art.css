@@ -1,0 +1,149 @@
+.creature-dex.compendium .poster-heading,
+.creature-dex.compendium .poster {
+  width: min(100%, 66rem);
+  margin-inline: auto;
+}
+.creature-dex .poster-type .type-emblem {
+  width: clamp(1.5rem, 3vw, 2.2rem);
+  border-radius: .3rem;
+}
+.creature-dex .poster-type .poster-art {
+  width: 100%;
+  min-height: 0;
+  aspect-ratio: 1.65;
+}
+.creature-dex .poster-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: .45rem .45rem 0 0;
+}
+.creature-dex .poster-type .poster-name {
+  margin-top: -.25rem;
+  z-index: 1;
+  color: #fff;
+  border-color: color-mix(in srgb, var(--type) 65%, #d5efff);
+  font-family: Georgia, serif;
+}
+.creature-dex .poster-type button:hover,
+.creature-dex .poster-type button:focus-visible {
+  outline: 2px solid var(--type);
+  outline-offset: 1px;
+}
+@media (max-width: 620px) {
+  .creature-dex .poster-type button {
+    min-height: 44px;
+  }
+}
+
+.creature-dex .dex-catalogue {
+  display: grid;
+  grid-template-columns: minmax(6.5rem, .8fr) minmax(0, 1.2fr);
+  gap: .45rem;
+}
+.creature-dex .dex-categories {
+  display: grid;
+  align-content: start;
+  gap: .3rem;
+}
+.creature-dex .dex-categories button {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  min-width: 0;
+  padding: .3rem .45rem;
+  font-size: clamp(.65rem, 1vw, .95rem);
+  text-align: left;
+}
+.dex-categories img { width: 1.05rem; border-radius: .2rem; }
+.dex-categories b { margin-left: auto; color: #e3f3ff; }
+.creature-dex .dex-catalogue .species-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-height: 58svh;
+  overflow-y: auto;
+  padding: .18rem;
+}
+.creature-dex .dex-catalogue .species-grid button {
+  min-width: 0;
+  padding: .2rem;
+  font-size: clamp(.58rem, .95vw, .95rem);
+  overflow-wrap: anywhere;
+}
+.dex-card-art,
+.dex-carousel img {
+  width: 100%;
+  aspect-ratio: 1.15;
+  object-fit: cover;
+  border-radius: .25rem;
+}
+.dex-carousel {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+  gap: .35rem;
+}
+.creature-dex .dex-carousel button {
+  min-width: 0;
+  padding: .2rem;
+  font: 600 clamp(.62rem, 1.2vw, 1rem) Georgia, serif;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 920px) {
+  .creature-dex:not(.compendium) .atlas-body.dex-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .creature-dex .dex-catalogue .species-grid { max-height: 20rem; }
+  .creature-dex .dex-hero { min-height: 0; }
+  .creature-dex .dex-hero .portrait { width: min(68%, 13rem); }
+  .creature-dex .dex-carousel { max-width: 20rem; }
+}
+
+@media (max-width: 850px) {
+  .creature-dex:not(.compendium) .dex-layout .species-detail {
+    grid-area: auto;
+  }
+  .creature-dex:not(.compendium) .dex-catalogue .species-grid {
+    grid-area: auto;
+  }
+}
+@media (max-width: 620px) {
+  .creature-dex .dex-catalogue { grid-template-columns: minmax(0, 1fr); }
+  .creature-dex .dex-categories {
+    display: flex;
+    overflow-x: auto;
+    padding: .2rem .15rem .4rem;
+  }
+  .creature-dex .dex-categories button {
+    flex: 0 0 auto;
+    min-height: 44px;
+    font-size: .78rem;
+    white-space: nowrap;
+  }
+}
+
+.creature-dex .dex-catalogue .species-grid {
+  align-content:start;
+  grid-auto-rows:max-content;
+  scrollbar-color:#79cfff #122e57;
+}
+.creature-dex .dex-catalogue .species-grid button {
+  display:grid;
+  grid-template-rows:auto auto auto;
+  align-content:start;
+  gap:.13rem;
+  padding:.23rem .23rem .38rem;
+}
+.creature-dex .dex-catalogue .species-grid button[aria-pressed="true"] {
+  border-color:#ffdb8a;
+  box-shadow:inset 0 0 .55rem #fed68f70;
+}
+.creature-dex .dex-hero .portrait {
+  overflow:hidden;
+  border-radius:1.3rem;
+  background:radial-gradient(ellipse,#80c57385,transparent 73%);
+}
+.creature-dex .dex-hero .portrait img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}

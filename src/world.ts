@@ -1,4 +1,11 @@
 import * as T from "three";
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+import { canopyGeometry, mountValley } from "./valley-art";
+import { mountSky } from "./sky-art";
+import { makeHero } from "./hero-art";
 import regions from "./data/regions.json";
 import { wildlife } from "./wildlife";
 import { characterAt, openCharacters } from "./characters";
@@ -41,30 +48,50 @@ function surface(x: number, z: number, y: number) {
 export function explore(host: HTMLElement, settings: {quality:string;sensitivity:number;volume:number;language:string}, exit:()=>void, resume?:Save) {
   const low = settings.quality === "low" || (settings.quality === "auto" && matchMedia("(pointer:coarse)").matches);
   const adaptive = settings.quality === "auto";
+  const high = settings.quality === "high";
   const renderer = new T.WebGLRenderer({antialias:settings.quality==="high", powerPreference:low?"default":"high-performance"});
   let renderScale=adaptive ? (low ? .95 : .85) : 1;
+  renderer.toneMapping = T.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.12;
   const scene = new T.Scene();
   const sky = new T.Color();
   const clearSky = new T.Color(0x80c8f7);
   const overcastSky = new T.Color(0x9eafc7);
   const fog = new T.FogExp2(0x8bc8eb,.0024);
-  scene.background = sky;
+  const updateSky = mountSky(scene);
   scene.fog = fog;
-  const camera = new T.PerspectiveCamera(62,1,.2,1850);
+  const camera = new T.PerspectiveCamera(innerWidth < innerHeight ? 75 : 62,1,.2,1850);
   const light = new T.HemisphereLight(0xe0f8ff,0x708b59,2);
+  const sunOffset = new T.Vector3(-32,64,-22);
   const sun = new T.DirectionalLight(0xffe2b2,2);
   sun.position.set(80,120,40);
-  scene.add(light,sun);
-  const planet = new T.Mesh(new T.SphereGeometry(135,24,16),new T.MeshBasicMaterial({color:0xc3deff,fog:false}));
+  scene.add(light,sun,sun.target);
+  renderer.info.autoReset=!high;
+  renderer.shadowMap.enabled=high;
+  renderer.shadowMap.type=T.PCFSoftShadowMap;
+  sun.castShadow=high;
+  sun.shadow.mapSize.set(1024,1024);
+  sun.shadow.camera.left=sun.shadow.camera.bottom=-33;
+  sun.shadow.camera.right=sun.shadow.camera.top=33;
+  sun.shadow.camera.near=1;
+  sun.shadow.camera.far=115;
+  sun.shadow.camera.updateProjectionMatrix();
+  sun.shadow.normalBias=.075;
+  const composer=high?new EffectComposer(renderer):null;
+  const bloom=high?new UnrealBloomPass(new T.Vector2(1,1),.14,.38,1.03):null;
+  const output=high?new OutputPass():null;
+  if(composer&&bloom&&output){
+    composer.addPass(new RenderPass(scene,camera));
+    composer.addPass(bloom);
+    composer.addPass(output);
+  }
+  const planet = new T.Mesh(new T.SphereGeometry(98,32,20),new T.MeshBasicMaterial({color:0xc3deff,fog:false}));
   scene.add(planet);
-  const water = new T.Mesh(new T.PlaneGeometry(14000,14000),new T.MeshLambertMaterial({color:0x37a8cf}));
-  water.rotation.x = -Math.PI/2;
-  water.position.y = SEA;
-  scene.add(water);
+  const updateValleyArt = mountValley(scene, terrain, SEA, sample);
   const island = new T.Mesh(new T.CylinderGeometry(155,22,42,16),new T.MeshLambertMaterial({color:0x826fba}));
   island.position.set(0,70,-750);
   scene.add(island);
-  const marker = new T.CylinderGeometry(.35,1.5,8,5);
+  const marker = new T.OctahedronGeometry(1).scale(.72,1.55,.72);
   const crystal = new T.MeshLambertMaterial({color:0xbcf3ff,emissive:0x27608b,flatShading:true});
   const landmarkTransform = new T.Object3D();
   for(const region of regions){
@@ -72,7 +99,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     const landmarks = new T.InstancedMesh(marker, crystal, sites.length);
     sites.forEach((place,index)=>{
       landmarkTransform.scale.setScalar(place.kind==="statue"?1.5:.75);
-      landmarkTransform.position.set(place.x,(place.y??terrain(place.x,place.z))+3,place.z);
+      landmarkTransform.position.set(place.x,(place.y??terrain(place.x,place.z))+1.8,place.z);
       landmarkTransform.updateMatrix();
       landmarks.setMatrixAt(index,landmarkTransform.matrix);
     });
@@ -92,23 +119,9 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   const embercrest=regions.find(region=>region.id==="embercrest")!;
   const forgePlace=(kind:string)=>embercrest.locations.find(place=>place.kind===kind)!;
   const showForgeState=mountForge(scene,{entrance:forgePlace("cave"),vent:forgePlace("resource"),shelter:forgePlace("habitat")},(x,z)=>surface(x,z,0));
-  const actor = new T.Group();
-  const addPart=(geometry:T.BufferGeometry,color:number,x:number,y:number,z:number)=>{
-    const mesh=new T.Mesh(geometry,new T.MeshLambertMaterial({color,flatShading:true}));
-    mesh.position.set(x,y,z);
-    actor.add(mesh);
-    return mesh;
-  };
-  addPart(new T.SphereGeometry(.32,10,7),0xe4af88,0,.72,0);
-  addPart(new T.SphereGeometry(.34,9,6),0x3b2a44,0,.85,.04).scale.y=.68;
-  addPart(new T.CylinderGeometry(.34,.43,.74,8),0x294f9a,0,.16,0);
-  addPart(new T.CylinderGeometry(.35,.37,.14,8),0xe4bf73,0,.48,0);
-  addPart(new T.BoxGeometry(.46,.48,.2),0x62473d,.06,.14,.38);
-  for(const side of [-1,1]){
-    addPart(new T.CylinderGeometry(.12,.13,.51,7),0x1f2d52,side*.18,-.48,0);
-    addPart(new T.BoxGeometry(.26,.22,.36),0x392d42,side*.18,-.78,-.06);
-  }
+  const {actor,animate:animateHero} = makeHero();
   actor.position.set(0,terrain(0,0)+1,12);
+  actor.traverse(node=>{if(node instanceof T.Mesh)node.castShadow=high;});
   scene.add(actor);
   const fauna=wildlife(scene,nearest,surface,sample);
   if(resume)actor.position.fromArray(resume.position);
@@ -127,9 +140,9 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   let fighting=false,overlay=false,lastBattle=0;
   let target:ReturnType<typeof fauna.update>;
 
-  const material = new T.MeshLambertMaterial({vertexColors:true,flatShading:true});
-  const leaves = new T.ConeGeometry(1,3,5);
-  const leafMaterial = new T.MeshLambertMaterial({color:0xffffff,flatShading:true});
+  const material = new T.MeshLambertMaterial({vertexColors:true});
+  const leaves = canopyGeometry();
+  const leafMaterial = new T.MeshLambertMaterial({vertexColors:true});
   const chunks = new Map<string,{mesh:T.Mesh;trees:T.InstancedMesh}>();
   const dummy = new T.Object3D();
   let pendingChunks: Array<{gx:number;gz:number;segments:number;id:string}> = [];
@@ -141,7 +154,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     pendingChunks=[];
     for(let z=-radius;z<=radius;z++) for(let x=-radius;x<=radius;x++){
       const gx=cx+x,gz=cz+z;
-      const segments=Math.max(Math.abs(x),Math.abs(z))<=1?16:8;
+      const segments=Math.max(Math.abs(x),Math.abs(z))<=1?32:8;
       const id = [gx,gz,segments].join(",");
       active.add(id);
       if(!chunks.has(id))pendingChunks.push({gx,gz,segments,id});
@@ -162,23 +175,31 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
       for(let i=0;i<pos.count;i++){
         const wx=pos.getX(i),wz=pos.getZ(i),height=terrain(wx,wz);
         pos.setY(i,height);
-        const c=new T.Color(nearest(wx,wz).color).multiplyScalar(.86+.23*sample(wx,wz));
+        const c=new T.Color(nearest(wx,wz).color);
+        const grass=c.clone().lerp(new T.Color(0x95ba57),.36);
+        const bank=clamp(1-(height-SEA)/2.4,0,1);
+        const stone=clamp((height-terrain(wx+2,wz+2))*.56,0,.7);
+        c.copy(grass).lerp(new T.Color(0xafa180),bank).lerp(new T.Color(0x83899a),stone);
+        c.multiplyScalar(.82+.25*sample(Math.floor(wx/11),Math.floor(wz/11)));
         colors.push(c.r,c.g,c.b);
       }
       geometry.setAttribute("color",new T.Float32BufferAttribute(colors,3));
       geometry.computeVertexNormals();
       const mesh=new T.Mesh(geometry,material);
-      const trees=new T.InstancedMesh(leaves,leafMaterial,low?10:22);
+      const trees=new T.InstancedMesh(leaves,leafMaterial,low?16:31);
       for(let i=0;i<trees.count;i++){
         const wx=(gx+sample(gx*31+i,gz))*SIZE,wz=(gz+sample(gx,gz*31+i))*SIZE;
         const h=terrain(wx,wz),size=1.2+sample(wx,wz)*2.8;
-        dummy.position.set(wx,h+size,wz);
-        dummy.scale.setScalar(h>SEA+1?size:0);
+        dummy.position.set(wx,h,wz);
+        const pathClear=Math.abs(wx-Math.sin((12-wz)/22)*5)>10 || wz < -58 || wz > 35;
+        dummy.scale.setScalar(h>SEA+1 && pathClear ? size : 0);
         dummy.rotation.y=i;
         dummy.updateMatrix();
         trees.setMatrixAt(i,dummy.matrix);
-        trees.setColorAt(i,new T.Color(nearest(wx,wz).color).multiplyScalar(.65));
+        trees.setColorAt(i,new T.Color(0xffffff).lerp(new T.Color(nearest(wx,wz).color),.28));
       }
+      mesh.receiveShadow=high;
+      trees.castShadow=high;
       scene.add(mesh,trees);
       chunks.set(id,{mesh,trees});
     }
@@ -189,16 +210,18 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   <button class="minimap" aria-label="Open world map" data-key="KeyM"><canvas width="96" height="96" aria-hidden="true"></canvas><b>N</b><span>▲</span><small></small></button><div class="minimap-zoom"><button data-key="Equal" aria-label="Minimap zoom in">+</button><button data-key="Minus" aria-label="Minimap zoom out">−</button></div>
   <div class="discovery-note" aria-live="polite"></div><aside class="quest-track"><strong>The Call of Skyspire</strong><small></small></aside><div class="quick-items"><button data-key="KeyI" aria-label="Bag">Bag</button><button data-key="Digit1" aria-label="Use berry">Berry</button><button data-key="KeyL" aria-label="Field mail">✉</button><button data-key="KeyP" aria-label="Save game">Save</button></div>
   <section class="team-hud" aria-label="Party"><strong></strong><div class="team-slots"></div></section>
-  <div class="energy-hud"><label><span>♥</span><progress class="player-hp" max="100" value="100" aria-label="Player health"></progress></label><label><span>⚡</span><progress class="player-energy" max="100" value="100" aria-label="Energy"></progress></label></div>
+  <div class="energy-hud"><label><span>♥</span><progress class="player-hp" max="100" value="100" aria-label="Player health"></progress><output class="hp-value">100 / 100</output></label><label><span>⚡</span><progress class="player-energy" max="100" value="100" aria-label="Energy"></progress><output class="energy-value">100 / 100</output></label></div>
   <div class="stick" aria-label="Move"><i></i></div>
-  <div class="world-shortcuts"><button data-key="Tab" aria-label="Creature Dex">◇</button><button data-key="KeyB" aria-label="Scan">⌕</button></div>
-  <div class="world-actions"><button data-key="KeyR" aria-label="Recenter camera">⌖</button><button data-key="Space" aria-label="Jump or glide">⛯</button><button class="interact" data-key="KeyE" aria-label="Interact"><span>✧</span>Interact</button><button data-key="ShiftLeft" aria-label="Sprint">⇧</button></div>`;
+  <div class="world-shortcuts"><button data-key="Tab" aria-label="Creature Dex">◇</button><button data-key="KeyB" aria-label="Binoculars"><img class="hud-action-art" src="/assets/reference-crops/hud/binoculars.webp" alt=""></button></div>
+  <div class="world-actions"><button data-key="KeyR" aria-label="Recenter camera"><img class="hud-action-art" src="/assets/reference-crops/hud/target.webp" alt=""></button><button data-key="Space" aria-label="Jump or glide"><img class="hud-action-art" src="/assets/reference-crops/hud/ability.webp" alt=""></button><button class="interact" data-key="KeyE" aria-label="Interact"><img class="hud-action-art" src="/assets/reference-crops/hud/interact.webp" alt="">Interact</button><button data-key="ShiftLeft" aria-label="Sprint"><img class="hud-action-art" src="/assets/reference-crops/hud/sprint.webp" alt=""></button></div>`;
   const viewport=host.querySelector(".world")!;
   viewport.append(renderer.domElement);
   const info=host.querySelector(".world-info strong")!;
   const clock=host.querySelector(".world-info small")!;
   const energyBar=host.querySelector<HTMLProgressElement>(".player-energy")!;
   const healthBar=host.querySelector<HTMLProgressElement>(".player-hp")!;
+  const hpValue=host.querySelector(".hp-value")!;
+  const energyValue=host.querySelector(".energy-value")!;
   const discoveryNote=host.querySelector(".discovery-note")!;
   const compass=host.querySelector<HTMLElement>(".minimap span")!;
   const mapCount=host.querySelector(".minimap small")!;
@@ -263,7 +286,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   let yaw=resume?.yaw??0,pitch=resume?.pitch??.32,vertical=resume?.vertical??0,energy=resume?.energy??100,time=resume?.time??0,jump=false,glide=resume?.glide??false,raf=0;
   let nextSave=time+8;
   let playerHp=resume?.hp??100;
-  healthBar.value=playerHp;
+  healthBar.value=playerHp; hpValue.textContent=healthBar.value+" / "+healthBar.max;
   const stopSound=ambience(settings.volume);
   function save(){
     if(fighting)return false;
@@ -366,7 +389,10 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   function resize() {
     renderer.setPixelRatio(Math.min(devicePixelRatio,low?1.25:1.8)*renderScale);
     renderer.setSize(viewport.clientWidth,viewport.clientHeight);
+    composer?.setPixelRatio(renderer.getPixelRatio());
+    composer?.setSize(viewport.clientWidth,viewport.clientHeight);
     camera.aspect=viewport.clientWidth/Math.max(1,viewport.clientHeight);
+    camera.fov=camera.aspect<1?75:62;
     camera.updateProjectionMatrix();
   }
   window.addEventListener("resize",resize,options);
@@ -428,7 +454,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
       p.y=nextFloor;
       if(vertical<-28&&!swim){playerHp=clamp(playerHp+Math.round((vertical+26)*2),0,100);notify("Hard landing");}
       if(playerHp<=0){p.set(0,surface(0,12,0)+1,12);playerHp=100;notify("Recovered at Skyspire City");}
-      healthBar.value=playerHp;
+      healthBar.value=playerHp; hpValue.textContent=healthBar.value+" / "+healthBar.max;
       vertical=0;
     }
     focus.copy(p).y+=1;
@@ -436,15 +462,20 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     camera.position.copy(focus).add(offset);
     camera.position.y=Math.max(camera.position.y,terrain(camera.position.x,camera.position.z)+1);
     camera.lookAt(focus);
-    planet.position.set(p.x-310,235,p.z-780);
+    planet.position.set(p.x-400,345,p.z-920);
     const hour=(8+time*.06)%24;
     const day=clamp(.4+.75*Math.cos((hour-12)*Math.PI/12),0,1);
     const weather=["Clear","Rain","Storm","Snow","Fog"][Math.floor(time/75)%5];
     sky.set(0x15214e).lerp(weather==="Clear"?clearSky:overcastSky,day);
     fog.color.copy(sky);
+    updateSky(camera,sky,day,weather==="Clear",time);
     fog.density=weather==="Fog"?.008:weather==="Storm"?.004:.0024;
     light.intensity=.55+day*1.45;
     sun.intensity=day*2;
+    if(high){
+      sun.target.position.set(Math.round(p.x/2)*2,Math.round(p.y),Math.round(p.z/2)*2);
+      sun.position.copy(sun.target.position).add(sunOffset);
+    }
     const chunk=Math.floor(p.x/SIZE)+","+Math.floor(p.z/SIZE);
     if(chunk!==lastChunk){lastChunk=chunk;stream();fillChunks(1);}
     if(pendingChunks.length)fillChunks(low?2:3);
@@ -481,12 +512,15 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
         const member=party.team[index];
         if(!member)return '<span class="team-empty" aria-label="Empty party slot">+</span>';
         const c=speciesOf(member);
-        return `<span class="team-member" title="${c.name}"><span class="team-portrait">${c.id==="florix"?'<img src="/sprites/florix.png" alt="Florix">':c.name.slice(0,2)}</span><small>Lv.${member.level}</small><progress value="${member.hp}" max="${maxHp(member)}" aria-label="${c.name} HP"></progress></span>`;
+        return `<span class="team-member" title="${c.name}"><span class="team-portrait"><img src="/assets/reference-crops/creatures/${c.id}.webp" alt=""></span><small>Lv.${member.level}</small><progress value="${member.hp}" max="${maxHp(member)}" aria-label="${c.name} HP"></progress></span>`;
       }).join("");
     }
     const energyDisplay=Math.round(energy);
-    if(lastEnergy!==energyDisplay){lastEnergy=energyDisplay;energyBar.value=energyDisplay;}
-    renderer.render(scene,camera);
+    if(lastEnergy!==energyDisplay){lastEnergy=energyDisplay;energyBar.value=energyDisplay;energyValue.textContent=energyDisplay+" / "+energyBar.max;}
+    animateHero(dt,time,step.lengthSq()>.0001,sprint);
+    updateValleyArt(time);
+    if(composer){renderer.info.reset();composer.render(dt);}
+    else renderer.render(scene,camera);
     if(meter){
       if(!sampleStart){sampleStart=now;samplePrevious=now;}
       else {
@@ -517,6 +551,13 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     fauna.dispose();
     removeCharacterMarkers();
     scene.traverse(node=>{if(node instanceof T.InstancedMesh)node.dispose();if(node instanceof T.Mesh){node.geometry.dispose();const mats=Array.isArray(node.material)?node.material:[node.material];mats.forEach(mat=>mat.dispose());}});
+    leaves.dispose();
+    leafMaterial.dispose();
+    material.dispose();
+    bloom?.dispose();
+    output?.dispose();
+    composer?.dispose();
+    sun.shadow.dispose();
     renderer.dispose();
   };
   host.querySelector(".world-exit")!.addEventListener("click",()=>{dispose();exit();},options);

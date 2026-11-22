@@ -1,4 +1,6 @@
 import "./style.css";
+import "./title.css";
+import "./field-art.css";
 import { explore } from "./world";
 import { readSave } from "./save";
 import { openDex } from "./dex";
@@ -27,8 +29,9 @@ function render() {
   const words = labels[settings.language === "fr" ? "fr" : "en"];
   document.documentElement.lang = settings.language === "fr" ? "fr" : "en";
   const active = buttons.indexOf(page);
-  app.innerHTML = `<div class="landscape" aria-hidden="true"><i class="planet"></i><i class="ridge far"></i><i class="ridge near"></i><i class="mist"></i></div>
-    <section class="screen">
+  const illustratedTitle = page === "title";
+  app.innerHTML = `<div class="landscape" aria-hidden="true"></div>
+    <section class="screen${illustratedTitle ? " illustrated-title" : ""}">
       <header><div class="crest" aria-hidden="true">✧</div><h1>${GAME_NAME}</h1></header>
       ${page === "title" ? `<nav>${buttons.map((name, i) => `<button data-page="${name}" ${name === "continue" && !readSave() ? "disabled" : ""}><span aria-hidden="true">${icons[i]}</span>${words[i]}<b aria-hidden="true">›</b></button>`).join("")}<button data-page="characters"><span aria-hidden="true">✦</span>${settings.language==="fr"?"Personnages":"Characters"}<b aria-hidden="true">›</b></button></nav>` :
       `<section class="panel"><h2>${words[active]}</h2>${page === "settings" ? `<form>
