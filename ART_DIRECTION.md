@@ -31,3 +31,7 @@ Billboards 2D originaux, vus de trois quarts, tête expressive et formes souples
 - Réglages : libellés, valeurs et focus lisibles sur le même verre bleu.
 
 Pour chaque écran modifié, lancer Aetheris, capturer en portrait mobile et en 16:9, puis comparer composition, contraste, silhouettes et zones tactiles à la référence pertinente avant de passer au suivant. Respecter les zones sûres et la préférence de réduction des animations.
+
+## Visuel du titre
+
+`public/title-landscape.png` provient d’une illustration originale générée pour Aetheris avec ImageGen. Le cadrage du menu est inspiré de la référence fournie. Les libellés et le logo sont rendus par l’interface du jeu.

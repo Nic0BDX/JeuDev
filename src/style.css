@@ -22,3 +22,7 @@
 .landscape::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 30%,#071b5860),linear-gradient(0deg,#071831a0,transparent 55%);pointer-events:none}
 @media(min-width:850px){.screen{margin-right:clamp(1rem,6vw,8rem);margin-left:auto}.screen nav{margin-right:1.1rem}}
 @media(max-width:540px){#app{padding:max(1rem,env(safe-area-inset-top)) max(.9rem,env(safe-area-inset-right)) max(1rem,env(safe-area-inset-bottom)) max(.9rem,env(safe-area-inset-left))}.screen h1{font-size:clamp(2.9rem,14vw,5rem)}.planet{top:-12vmin;left:-20vmin;width:120vmin}.screen nav button{padding-inline:1.2rem}}
+
+.landscape::before{content:"";position:absolute;z-index:1;inset:0;background:url("/title-landscape.png") 45% center/cover no-repeat;pointer-events:none}
+.landscape::after{z-index:2;background:linear-gradient(90deg,transparent 37%,#071b5860 61%,#071b5890),linear-gradient(0deg,#0718316b,transparent 35%)}
+@media(max-width:700px){.landscape::before{background-position:30% center}.landscape::after{background:linear-gradient(0deg,#071831bd 0%,#07183173 65%,#071b5840)}}
