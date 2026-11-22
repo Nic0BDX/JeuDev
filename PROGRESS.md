@@ -39,3 +39,5 @@ Récit : [build](https://github.com/Nic0BDX/JeuDev/actions/runs/45045424057) et 
 Navigation narrative : repère 3D et losange de minimap. [Build](https://github.com/Nic0BDX/JeuDev/actions/runs/45045815365) et [parcours de sauvetage de Florix avec sauvegarde du nom](https://github.com/Nic0BDX/JeuDev/actions/runs/45045815306) validés en Chromium.
 
 Forge du Cratère : entrée, évent et abri modélisés. L’ordre des deux actions et la reprise entre les actions sont vérifiés. [Build](https://github.com/Nic0BDX/JeuDev/actions/runs/45046357388) · [Tests et captures](https://github.com/Nic0BDX/JeuDev/actions/runs/45046357241).
+
+Boucle autonome sur `auto-dev`. Hypothèse retenue : le projet est Aetheris, déjà publié sur Vercel. Priorité à la fiabilité de la partie, aux contrôles mobiles et à la cohérence visuelle. Aucun nouveau skill installé dans cette session (voir BLOCKERS.md).
