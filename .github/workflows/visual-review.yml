@@ -86,6 +86,19 @@ jobs:
               await page.locator('.world canvas').waitFor();
               await page.locator('.quest-track').getByText('The Call of Skyspire').waitFor();
               await capture('hud', true);
+              await page.keyboard.down('KeyD');
+              try {
+                await page.waitForTimeout(220);
+                await page.evaluate(() => window.dispatchEvent(new Event('blur')));
+                await page.getByRole('button', {name: 'Save game'}).click();
+                const stopped = await page.evaluate(() => JSON.parse(localStorage.getItem('aetheris.save')).position[0]);
+                await page.waitForTimeout(450);
+                await page.getByRole('button', {name: 'Save game'}).click();
+                const later = await page.evaluate(() => JSON.parse(localStorage.getItem('aetheris.save')).position[0]);
+                if (later !== stopped) throw new Error('Movement key stuck after window blur');
+              } finally {
+                await page.keyboard.up('KeyD');
+              }
               await page.getByRole('button', {name: 'Bag', exact: true}).click();
               await page.getByText('Field Bag · 120 coins').waitFor();
               await capture('bag');
