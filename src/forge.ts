@@ -35,15 +35,15 @@ export function mountForge(scene:T.Scene,anchors:ForgeAnchors,height:(x:number,z
   const vent=buildSite(anchors.vent,"Évent de pression");
   put(vent,box,basalt,0,.2,0,2.8,.5,2.8);
   put(vent,shaft,iron,0,1.25,0,1.2,2,1.2);
-  const valve=put(vent,wheel,heat,0,1.65,.8);
-  put(vent,box,heat,0,1.65,.81,.11,1.06,.15);
+  put(vent,wheel,heat,0,1.65,.8);
+  const lever=put(vent,box,heat,0,1.65,.90,.11,1.06,.15);
   const shelter=buildSite(anchors.shelter,"Abri des petits");
   for(const side of [-1,1])put(shelter,box,basalt,side*1.45,1.3,0,.65,3.2,2);
   put(shelter,box,basalt,0,2.7,0,3.6,.55,2.4);
   const hatch=put(shelter,box,iron,0,1.15,0,2.2,2.25,.24);
   put(shelter,fire,heat,0,3.12,.4);
   return (ventOpen:boolean,shelterOpen:boolean)=>{
-    valve.rotation.z=ventOpen?Math.PI*.5:0;
+    lever.rotation.z=ventOpen?Math.PI*.5:0;
     hatch.position.y=shelterOpen?2.8:1.15;
   };
 }

@@ -68,8 +68,9 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   const crystal = new T.MeshLambertMaterial({color:0xbcf3ff,emissive:0x27608b,flatShading:true});
   const landmarkTransform = new T.Object3D();
   for(const region of regions){
-    const landmarks = new T.InstancedMesh(marker, crystal, region.locations.length);
-    region.locations.forEach((place,index)=>{
+    const sites=region.locations.filter(place=>region.id!=="embercrest"||!["cave","resource","habitat"].includes(place.kind));
+    const landmarks = new T.InstancedMesh(marker, crystal, sites.length);
+    sites.forEach((place,index)=>{
       landmarkTransform.scale.setScalar(place.kind==="statue"?1.5:.75);
       landmarkTransform.position.set(place.x,(place.y??terrain(place.x,place.z))+3,place.z);
       landmarkTransform.updateMatrix();
@@ -115,7 +116,8 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   const journey=resume?.journey??newJourney();
   const chronicle=restoreChronicle(resume?.chronicle);
   function refreshForge(){
-    const pastTrial=chronicle.next>7;
+    const active=chapter(chronicle);
+    const pastTrial=!active||active.chapter>4||active.id==="volflare-and-cubs";
     showForgeState(pastTrial||chronicle.fieldStep===1,pastTrial);
   }
   refreshForge();
