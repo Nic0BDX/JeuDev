@@ -106,7 +106,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
       chunks.delete(id);
     }
   }
-  host.innerHTML='<div class="world"></div><div class="world-info"><strong></strong><small></small><progress max="100" value="100" aria-label="Energy"></progress></div><button class="world-exit">‹</button><div class="stick" aria-label="Move"><i></i></div><div class="world-actions"><button data-key="ShiftLeft">⇧</button><button data-key="Space">⛯</button><button data-key="KeyR">⌖</button></div>';
+  host.innerHTML='<div class="world"></div><div class="world-info"><strong></strong><small></small><progress max="100" value="100" aria-label="Energy"></progress></div><button class="world-exit">‹</button><div class="stick" aria-label="Move"><i></i></div><div class="world-actions"><button data-key="ShiftLeft" aria-label="Sprint">⇧</button><button data-key="Space" aria-label="Jump or glide">⛯</button><button data-key="KeyR" aria-label="Recenter camera">⌖</button></div>';
   const viewport=host.querySelector(".world")!;
   viewport.append(renderer.domElement);
   const info=host.querySelector(".world-info strong")!;
