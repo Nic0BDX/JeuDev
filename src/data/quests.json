@@ -1,0 +1,215 @@
+[
+  {
+    "id": "call-of-skyspire",
+    "name": "The Call of Skyspire",
+    "giver": "Grande Chercheuse",
+    "steps": [
+      {
+        "location": "skyspire-village"
+      },
+      {
+        "location": "verdalia-ruin"
+      },
+      {
+        "location": "frostveil-tower"
+      },
+      {
+        "location": "skyspire-statue"
+      },
+      {
+        "location": "embercrest-cave"
+      },
+      {
+        "location": "azuremere-resource"
+      },
+      {
+        "location": "suncrest-habitat"
+      },
+      {
+        "location": "coralreach-ruin"
+      },
+      {
+        "location": "celestial-ruin"
+      },
+      {
+        "location": "skyspire-village"
+      }
+    ]
+  },
+  {
+    "id": "field-1",
+    "name": "Relevé de terrain · Skyspire City",
+    "giver": "Skyspire City · Settlement",
+    "steps": [
+      {
+        "location": "skyspire-resource"
+      }
+    ],
+    "reward": 30
+  },
+  {
+    "id": "field-2",
+    "name": "Relevé de terrain · Frostveil Peaks",
+    "giver": "Frostveil Peaks · Settlement",
+    "steps": [
+      {
+        "location": "frostveil-resource"
+      }
+    ],
+    "reward": 34
+  },
+  {
+    "id": "field-3",
+    "name": "Relevé de terrain · Embercrest",
+    "giver": "Embercrest · Settlement",
+    "steps": [
+      {
+        "location": "embercrest-resource"
+      }
+    ],
+    "reward": 38
+  },
+  {
+    "id": "field-4",
+    "name": "Relevé de terrain · Verdalia Woods",
+    "giver": "Verdalia Woods · Settlement",
+    "steps": [
+      {
+        "location": "verdalia-resource"
+      }
+    ],
+    "reward": 42
+  },
+  {
+    "id": "field-5",
+    "name": "Relevé de terrain · Azuremere",
+    "giver": "Azuremere · Settlement",
+    "steps": [
+      {
+        "location": "azuremere-resource"
+      }
+    ],
+    "reward": 46
+  },
+  {
+    "id": "field-6",
+    "name": "Relevé de terrain · Suncrest Plains",
+    "giver": "Suncrest Plains · Settlement",
+    "steps": [
+      {
+        "location": "suncrest-resource"
+      }
+    ],
+    "reward": 50
+  },
+  {
+    "id": "field-7",
+    "name": "Relevé de terrain · Coralreach Coast",
+    "giver": "Coralreach Coast · Settlement",
+    "steps": [
+      {
+        "location": "coralreach-resource"
+      }
+    ],
+    "reward": 54
+  },
+  {
+    "id": "field-8",
+    "name": "Relevé de terrain · Celestial Ruins",
+    "giver": "Celestial Ruins · Settlement",
+    "steps": [
+      {
+        "location": "celestial-resource"
+      }
+    ],
+    "reward": 58
+  },
+  {
+    "id": "field-9",
+    "name": "L’écho des cavernes · Skyspire City",
+    "giver": "Skyspire City · Settlement",
+    "steps": [
+      {
+        "location": "skyspire-cave"
+      }
+    ],
+    "reward": 62
+  },
+  {
+    "id": "field-10",
+    "name": "L’écho des cavernes · Frostveil Peaks",
+    "giver": "Frostveil Peaks · Settlement",
+    "steps": [
+      {
+        "location": "frostveil-cave"
+      }
+    ],
+    "reward": 66
+  },
+  {
+    "id": "field-11",
+    "name": "L’écho des cavernes · Embercrest",
+    "giver": "Embercrest · Settlement",
+    "steps": [
+      {
+        "location": "embercrest-cave"
+      }
+    ],
+    "reward": 70
+  },
+  {
+    "id": "field-12",
+    "name": "L’écho des cavernes · Verdalia Woods",
+    "giver": "Verdalia Woods · Settlement",
+    "steps": [
+      {
+        "location": "verdalia-cave"
+      }
+    ],
+    "reward": 74
+  },
+  {
+    "id": "field-13",
+    "name": "L’écho des cavernes · Azuremere",
+    "giver": "Azuremere · Settlement",
+    "steps": [
+      {
+        "location": "azuremere-cave"
+      }
+    ],
+    "reward": 78
+  },
+  {
+    "id": "field-14",
+    "name": "L’écho des cavernes · Suncrest Plains",
+    "giver": "Suncrest Plains · Settlement",
+    "steps": [
+      {
+        "location": "suncrest-cave"
+      }
+    ],
+    "reward": 82
+  },
+  {
+    "id": "field-15",
+    "name": "L’écho des cavernes · Coralreach Coast",
+    "giver": "Coralreach Coast · Settlement",
+    "steps": [
+      {
+        "location": "coralreach-cave"
+      }
+    ],
+    "reward": 86
+  },
+  {
+    "id": "field-16",
+    "name": "L’écho des cavernes · Celestial Ruins",
+    "giver": "Celestial Ruins · Settlement",
+    "steps": [
+      {
+        "location": "celestial-cave"
+      }
+    ],
+    "reward": 90
+  }
+]
