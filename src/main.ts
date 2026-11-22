@@ -1,5 +1,8 @@
 import "./style.css";
 import { explore } from "./world";
+import { readSave } from "./save";
+import { openDex } from "./dex";
+import { openMap } from "./map";
 
 export const GAME_NAME = "Aetheris";
 document.title = GAME_NAME;
@@ -26,7 +29,7 @@ function render() {
   app.innerHTML = `<div class="landscape" aria-hidden="true"><i class="planet"></i><i class="ridge far"></i><i class="ridge near"></i><i class="mist"></i></div>
     <section class="screen">
       <header><div class="crest" aria-hidden="true">✧</div><h1>${GAME_NAME}</h1></header>
-      ${page === "title" ? `<nav>${buttons.map((name, i) => `<button data-page="${name}" ${name === "continue" && !localStorage.getItem("aetheris.save") ? "disabled" : ""}><span aria-hidden="true">${icons[i]}</span>${words[i]}<b aria-hidden="true">›</b></button>`).join("")}</nav>` :
+      ${page === "title" ? `<nav>${buttons.map((name, i) => `<button data-page="${name}" ${name === "continue" && !readSave() ? "disabled" : ""}><span aria-hidden="true">${icons[i]}</span>${words[i]}<b aria-hidden="true">›</b></button>`).join("")}</nav>` :
       `<section class="panel"><h2>${words[active]}</h2>${page === "settings" ? `<form>
         <label>${words[6]} <select name="quality"><option value="auto">Auto</option><option value="low">Low</option><option value="high">High</option></select></label>
         <label>${words[7]} <input name="volume" type="range" min="0" max="100"></label>
@@ -45,8 +48,13 @@ function render() {
 app.addEventListener("click", event => {
   const target = (event.target as HTMLElement).closest<HTMLButtonElement>("button[data-page]");
   if (!target) return;
-  if (target.dataset.page === "new") {
-    try { explore(app, settings, render); } catch { render(); alert("WebGL is unavailable."); }
+  if (target.dataset.page === "map") { openMap(app, undefined, render); return; }
+  if (target.dataset.page === "codex") { openDex(app, undefined, render); return; }
+  if (target.dataset.page === "new" || target.dataset.page === "continue") {
+    const save=readSave();
+    if(target.dataset.page==="continue"&&!save)return;
+    if(target.dataset.page==="new"&&save&&!confirm(settings.language==="fr"?"Remplacer l’aventure sauvegardée ?":"Replace your saved adventure?"))return;
+    try { explore(app, settings, render, target.dataset.page==="continue"?save:undefined); } catch { render(); alert("WebGL is unavailable."); }
     return;
   }
   page = target.dataset.page as Page;
