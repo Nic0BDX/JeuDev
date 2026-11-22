@@ -2,6 +2,7 @@ import * as T from "three";
 import regions from "./data/regions.json";
 import { wildlife } from "./wildlife";
 import { openDex } from "./dex";
+import { discover, openMap, type Exploration } from "./map";
 import { battle, newParty, speciesOf, maxHp } from "./combat";
 
 const SIZE = 96;
@@ -61,6 +62,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   scene.add(actor);
   const fauna=wildlife(scene,nearest,surface,sample);
   const party=newParty();
+  const exploration:Exploration={discovered:[],x:actor.position.x,z:actor.position.z};
   let fighting=false,overlay=false,lastBattle=0;
   let target:ReturnType<typeof fauna.update>;
 
@@ -113,12 +115,16 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
       chunks.delete(id);
     }
   }
-  host.innerHTML='<div class="world"></div><div class="world-info"><strong></strong><small></small><progress max="100" value="100" aria-label="Energy"></progress></div><button class="world-exit">‹</button><div class="stick" aria-label="Move"><i></i></div><div class="world-actions"><button data-key="Tab" aria-label="Creature Dex">◇</button><button data-key="KeyE" aria-label="Interact">E</button><button data-key="KeyB" aria-label="Scan">⌕</button><button data-key="ShiftLeft" aria-label="Sprint">⇧</button><button data-key="Space" aria-label="Jump or glide">⛯</button><button data-key="KeyR" aria-label="Recenter camera">⌖</button></div>';
+  host.innerHTML='<div class="world"></div><div class="world-info"><strong></strong><small></small><progress max="100" value="100" aria-label="Energy"></progress></div><button class="world-exit">‹</button><button class="minimap" aria-label="Open world map" data-key="KeyM"><b>N</b><span>▲</span><small></small></button><div class="discovery-note" aria-live="polite"></div><div class="stick" aria-label="Move"><i></i></div><div class="world-actions"><button data-key="KeyM" aria-label="World map">⌖</button><button data-key="Tab" aria-label="Creature Dex">◇</button><button data-key="KeyE" aria-label="Interact">E</button><button data-key="KeyB" aria-label="Scan">⌕</button><button data-key="ShiftLeft" aria-label="Sprint">⇧</button><button data-key="Space" aria-label="Jump or glide">⛯</button><button data-key="KeyR" aria-label="Recenter camera">⌖</button></div>';
   const viewport=host.querySelector(".world")!;
   viewport.append(renderer.domElement);
   const info=host.querySelector(".world-info strong")!;
   const clock=host.querySelector(".world-info small")!;
   const energyBar=host.querySelector("progress")!;
+  const discoveryNote=host.querySelector(".discovery-note")!;
+  const compass=host.querySelector<HTMLElement>(".minimap span")!;
+  const mapCount=host.querySelector(".minimap small")!;
+  let noteUntil=0;
   function startBattle() {
     if(!target||fighting||time<lastBattle)return;
     const opponent=target;
@@ -139,6 +145,10 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   const offset=new T.Vector3();
   function press(code:string) {
     if(fighting||overlay)return;
+    if(code==="KeyM"){
+      overlay=true;held.clear();
+      openMap(host,exploration,()=>{overlay=false;},point=>{actor.position.set(point.x,(point.y??surface(point.x,point.z,0))+1,point.z);vertical=0;});return;
+    }
     if(code==="Tab"){overlay=true;held.clear();openDex(host,party,()=>{overlay=false;});return;}
     if(code==="KeyE"){startBattle();return;}
     if(code==="KeyB"&&target&&!party.seen.includes(target.species.id))party.seen.push(target.species.id);
@@ -224,6 +234,12 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     if(chunk!==lastChunk){lastChunk=chunk;stream();}
     const nearby=fauna.update(p,dt,time,hour,weather);
     target=nearby;
+    exploration.x=p.x;exploration.z=p.z;
+    const site=discover(exploration,p.y);
+    if(site){discoveryNote.textContent="Discovered · "+site.name;noteUntil=time+4;}
+    if(time>noteUntil)discoveryNote.textContent="";
+    compass.style.transform="rotate("+(-yaw)+"rad)";
+    mapCount.textContent=exploration.discovered.length+"/64";
     if(nearby?.species.behavior==="aggressive" && nearby.sprite.position.distanceTo(p)<2.5)startBattle();
     info.textContent=nearest(p.x,p.z).name+(nearby?' · '+nearby.species.name+' Lv.'+nearby.level:'');
     clock.textContent=String(Math.floor(hour)).padStart(2,"0")+":"+String(Math.floor(hour%1*60)).padStart(2,"0")+" · "+weather+" · "+party.team.length+"/6 · "+party.team[0].hp+"/"+maxHp(party.team[0])+" HP";
