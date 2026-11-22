@@ -1,0 +1,25 @@
+.atlas-objective {
+  display: grid;
+  gap: .25rem;
+  margin: 0 0 .85rem;
+  padding: .65rem .5rem;
+  border: 1px solid #ffd784;
+  border-radius: .5rem;
+  color: #f5faff;
+  background: #0b204d;
+}
+.atlas-objective small { color: #ffd784; }
+.map-compass {
+  align-self: center;
+  color: #ffd784;
+  white-space: nowrap;
+}
+
+.world-actions .hud-action-art {
+  display: block;
+  width: 1.55rem;
+  height: 1.55rem;
+  margin-inline: auto;
+  object-fit: cover;
+  border-radius: 50%;
+}

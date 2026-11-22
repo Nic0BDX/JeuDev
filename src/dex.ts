@@ -1,3 +1,4 @@
+import "./dex-art.css";
 import creatures from "./data/creatures.json";
 import moves from "./data/skills.json";
 import types from "./data/types.json";
@@ -13,7 +14,6 @@ export function openDex(host:HTMLElement,party:Party|undefined,close:()=>void){
   host.append(panel);
   let tab=0,filter="",query="",selected=creatures[0];
   const caught=(id:string)=>party?.caught.includes(id)??false;
-  const seen=(id:string)=>party?.seen.includes(id)??false;
   const typeColor=(type:string)=>types[type as keyof typeof types].color;
   function portrait(id:string,type:string){
     return `<span class="portrait" style="--type:${typeColor(type)}"><span aria-hidden="true">${typeIcons[type]}</span><img src="/sprites/${id}.png" alt="" loading="lazy"></span>`;
@@ -24,8 +24,8 @@ export function openDex(host:HTMLElement,party:Party|undefined,close:()=>void){
       const rows=creatures.filter(c=>c.type===type);
       const habitats=[...new Set(rows.flatMap(c=>c.habitats))].map(id=>regions.find(r=>r.id===id)?.name).filter(Boolean);
       return `<section class="poster-type" style="--type:${typeColor(type)}">
-        <header><span aria-hidden="true">${typeIcons[type]}</span><h3>${type}</h3><small>${habitats.join(" · ")}</small></header>
-        <div>${rows.map(c=>`<button data-species="${c.id}" ${seen(c.id)?"":"disabled"} aria-label="${seen(c.id)?c.name:"Undiscovered "+type+" species"}"><span class="poster-art ${seen(c.id)?"":"locked"}">${seen(c.id)?portrait(c.id,c.type):'<span aria-hidden="true">?</span>'}</span><span class="poster-name">${seen(c.id)?c.name:"Undiscovered"}</span></button>`).join("")}</div>
+        <header><img class="type-emblem" src="/assets/reference-crops/types/${type.toLowerCase()}.webp" alt=""><h3>${type}</h3><small>${habitats.join(" · ")}</small></header>
+        <div>${rows.map(c=>`<button data-species="${c.id}" aria-label="${c.name}"><span class="poster-art"><img src="/assets/reference-crops/creatures/${c.id}.webp" alt="" loading="lazy"></span><span class="poster-name">${c.name}</span></button>`).join("")}</div>
       </section>`;
     }).join("");
     return rows.map(c=>`<button data-species="${c.id}" aria-pressed="${selected.id===c.id}">${portrait(c.id,c.type)}<small>No.${String(c.no).padStart(3,"0")}</small>${c.name}${caught(c.id)?" ✓":""}</button>`).join("") || "<p>No matching creatures.</p>";

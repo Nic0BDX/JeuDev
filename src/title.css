@@ -65,3 +65,10 @@
     font-size: .9rem;
   }
 }
+
+@media (max-width: 580px) {
+  .landscape:has(+ .illustrated-title)::before {
+    background: url("/assets/title-reference.png") left center / auto 100% no-repeat;
+    animation: none;
+  }
+}

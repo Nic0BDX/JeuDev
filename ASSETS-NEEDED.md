@@ -2,7 +2,7 @@
 
 Les cinq PNG d’origine sont archivés dans `reference/`. Le titre en paysage
 utilise temporairement sa capture Aetheris avec des contrôles HTML alignés
-sur les boutons illustrés. Le portrait utilise le panorama existant.
+sur les boutons illustrés. Le portrait recadre la partie gauche du panorama en anglais.
 
 | Destination proposée | Élément incrusté dans la référence | Prompt de génération |
 |---|---|---|
@@ -12,6 +12,8 @@ sur les boutons illustrés. Le portrait utilise le panorama existant.
 | `public/assets/backgrounds/compendium.webp` | Légende et neuf rangées illustrées | Affiche fantasy anime portrait, ciel cobalt et cité flottante en haut, vallée fleurie et cascades en bas, milieu bleu léger, trois compagnons au pied, sans texte ni interface. |
 | `public/assets/backgrounds/verdant-valley.webp` | HUD, héros, Florix et marqueur | Panorama fantasy anime de Verdant Cascade Valley vu depuis un sentier en hauteur, cascade, cité cristalline, fleurs et arbres à bannière violette, profondeur atmosphérique, sans personnage, texte ni interface. Utilisable comme décor distant, derrière le terrain jouable. |
 
-Prévoir des portraits détourés pour les 36 espèces. Les recadrages du
-Compendium contiennent par endroits des effets et un fond peints autour
-des silhouettes. Vérifier chaque masque avant de remplacer les sprites.
+Les 63 découpes de travail sont dans `public/assets/reference-crops/`.
+Les 36 portraits du Compendium conservent leur fond peint. Prévoir des
+versions détourées avant de réutiliser ces portraits comme sprites de jeu.
+Les fragments de décor sont trop petits ou encore trop chargés pour remplacer
+les fonds complets listés ci-dessus.

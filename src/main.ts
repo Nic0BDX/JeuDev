@@ -1,5 +1,6 @@
 import "./style.css";
 import "./title.css";
+import "./field-art.css";
 import { explore } from "./world";
 import { readSave } from "./save";
 import { openDex } from "./dex";

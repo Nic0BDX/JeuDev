@@ -1,0 +1,37 @@
+.creature-dex.compendium .poster-heading,
+.creature-dex.compendium .poster {
+  width: min(100%, 66rem);
+  margin-inline: auto;
+}
+.creature-dex .poster-type .type-emblem {
+  width: clamp(1.5rem, 3vw, 2.2rem);
+  border-radius: .3rem;
+}
+.creature-dex .poster-type .poster-art {
+  width: 100%;
+  min-height: 0;
+  aspect-ratio: 1.65;
+}
+.creature-dex .poster-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: .45rem .45rem 0 0;
+}
+.creature-dex .poster-type .poster-name {
+  margin-top: -.25rem;
+  z-index: 1;
+  color: #fff;
+  border-color: color-mix(in srgb, var(--type) 65%, #d5efff);
+  font-family: Georgia, serif;
+}
+.creature-dex .poster-type button:hover,
+.creature-dex .poster-type button:focus-visible {
+  outline: 2px solid var(--type);
+  outline-offset: 1px;
+}
+@media (max-width: 620px) {
+  .creature-dex .poster-type button {
+    min-height: 44px;
+  }
+}

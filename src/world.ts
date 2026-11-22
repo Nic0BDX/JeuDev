@@ -192,7 +192,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   <div class="energy-hud"><label><span>♥</span><progress class="player-hp" max="100" value="100" aria-label="Player health"></progress></label><label><span>⚡</span><progress class="player-energy" max="100" value="100" aria-label="Energy"></progress></label></div>
   <div class="stick" aria-label="Move"><i></i></div>
   <div class="world-shortcuts"><button data-key="Tab" aria-label="Creature Dex">◇</button><button data-key="KeyB" aria-label="Scan">⌕</button></div>
-  <div class="world-actions"><button data-key="KeyR" aria-label="Recenter camera">⌖</button><button data-key="Space" aria-label="Jump or glide">⛯</button><button class="interact" data-key="KeyE" aria-label="Interact"><span>✧</span>Interact</button><button data-key="ShiftLeft" aria-label="Sprint">⇧</button></div>`;
+  <div class="world-actions"><button data-key="KeyR" aria-label="Recenter camera"><img class="hud-action-art" src="/assets/reference-crops/hud/target.webp" alt=""></button><button data-key="Space" aria-label="Jump or glide"><img class="hud-action-art" src="/assets/reference-crops/hud/ability.webp" alt=""></button><button class="interact" data-key="KeyE" aria-label="Interact"><img class="hud-action-art" src="/assets/reference-crops/hud/interact.webp" alt="">Interact</button><button data-key="ShiftLeft" aria-label="Sprint"><img class="hud-action-art" src="/assets/reference-crops/hud/sprint.webp" alt=""></button></div>`;
   const viewport=host.querySelector(".world")!;
   viewport.append(renderer.domElement);
   const info=host.querySelector(".world-info strong")!;
