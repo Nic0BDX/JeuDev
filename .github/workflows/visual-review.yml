@@ -15,7 +15,7 @@ jobs:
       - run: npm install
       - run: npm install --no-save --package-lock=false playwright
       - run: npx playwright install --with-deps chromium
-      - name: Capture title
+      - name: Capture compendium
         run: |
           npm run dev -- --host 127.0.0.1 > /tmp/aetheris-vite.log 2>&1 &
           for attempt in {1..30}; do
@@ -31,8 +31,12 @@ jobs:
               const page = await browser.newPage({viewport: {width, height}, isMobile: name === 'mobile', hasTouch: name === 'mobile', reducedMotion: 'reduce'});
               await page.goto('http://127.0.0.1:5173/');
               await page.getByRole('heading', {name: 'Aetheris'}).waitFor();
+              await page.getByRole('button', {name: 'Creature Codex'}).click();
+              await page.getByRole('button', {name: 'Species Compendium'}).click();
+              await page.getByRole('heading', {name: 'Grand Species Compendium'}).waitFor();
+              if (await page.locator('.poster-type').count() !== 9) throw new Error('Expected nine type rows');
               await page.evaluate(() => document.fonts.ready);
-              await page.screenshot({path: 'captures/title-' + name + '.png'});
+              await page.screenshot({path: 'captures/compendium-' + name + '.png'});
               const cdp = await page.context().newCDPSession(page);
               const preview = await cdp.send('Page.captureScreenshot', {format: 'jpeg', quality: 48, clip: {x: 0, y: 0, width, height, scale: .45}});
               for (const [i, chunk] of preview.data.match(/.{1,5000}/g).entries()) console.log('AETHERIS_' + name + '_' + i + ' ' + chunk);
@@ -44,6 +48,6 @@ jobs:
           JS
       - uses: actions/upload-artifact@v4
         with:
-          name: aetheris-title
+          name: aetheris-compendium
           path: captures/
           if-no-files-found: error

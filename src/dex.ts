@@ -5,6 +5,7 @@ import regions from "./data/regions.json";
 import { maxHp, type Party } from "./combat";
 
 const tabs=["Dex","Collection","Affinity","Evolution Guide","Species Compendium"];
+const typeIcons: Record<string,string> = {Nature:"❧",Fire:"♨",Water:"◈",Wind:"≋",Earth:"▲",Light:"✦",Shadow:"☾",Crystal:"◇",Sky:"❋"};
 const stats=["HP","ATK","DEF","SP. ATK","SP. DEF","SPD"];
 export function openDex(host:HTMLElement,party:Party|undefined,close:()=>void){
   const panel=document.createElement("section");
@@ -15,11 +16,18 @@ export function openDex(host:HTMLElement,party:Party|undefined,close:()=>void){
   const seen=(id:string)=>party?.seen.includes(id)??false;
   const typeColor=(type:string)=>types[type as keyof typeof types].color;
   function portrait(id:string,type:string){
-    return `<span class="portrait" style="--type:${typeColor(type)}"><span aria-hidden="true">✧</span><img src="/sprites/${id}.png" alt="" loading="lazy"></span>`;
+    return `<span class="portrait" style="--type:${typeColor(type)}"><span aria-hidden="true">${typeIcons[type]}</span><img src="/sprites/${id}.png" alt="" loading="lazy"></span>`;
   }
   function grid(){
     const rows=creatures.filter(c=>(!filter||c.type===filter)&&c.name.toLowerCase().includes(query)&&(tab!==1||caught(c.id)));
-    if(tab===4)return Object.entries(types).map(([type])=>`<section class="poster-type"><h3 style="color:${typeColor(type)}">${type}</h3><div>${creatures.filter(c=>c.type===type).map(c=>`<button data-species="${c.id}" ${seen(c.id)?"":"disabled"}>${seen(c.id)?portrait(c.id,c.type)+c.name:"?"}</button>`).join("")}</div></section>`).join("");
+    if(tab===4)return [...new Set(creatures.map(c=>c.type))].map(type=>{
+      const rows=creatures.filter(c=>c.type===type);
+      const habitats=[...new Set(rows.flatMap(c=>c.habitats))].map(id=>regions.find(r=>r.id===id)?.name).filter(Boolean);
+      return `<section class="poster-type" style="--type:${typeColor(type)}">
+        <header><span aria-hidden="true">${typeIcons[type]}</span><h3>${type}</h3><small>${habitats.join(" · ")}</small></header>
+        <div>${rows.map(c=>`<button data-species="${c.id}" ${seen(c.id)?"":"disabled"} aria-label="${seen(c.id)?c.name:"Undiscovered "+type+" species"}"><span class="poster-art ${seen(c.id)?"":"locked"}">${seen(c.id)?portrait(c.id,c.type):'<span aria-hidden="true">?</span>'}</span><span class="poster-name">${seen(c.id)?c.name:"Undiscovered"}</span></button>`).join("")}</div>
+      </section>`;
+    }).join("");
     return rows.map(c=>`<button data-species="${c.id}" aria-pressed="${selected.id===c.id}">${portrait(c.id,c.type)}<small>No.${String(c.no).padStart(3,"0")}</small>${c.name}${caught(c.id)?" ✓":""}</button>`).join("") || "<p>No matching creatures.</p>";
   }
   function detail(){
@@ -35,12 +43,15 @@ export function openDex(host:HTMLElement,party:Party|undefined,close:()=>void){
       <h3>Skills</h3><p>${c.skills.map(id=>moves.find(move=>move.id===id)?.name).join(" · ")}</p>${evolution}${bond}`}`;
   }
   function draw(){
+    panel.classList.toggle("compendium",tab===4);
     panel.innerHTML=`<header class="atlas-header"><strong>Creature Dex · ${party?.caught.length??0}/${creatures.length}</strong><button data-close aria-label="Close">×</button></header>
       <div class="atlas-tabs">${tabs.map((name,i)=>`<button data-tab="${i}" aria-pressed="${i===tab}">${name}</button>`).join("")}</div>
-      <div class="atlas-filters"><input type="search" placeholder="Search species" aria-label="Search species"><select aria-label="Filter by type"><option value="">All types · ${creatures.length}</option>${Object.keys(types).map(type=>`<option value="${type}">${type} · ${creatures.filter(c=>c.type===type).length}</option>`).join("")}</select></div>
+      ${tab===4?`<div class="poster-heading"><h2>Grand Species Compendium</h2><p>${party?.seen.length??0}/${creatures.length} species discovered</p></div>`:`<div class="atlas-filters"><input type="search" placeholder="Search species" aria-label="Search species"><select aria-label="Filter by type"><option value="">All types · ${creatures.length}</option>${Object.keys(types).map(type=>`<option value="${type}">${type} · ${creatures.filter(c=>c.type===type).length}</option>`).join("")}</select></div>`}
       <div class="atlas-body"><div class="species-grid"></div><aside class="species-detail"></aside></div>`;
-    panel.querySelector("input")!.value=query;
-    panel.querySelector("select")!.value=filter;
+    const search=panel.querySelector("input");
+    const select=panel.querySelector("select");
+    if(search)search.value=query;
+    if(select)select.value=filter;
     refresh();
   }
   function refresh(){
@@ -56,7 +67,7 @@ export function openDex(host:HTMLElement,party:Party|undefined,close:()=>void){
     if(!btn)return;
     if("close" in btn.dataset){panel.remove();close();return;}
     if(btn.dataset.tab!==undefined){tab=Number(btn.dataset.tab);draw();}
-    if(btn.dataset.species){selected=creatures.find(c=>c.id===btn.dataset.species)??selected;refresh();}
+    if(btn.dataset.species){selected=creatures.find(c=>c.id===btn.dataset.species)??selected;if(tab===4){tab=0;draw();}else refresh();}
   });
   draw();
 }
