@@ -133,7 +133,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   host.innerHTML=`<div class="world"></div>
   <section class="world-info"><strong></strong><small></small></section>
   <button class="world-exit" aria-label="Return to title">‹</button>
-  <button class="minimap" aria-label="Open world map" data-key="KeyM"><b>N</b><span>▲</span><small></small></button>
+  <button class="minimap" aria-label="Open world map" data-key="KeyM"><canvas width="96" height="96" aria-hidden="true"></canvas><b>N</b><span>▲</span><small></small></button><div class="minimap-zoom"><button data-key="Equal" aria-label="Minimap zoom in">+</button><button data-key="Minus" aria-label="Minimap zoom out">−</button></div>
   <div class="discovery-note" aria-live="polite"></div>
   <section class="team-hud" aria-label="Party"><strong></strong><div class="team-slots"></div></section>
   <label class="energy-hud"><span>⚡</span><progress max="100" value="100" aria-label="Energy"></progress></label>
@@ -148,6 +148,26 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   const discoveryNote=host.querySelector(".discovery-note")!;
   const compass=host.querySelector<HTMLElement>(".minimap span")!;
   const mapCount=host.querySelector(".minimap small")!;
+  const mapInk=host.querySelector<HTMLCanvasElement>(".minimap canvas")!.getContext("2d");
+  let mapRange=74,mapNext=0;
+  function drawMinimap(x:number,z:number){
+    if(!mapInk)return;
+    const size=96,cell=8;
+    for(let row=0;row<size;row+=cell)for(let col=0;col<size;col+=cell){
+      const wx=x+(col+cell/2-size/2)*mapRange/size,wz=z+(row+cell/2-size/2)*mapRange/size;
+      const ground=terrain(wx,wz);
+      mapInk.fillStyle=ground<SEA?"#236697":nearest(wx,wz).color;
+      mapInk.globalAlpha=ground<SEA?1:clamp(.67+ground*.012,.54,.95);
+      mapInk.fillRect(col,row,cell,cell);
+    }
+    mapInk.globalAlpha=1;
+    for(const place of nearest(x,z).locations){
+      const dx=(place.x-x)*size/mapRange,dz=(place.z-z)*size/mapRange;
+      if(Math.hypot(dx,dz)>43)continue;
+      mapInk.fillStyle=place.kind==="statue"?"#ffd784":"#f5faff";
+      mapInk.fillRect(46+dx,46+dz,4,4);
+    }
+  }
   const team=host.querySelector(".team-hud strong")!;
   const slots=host.querySelector(".team-slots")!;
   let teamKey="",placeLabel="",weatherLabel="";
@@ -171,6 +191,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   const focus=new T.Vector3();
   const offset=new T.Vector3();
   function press(code:string) {
+    if(!overlay&&!fighting&&(code==="Equal"||code==="Minus")){mapRange=clamp(mapRange*(code==="Equal"?.72:1.38),34,230);mapNext=0;return;}
     if(fighting||overlay)return;
     if(code==="KeyM"){
       overlay=true;held.clear();
@@ -267,7 +288,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     if(site){discoveryNote.textContent="Discovered · "+site.name;noteUntil=time+4;}
     if(time>noteUntil)discoveryNote.textContent="";
     compass.style.transform="rotate("+(-yaw)+"rad)";
-    mapCount.textContent=exploration.discovered.length+"/64";
+    if(time>=mapNext){drawMinimap(p.x,p.z);mapCount.textContent=exploration.discovered.length+"/64";mapNext=time+.2;}
     if(nearby?.species.behavior==="aggressive" && nearby.sprite.position.distanceTo(p)<2.5)startBattle();
     const placeName=nearest(p.x,p.z).name;
     if(placeName!==placeLabel){placeLabel=placeName;info.textContent=placeName;}
