@@ -32,7 +32,7 @@ Mesure de référence sur GitHub Actions, Chromium headless et rendu logiciel Sw
 
 M8 : résolution Auto adaptative, repères groupés, génération des chunks répartie entre images. En CI SwiftShader, 43,7 FPS en 16:9 et 57,6 FPS en portrait ; test de traversée réussi. [Build](https://github.com/Nic0BDX/JeuDev/actions/runs/45015954707) · [Parcours](https://github.com/Nic0BDX/JeuDev/actions/runs/45015954702).
 
-Narration : six personnages et trame jouable en douze chapitres. Les mini-épreuves utilisent l’interface de dialogue et le Collecteur réemploie la simulation de combat. Les 14 cinématiques restent à produire.
+Narration : six personnages et trame jouable en douze chapitres. La Forge du Cratère propose deux interactions successives sur le terrain, et l’épreuve de Zephowl utilise l’interface de dialogue et le Collecteur réemploie la simulation de combat. Les 14 cinématiques restent à produire.
 
 Récit : [build](https://github.com/Nic0BDX/JeuDev/actions/runs/45045424057) et [contrôles Chromium](https://github.com/Nic0BDX/JeuDev/actions/runs/45045424076) réussis. Validation des 25 scènes, rencontre avec Elara et sauvegarde des deux fins via des états de test. À Skyspire, SwiftShader mesure 36,3 FPS en 16:9 et 57,6 FPS en portrait ; la mesure sur appareils réels reste ouverte.
 

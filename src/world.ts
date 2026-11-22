@@ -6,7 +6,7 @@ import { mountCharacterMarkers } from "./character-markers";
 import { openDex } from "./dex";
 import { ambience, writeSave, type Save } from "./save";
 import { nearestSite, newJourney, openBag, visit } from "./quests";
-import { chapter, destination, restoreChronicle, playScene, siteLabel } from "./story";
+import { chapter, currentField, destination, resolveField, restoreChronicle, playScene, siteLabel } from "./story";
 import { discover, openMap, type Exploration } from "./map";
 import { battle, newParty, speciesOf, maxHp } from "./combat";
 
@@ -283,10 +283,12 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
       const site=objectiveNearby?goal:nearestSite(p.x,p.y,p.z);
       if(!site){startBattle();return;}
       if(destination(chronicle)?.id===site.id){
+        const fieldResult=resolveField(chronicle,site.id);
+        if(fieldResult){notify(fieldResult);save();return;}
         overlay=true;held.clear();
         playScene(host,chronicle,party,(scene,advanced)=>{
           closeOverlay();
-          if(!advanced)return;
+          if(!advanced){if(currentField(chronicle)){notify(currentField(chronicle)!.label);save();}return;}
           fauna.showCompanion(true);
           if(scene.crystal&&!journey.looted.includes(site.id)){journey.crystals++;journey.looted.push(site.id);}
           if(scene.travel){
@@ -448,7 +450,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     }
     if(markerGroup.visible){questDiamond.position.y=4+Math.sin(time*2)*.55;questDiamond.rotation.y=time*.8;}
     const distance=storyPlace?Math.round(Math.hypot(storyPlace.x-p.x,storyPlace.z-p.z)/5)*5:0;
-    const objectiveName=storyPlace?"Ch. "+chapter(chronicle).chapter+" · "+siteLabel(storyPlace.id,storyPlace.name)+" · "+distance+" m · "+chronicle.shards.length+"/4 Éclats":"Épilogue terminé";
+    const objectiveName=storyPlace?"Ch. "+chapter(chronicle).chapter+" · "+(currentField(chronicle)?.label??siteLabel(storyPlace.id,storyPlace.name))+" · "+distance+" m · "+chronicle.shards.length+"/4 Éclats":"Épilogue terminé";
     if(lastObjective!==objectiveName){lastObjective=objectiveName;questTrack.textContent=objectiveName;}
     const berryLabel="Berry ×"+party.berries;
     if(lastBerry!==berryLabel){lastBerry=berryLabel;berry.textContent=berryLabel;}

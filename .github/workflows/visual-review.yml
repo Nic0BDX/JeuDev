@@ -30,6 +30,7 @@ jobs:
             if (!places.has(scene.location) || (scene.travel && !places.has(scene.travel))) throw new Error('Invalid location: ' + scene.id);
             if (!scene.lines.length || scene.lines.some(([speaker, line]) => !cast.has(speaker) || !line)) throw new Error('Invalid dialogue: ' + scene.id);
             if ((scene.battle && !species.has(scene.battle.id)) || (scene.gift && !species.has(scene.gift))) throw new Error('Invalid creature: ' + scene.id);
+            if (scene.field && (!scene.field.length || scene.field.some(task => !places.has(task.location) || !task.label || !task.success))) throw new Error('Invalid field trial: ' + scene.id);
             if (scene.puzzle && !scene.puzzle.options[scene.puzzle.answer]) throw new Error('Invalid puzzle: ' + scene.id);
           }
           if (new Set(scenes.flatMap(scene => scene.shard ? [scene.shard] : [])).size !== 4 || !scenes.at(-1).ending || !endings.guardian || !endings.release || cinematics.length !== 14) throw new Error('Incomplete campaign');
@@ -174,6 +175,33 @@ jobs:
               await page.getByRole('button', {name: 'Terminer le récit'}).click();
               const outcome = await page.evaluate(() => JSON.parse(localStorage.getItem('aetheris.save')).chronicle.ending);
               if (outcome !== (name === 'mobile' ? 'release' : 'guardian')) throw new Error('Ending was not saved');
+              if (name === 'desktop') {
+                const seedTrial = async (position, chronicle) => {
+                  await page.locator('.world-exit').click();
+                  await page.evaluate(({position, chronicle}) => {
+                    const save = JSON.parse(localStorage.getItem('aetheris.save'));
+                    save.position = position;
+                    save.vertical = 0;
+                    save.glide = false;
+                    if (chronicle) save.chronicle = chronicle;
+                    localStorage.setItem('aetheris.save', JSON.stringify(save));
+                  }, {position, chronicle});
+                  await page.getByRole('button', {name: 'Continue'}).click();
+                };
+                await seedTrial([471, 10, -341], {checkpoint: 'crater-vent', hero: 'Ari', shards: []});
+                await page.getByRole('button', {name: 'Interact', exact: true}).click();
+                await page.getByRole('heading', {name: 'Chapitre 4 · La Forge du Cratère'}).waitFor();
+                await page.getByRole('button', {name: 'Suivant'}).click();
+                await page.getByRole('button', {name: 'Poursuivre'}).click();
+                await page.locator('.quest-track small').getByText('Ouvrir l’évent de pression', {exact: false}).waitFor();
+                await capture('forge-trial', true);
+                await seedTrial([449, 10, -408], null);
+                await page.getByRole('button', {name: 'Interact', exact: true}).click();
+                await page.locator('.quest-track small').getByText('Ouvrir l’abri des petits', {exact: false}).waitFor();
+                await seedTrial([521, 10, -457], null);
+                await page.getByRole('button', {name: 'Interact', exact: true}).click();
+                await page.waitForFunction(() => JSON.parse(localStorage.getItem('aetheris.save')).chronicle.checkpoint === 'volflare-and-cubs');
+              }
               await page.close();
             }
           } finally {

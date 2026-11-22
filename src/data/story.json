@@ -179,18 +179,25 @@
       "lines": [
         [
           "narrator",
-          "La chaleur monte dans la forge. Il faut ouvrir une sortie pour protéger les petits de Volflare."
+          "La chaleur monte dans la Forge du Cratère. La conduite tremble sous la pression. Il faut ouvrir l’évent avant de déverrouiller l’abri des petits de Volflare."
+        ],
+        [
+          "hero",
+          "Je vais libérer la vapeur, puis ouvrir le passage vers l’abri."
         ]
       ],
-      "puzzle": {
-        "question": "Quel dispositif actionner en premier ?",
-        "options": [
-          "Ouvrir l’évent pour relâcher la pression",
-          "Fermer les deux conduits",
-          "Ajouter du combustible"
-        ],
-        "answer": 0
-      }
+      "field": [
+        {
+          "location": "embercrest-resource",
+          "label": "Ouvrir l’évent de pression",
+          "success": "L’évent libère un jet de vapeur. Le passage vers l’abri est accessible."
+        },
+        {
+          "location": "embercrest-habitat",
+          "label": "Ouvrir l’abri des petits",
+          "success": "Les petits gagnent l’abri. Retourne à la Forge du Cratère."
+        }
+      ]
     },
     {
       "id": "volflare-and-cubs",

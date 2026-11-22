@@ -6,10 +6,11 @@ import {portrait} from "./characters";
 import {battle,createMember,maxHp,type Party} from "./combat";
 
 type Ending="guardian"|"release";
-export type Chronicle={next:number;checkpoint?:string;hero:string;shards:string[];ending?:Ending};
+export type Chronicle={next:number;checkpoint?:string;fieldStep?:number;hero:string;shards:string[];ending?:Ending};
 type Scene={
   id:string;chapter:number;title:string;location:string;lines:string[][];
   name?:boolean;crystal?:boolean;shard?:string;gift?:string;travel?:string;ending?:boolean;
+  field?:{location:string;label:string;success:string}[];
   puzzle?:{question:string;options:string[];answer:number};
   battle?:{id:string;level:number;owner?:string;alias?:string;acceptLoss?:boolean;mixed?:boolean};
 };
@@ -22,10 +23,22 @@ export function restoreChronicle(saved?:Chronicle):Chronicle {
   const legacy=Number.isInteger(saved.next)?Math.max(0,Math.min(story.length-1,saved.next)):0;
   const next=ending?story.length:marked>=0?marked:legacy;
   const shards=Array.isArray(saved.shards)?[...new Set(saved.shards.filter(shard=>story.some(scene=>scene.shard===shard)))]:[];
-  return {next,checkpoint:story[next]?.id,hero:typeof saved.hero==="string"?saved.hero.slice(0,24):"",shards,ending};
+  const fields=story[next]?.field;
+  const fieldStep=fields&&Number.isInteger(saved.fieldStep)&&saved.fieldStep!>=0&&saved.fieldStep!<fields.length?saved.fieldStep:undefined;
+  return {next,checkpoint:story[next]?.id,fieldStep,hero:typeof saved.hero==="string"?saved.hero.slice(0,24):"",shards,ending};
 }
 export const chapter=(state:Chronicle)=>story[state.next];
-export const destination=(state:Chronicle)=>places.find(place=>place.id===chapter(state)?.location);
+export const currentField=(state:Chronicle)=>state.fieldStep===undefined?undefined:chapter(state)?.field?.[state.fieldStep];
+export const destination=(state:Chronicle)=>places.find(place=>place.id===(currentField(state)?.location??chapter(state)?.location));
+export function resolveField(state:Chronicle,location:string){
+  const task=currentField(state);
+  if(!task||location!==task.location)return;
+  const scene=chapter(state);
+  const next=(state.fieldStep??0)+1;
+  if(next<(scene.field?.length??0))state.fieldStep=next;
+  else{state.fieldStep=undefined;state.next++;state.checkpoint=story[state.next]?.id;}
+  return task.success;
+}
 export const siteLabel=(id:string,name:string)=>narrative.placeNames[id as keyof typeof narrative.placeNames]??name;
 
 export function playScene(host:HTMLElement,state:Chronicle,party:Party,finish:(scene:Scene,advanced:boolean)=>void){
@@ -76,6 +89,7 @@ export function playScene(host:HTMLElement,state:Chronicle,party:Party,finish:(s
     if(input){newHero=input.value.trim();input.remove();input=undefined;}
     actions.replaceChildren();
     face.replaceChildren();
+    if(scene.field){state.fieldStep=0;handoff=true;dialog.close();finish(scene,false);return;}
     if(scene.puzzle){
       const puzzle=scene.puzzle;
       speaker.textContent="Épreuve";
