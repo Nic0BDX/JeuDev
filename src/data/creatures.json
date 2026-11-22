@@ -1,0 +1,1366 @@
+[
+  {
+    "id": "florix",
+    "no": 1,
+    "name": "Florix",
+    "type": "Nature",
+    "habitats": [
+      "verdalia",
+      "coralreach"
+    ],
+    "rarity": 1,
+    "description": "Its emerald leaves perk up when the wind carries the scent of rain.",
+    "stats": [
+      104,
+      78,
+      72,
+      96,
+      83,
+      45
+    ],
+    "skills": [
+      "leaf-wink",
+      "vine-lash",
+      "bloom-burst"
+    ],
+    "evolution": {
+      "forms": [
+        "Florling",
+        "Florix",
+        "Floradon"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "flee"
+  },
+  {
+    "id": "mossling",
+    "no": 2,
+    "name": "Mossling",
+    "type": "Nature",
+    "habitats": [
+      "verdalia",
+      "coralreach"
+    ],
+    "rarity": 2,
+    "description": "Mossling gathers pollen near its favored vent.",
+    "stats": [
+      83,
+      56,
+      60,
+      60,
+      57,
+      49
+    ],
+    "skills": [
+      "leaf-wink",
+      "vine-lash",
+      "bloom-burst"
+    ],
+    "evolution": {
+      "forms": [
+        "Mosslet",
+        "Mossling",
+        "Mosslingaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "wander"
+  },
+  {
+    "id": "rocleaf",
+    "no": 3,
+    "name": "Rocleaf",
+    "type": "Nature",
+    "habitats": [
+      "verdalia",
+      "coralreach"
+    ],
+    "rarity": 3,
+    "description": "Rocleaf gathers pollen near its favored pool.",
+    "stats": [
+      94,
+      61,
+      67,
+      66,
+      65,
+      53
+    ],
+    "skills": [
+      "leaf-wink",
+      "vine-lash",
+      "bloom-burst"
+    ],
+    "evolution": {
+      "forms": [
+        "Rocllet",
+        "Rocleaf",
+        "Rocleafaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "sleep"
+  },
+  {
+    "id": "petalyn",
+    "no": 4,
+    "name": "Petalyn",
+    "type": "Nature",
+    "habitats": [
+      "verdalia",
+      "coralreach"
+    ],
+    "rarity": 4,
+    "description": "Petalyn gathers pollen near its favored ridge.",
+    "stats": [
+      105,
+      66,
+      74,
+      72,
+      73,
+      57
+    ],
+    "skills": [
+      "leaf-wink",
+      "vine-lash",
+      "bloom-burst"
+    ],
+    "evolution": {
+      "forms": [
+        "Petalet",
+        "Petalyn",
+        "Petalynaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "aggressive"
+  },
+  {
+    "id": "pyrowl",
+    "no": 5,
+    "name": "Pyrowl",
+    "type": "Fire",
+    "habitats": [
+      "embercrest",
+      "suncrest"
+    ],
+    "rarity": 1,
+    "description": "Pyrowl gathers embers near its favored glade.",
+    "stats": [
+      73,
+      55,
+      54,
+      57,
+      52,
+      50
+    ],
+    "skills": [
+      "spark-peck",
+      "searing-coil",
+      "cinderfall"
+    ],
+    "evolution": {
+      "forms": [
+        "Pyrolet",
+        "Pyrowl",
+        "Pyrowlaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "flee"
+  },
+  {
+    "id": "embera",
+    "no": 6,
+    "name": "Embera",
+    "type": "Fire",
+    "habitats": [
+      "embercrest",
+      "suncrest"
+    ],
+    "rarity": 2,
+    "description": "Embera gathers embers near its favored vent.",
+    "stats": [
+      84,
+      60,
+      61,
+      63,
+      60,
+      54
+    ],
+    "skills": [
+      "spark-peck",
+      "searing-coil",
+      "cinderfall"
+    ],
+    "evolution": {
+      "forms": [
+        "Embelet",
+        "Embera",
+        "Emberaaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "wander"
+  },
+  {
+    "id": "volflare",
+    "no": 7,
+    "name": "Volflare",
+    "type": "Fire",
+    "habitats": [
+      "embercrest",
+      "suncrest"
+    ],
+    "rarity": 3,
+    "description": "Volflare gathers embers near its favored pool.",
+    "stats": [
+      95,
+      65,
+      68,
+      69,
+      68,
+      58
+    ],
+    "skills": [
+      "spark-peck",
+      "searing-coil",
+      "cinderfall"
+    ],
+    "evolution": {
+      "forms": [
+        "Volflet",
+        "Volflare",
+        "Volflarearis"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "sleep"
+  },
+  {
+    "id": "cindram",
+    "no": 8,
+    "name": "Cindram",
+    "type": "Fire",
+    "habitats": [
+      "embercrest",
+      "suncrest"
+    ],
+    "rarity": 4,
+    "description": "Cindram gathers embers near its favored ridge.",
+    "stats": [
+      106,
+      70,
+      75,
+      75,
+      76,
+      62
+    ],
+    "skills": [
+      "spark-peck",
+      "searing-coil",
+      "cinderfall"
+    ],
+    "evolution": {
+      "forms": [
+        "Cindlet",
+        "Cindram",
+        "Cindramaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "aggressive"
+  },
+  {
+    "id": "bubblit",
+    "no": 9,
+    "name": "Bubblit",
+    "type": "Water",
+    "habitats": [
+      "azuremere",
+      "coralreach"
+    ],
+    "rarity": 1,
+    "description": "Bubblit gathers droplets near its favored glade.",
+    "stats": [
+      74,
+      59,
+      55,
+      60,
+      55,
+      55
+    ],
+    "skills": [
+      "bubble-shot",
+      "tidal-arc",
+      "deep-surge"
+    ],
+    "evolution": {
+      "forms": [
+        "Bubblet",
+        "Bubblit",
+        "Bubblitaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "flee"
+  },
+  {
+    "id": "shellora",
+    "no": 10,
+    "name": "Shellora",
+    "type": "Water",
+    "habitats": [
+      "azuremere",
+      "coralreach"
+    ],
+    "rarity": 2,
+    "description": "Shellora gathers droplets near its favored vent.",
+    "stats": [
+      85,
+      64,
+      62,
+      66,
+      63,
+      59
+    ],
+    "skills": [
+      "bubble-shot",
+      "tidal-arc",
+      "deep-surge"
+    ],
+    "evolution": {
+      "forms": [
+        "Shellet",
+        "Shellora",
+        "Shelloraaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "wander"
+  },
+  {
+    "id": "tidera",
+    "no": 11,
+    "name": "Tidera",
+    "type": "Water",
+    "habitats": [
+      "azuremere",
+      "coralreach"
+    ],
+    "rarity": 3,
+    "description": "Tidera gathers droplets near its favored pool.",
+    "stats": [
+      96,
+      69,
+      69,
+      72,
+      71,
+      63
+    ],
+    "skills": [
+      "bubble-shot",
+      "tidal-arc",
+      "deep-surge"
+    ],
+    "evolution": {
+      "forms": [
+        "Tidelet",
+        "Tidera",
+        "Tideraaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "sleep"
+  },
+  {
+    "id": "aquaphin",
+    "no": 12,
+    "name": "Aquaphin",
+    "type": "Water",
+    "habitats": [
+      "azuremere",
+      "coralreach"
+    ],
+    "rarity": 4,
+    "description": "Aquaphin gathers droplets near its favored ridge.",
+    "stats": [
+      107,
+      74,
+      76,
+      78,
+      79,
+      67
+    ],
+    "skills": [
+      "bubble-shot",
+      "tidal-arc",
+      "deep-surge"
+    ],
+    "evolution": {
+      "forms": [
+        "Aqualet",
+        "Aquaphin",
+        "Aquaphinaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "aggressive"
+  },
+  {
+    "id": "zephowl",
+    "no": 13,
+    "name": "Zephowl",
+    "type": "Wind",
+    "habitats": [
+      "skyspire",
+      "frostveil"
+    ],
+    "rarity": 1,
+    "description": "Zephowl gathers currents near its favored glade.",
+    "stats": [
+      75,
+      63,
+      56,
+      63,
+      58,
+      60
+    ],
+    "skills": [
+      "breeze-cut",
+      "gust-spiral",
+      "tempest-wing"
+    ],
+    "evolution": {
+      "forms": [
+        "Zephlet",
+        "Zephowl",
+        "Zephowlaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "flee"
+  },
+  {
+    "id": "voltine",
+    "no": 14,
+    "name": "Voltine",
+    "type": "Wind",
+    "habitats": [
+      "skyspire",
+      "frostveil"
+    ],
+    "rarity": 2,
+    "description": "Voltine gathers currents near its favored vent.",
+    "stats": [
+      86,
+      68,
+      63,
+      69,
+      66,
+      64
+    ],
+    "skills": [
+      "breeze-cut",
+      "gust-spiral",
+      "tempest-wing"
+    ],
+    "evolution": {
+      "forms": [
+        "Voltlet",
+        "Voltine",
+        "Voltinearis"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "wander"
+  },
+  {
+    "id": "galeon",
+    "no": 15,
+    "name": "Galeon",
+    "type": "Wind",
+    "habitats": [
+      "skyspire",
+      "frostveil"
+    ],
+    "rarity": 3,
+    "description": "Galeon gathers currents near its favored pool.",
+    "stats": [
+      97,
+      73,
+      70,
+      75,
+      74,
+      68
+    ],
+    "skills": [
+      "breeze-cut",
+      "gust-spiral",
+      "tempest-wing"
+    ],
+    "evolution": {
+      "forms": [
+        "Galelet",
+        "Galeon",
+        "Galeonaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "sleep"
+  },
+  {
+    "id": "skyray",
+    "no": 16,
+    "name": "Skyray",
+    "type": "Wind",
+    "habitats": [
+      "skyspire",
+      "frostveil"
+    ],
+    "rarity": 4,
+    "description": "Skyray gathers currents near its favored ridge.",
+    "stats": [
+      108,
+      78,
+      77,
+      81,
+      82,
+      72
+    ],
+    "skills": [
+      "breeze-cut",
+      "gust-spiral",
+      "tempest-wing"
+    ],
+    "evolution": {
+      "forms": [
+        "Skyrlet",
+        "Skyray",
+        "Skyrayaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "aggressive"
+  },
+  {
+    "id": "terrabram",
+    "no": 17,
+    "name": "Terrabram",
+    "type": "Earth",
+    "habitats": [
+      "embercrest",
+      "suncrest"
+    ],
+    "rarity": 1,
+    "description": "Terrabram gathers pebbles near its favored glade.",
+    "stats": [
+      76,
+      67,
+      57,
+      66,
+      61,
+      65
+    ],
+    "skills": [
+      "pebble-snap",
+      "quake-step",
+      "stone-break"
+    ],
+    "evolution": {
+      "forms": [
+        "Terrlet",
+        "Terrabram",
+        "Terrabramaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "flee"
+  },
+  {
+    "id": "geomole",
+    "no": 18,
+    "name": "Geomole",
+    "type": "Earth",
+    "habitats": [
+      "embercrest",
+      "suncrest"
+    ],
+    "rarity": 2,
+    "description": "Geomole gathers pebbles near its favored vent.",
+    "stats": [
+      87,
+      72,
+      64,
+      72,
+      69,
+      69
+    ],
+    "skills": [
+      "pebble-snap",
+      "quake-step",
+      "stone-break"
+    ],
+    "evolution": {
+      "forms": [
+        "Geomlet",
+        "Geomole",
+        "Geomolearis"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "wander"
+  },
+  {
+    "id": "thornox",
+    "no": 19,
+    "name": "Thornox",
+    "type": "Earth",
+    "habitats": [
+      "embercrest",
+      "suncrest"
+    ],
+    "rarity": 3,
+    "description": "Thornox gathers pebbles near its favored pool.",
+    "stats": [
+      98,
+      77,
+      71,
+      78,
+      77,
+      73
+    ],
+    "skills": [
+      "pebble-snap",
+      "quake-step",
+      "stone-break"
+    ],
+    "evolution": {
+      "forms": [
+        "Thorlet",
+        "Thornox",
+        "Thornoxaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "sleep"
+  },
+  {
+    "id": "bedrock",
+    "no": 20,
+    "name": "Bedrock",
+    "type": "Earth",
+    "habitats": [
+      "embercrest",
+      "suncrest"
+    ],
+    "rarity": 4,
+    "description": "Bedrock gathers pebbles near its favored ridge.",
+    "stats": [
+      109,
+      82,
+      78,
+      84,
+      85,
+      77
+    ],
+    "skills": [
+      "pebble-snap",
+      "quake-step",
+      "stone-break"
+    ],
+    "evolution": {
+      "forms": [
+        "Bedrlet",
+        "Bedrock",
+        "Bedrockaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "aggressive"
+  },
+  {
+    "id": "lumera",
+    "no": 21,
+    "name": "Lumera",
+    "type": "Light",
+    "habitats": [
+      "skyspire",
+      "suncrest"
+    ],
+    "rarity": 1,
+    "description": "Lumera gathers sunbeams near its favored glade.",
+    "stats": [
+      77,
+      71,
+      58,
+      69,
+      64,
+      70
+    ],
+    "skills": [
+      "gleam",
+      "halo-lance",
+      "solar-flare"
+    ],
+    "evolution": {
+      "forms": [
+        "Lumelet",
+        "Lumera",
+        "Lumeraaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "flee"
+  },
+  {
+    "id": "solumi",
+    "no": 22,
+    "name": "Solumi",
+    "type": "Light",
+    "habitats": [
+      "skyspire",
+      "suncrest"
+    ],
+    "rarity": 2,
+    "description": "Solumi gathers sunbeams near its favored vent.",
+    "stats": [
+      88,
+      76,
+      65,
+      75,
+      72,
+      74
+    ],
+    "skills": [
+      "gleam",
+      "halo-lance",
+      "solar-flare"
+    ],
+    "evolution": {
+      "forms": [
+        "Solulet",
+        "Solumi",
+        "Solumiaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "wander"
+  },
+  {
+    "id": "aurelyn",
+    "no": 23,
+    "name": "Aurelyn",
+    "type": "Light",
+    "habitats": [
+      "skyspire",
+      "suncrest"
+    ],
+    "rarity": 3,
+    "description": "Aurelyn gathers sunbeams near its favored pool.",
+    "stats": [
+      99,
+      81,
+      72,
+      81,
+      80,
+      78
+    ],
+    "skills": [
+      "gleam",
+      "halo-lance",
+      "solar-flare"
+    ],
+    "evolution": {
+      "forms": [
+        "Aurelet",
+        "Aurelyn",
+        "Aurelynaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "sleep"
+  },
+  {
+    "id": "dawnveil",
+    "no": 24,
+    "name": "Dawnveil",
+    "type": "Light",
+    "habitats": [
+      "skyspire",
+      "suncrest"
+    ],
+    "rarity": 4,
+    "description": "Dawnveil gathers sunbeams near its favored ridge.",
+    "stats": [
+      110,
+      86,
+      79,
+      87,
+      88,
+      82
+    ],
+    "skills": [
+      "gleam",
+      "halo-lance",
+      "solar-flare"
+    ],
+    "evolution": {
+      "forms": [
+        "Dawnlet",
+        "Dawnveil",
+        "Dawnveilaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "aggressive"
+  },
+  {
+    "id": "noctiri",
+    "no": 25,
+    "name": "Noctiri",
+    "type": "Shadow",
+    "habitats": [
+      "verdalia",
+      "celestial"
+    ],
+    "rarity": 1,
+    "description": "Noctiri gathers shadows near its favored glade.",
+    "stats": [
+      78,
+      75,
+      59,
+      72,
+      67,
+      75
+    ],
+    "skills": [
+      "dusk-touch",
+      "night-pulse",
+      "veil-rend"
+    ],
+    "evolution": {
+      "forms": [
+        "Noctlet",
+        "Noctiri",
+        "Noctiriaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "flee"
+  },
+  {
+    "id": "umbrel",
+    "no": 26,
+    "name": "Umbrel",
+    "type": "Shadow",
+    "habitats": [
+      "verdalia",
+      "celestial"
+    ],
+    "rarity": 2,
+    "description": "Umbrel gathers shadows near its favored vent.",
+    "stats": [
+      89,
+      80,
+      66,
+      78,
+      75,
+      79
+    ],
+    "skills": [
+      "dusk-touch",
+      "night-pulse",
+      "veil-rend"
+    ],
+    "evolution": {
+      "forms": [
+        "Umbrlet",
+        "Umbrel",
+        "Umbrelaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "wander"
+  },
+  {
+    "id": "vexshade",
+    "no": 27,
+    "name": "Vexshade",
+    "type": "Shadow",
+    "habitats": [
+      "verdalia",
+      "celestial"
+    ],
+    "rarity": 3,
+    "description": "Vexshade gathers shadows near its favored pool.",
+    "stats": [
+      100,
+      85,
+      73,
+      84,
+      83,
+      83
+    ],
+    "skills": [
+      "dusk-touch",
+      "night-pulse",
+      "veil-rend"
+    ],
+    "evolution": {
+      "forms": [
+        "Vexslet",
+        "Vexshade",
+        "Vexshadearis"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "sleep"
+  },
+  {
+    "id": "mistail",
+    "no": 28,
+    "name": "Mistail",
+    "type": "Shadow",
+    "habitats": [
+      "verdalia",
+      "celestial"
+    ],
+    "rarity": 4,
+    "description": "Mistail gathers shadows near its favored ridge.",
+    "stats": [
+      111,
+      90,
+      80,
+      90,
+      91,
+      87
+    ],
+    "skills": [
+      "dusk-touch",
+      "night-pulse",
+      "veil-rend"
+    ],
+    "evolution": {
+      "forms": [
+        "Mistlet",
+        "Mistail",
+        "Mistailaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "aggressive"
+  },
+  {
+    "id": "crysthorn",
+    "no": 29,
+    "name": "Crysthorn",
+    "type": "Crystal",
+    "habitats": [
+      "frostveil",
+      "azuremere"
+    ],
+    "rarity": 1,
+    "description": "Crysthorn gathers crystals near its favored glade.",
+    "stats": [
+      79,
+      79,
+      60,
+      75,
+      70,
+      80
+    ],
+    "skills": [
+      "shard-toss",
+      "prism-ray",
+      "crystal-crash"
+    ],
+    "evolution": {
+      "forms": [
+        "Cryslet",
+        "Crysthorn",
+        "Crysthornaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "flee"
+  },
+  {
+    "id": "glacelle",
+    "no": 30,
+    "name": "Glacelle",
+    "type": "Crystal",
+    "habitats": [
+      "frostveil",
+      "azuremere"
+    ],
+    "rarity": 2,
+    "description": "Glacelle gathers crystals near its favored vent.",
+    "stats": [
+      90,
+      84,
+      67,
+      81,
+      78,
+      84
+    ],
+    "skills": [
+      "shard-toss",
+      "prism-ray",
+      "crystal-crash"
+    ],
+    "evolution": {
+      "forms": [
+        "Glaclet",
+        "Glacelle",
+        "Glacellearis"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "wander"
+  },
+  {
+    "id": "prismara",
+    "no": 31,
+    "name": "Prismara",
+    "type": "Crystal",
+    "habitats": [
+      "frostveil",
+      "azuremere"
+    ],
+    "rarity": 3,
+    "description": "Prismara gathers crystals near its favored pool.",
+    "stats": [
+      101,
+      89,
+      74,
+      87,
+      86,
+      88
+    ],
+    "skills": [
+      "shard-toss",
+      "prism-ray",
+      "crystal-crash"
+    ],
+    "evolution": {
+      "forms": [
+        "Prislet",
+        "Prismara",
+        "Prismaraaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "sleep"
+  },
+  {
+    "id": "shardrake",
+    "no": 32,
+    "name": "Shardrake",
+    "type": "Crystal",
+    "habitats": [
+      "frostveil",
+      "azuremere"
+    ],
+    "rarity": 4,
+    "description": "Shardrake gathers crystals near its favored ridge.",
+    "stats": [
+      112,
+      94,
+      81,
+      93,
+      94,
+      92
+    ],
+    "skills": [
+      "shard-toss",
+      "prism-ray",
+      "crystal-crash"
+    ],
+    "evolution": {
+      "forms": [
+        "Sharlet",
+        "Shardrake",
+        "Shardrakearis"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "aggressive"
+  },
+  {
+    "id": "aerion",
+    "no": 33,
+    "name": "Aerion",
+    "type": "Sky",
+    "habitats": [
+      "celestial"
+    ],
+    "rarity": 1,
+    "description": "Aerion gathers cloud wisps near its favored glade.",
+    "stats": [
+      80,
+      83,
+      61,
+      78,
+      73,
+      85
+    ],
+    "skills": [
+      "cloud-skip",
+      "nimbus-bolt",
+      "star-dive"
+    ],
+    "evolution": {
+      "forms": [
+        "Aerilet",
+        "Aerion",
+        "Aerionaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "flee"
+  },
+  {
+    "id": "cloudpom",
+    "no": 34,
+    "name": "Cloudpom",
+    "type": "Sky",
+    "habitats": [
+      "celestial"
+    ],
+    "rarity": 2,
+    "description": "Cloudpom gathers cloud wisps near its favored vent.",
+    "stats": [
+      91,
+      88,
+      68,
+      84,
+      81,
+      89
+    ],
+    "skills": [
+      "cloud-skip",
+      "nimbus-bolt",
+      "star-dive"
+    ],
+    "evolution": {
+      "forms": [
+        "Cloulet",
+        "Cloudpom",
+        "Cloudpomaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "wander"
+  },
+  {
+    "id": "cirravel",
+    "no": 35,
+    "name": "Cirravel",
+    "type": "Sky",
+    "habitats": [
+      "celestial"
+    ],
+    "rarity": 3,
+    "description": "Cirravel gathers cloud wisps near its favored pool.",
+    "stats": [
+      102,
+      93,
+      75,
+      90,
+      89,
+      93
+    ],
+    "skills": [
+      "cloud-skip",
+      "nimbus-bolt",
+      "star-dive"
+    ],
+    "evolution": {
+      "forms": [
+        "Cirrlet",
+        "Cirravel",
+        "Cirravelaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "sleep"
+  },
+  {
+    "id": "nimbus",
+    "no": 36,
+    "name": "Nimbus",
+    "type": "Sky",
+    "habitats": [
+      "celestial"
+    ],
+    "rarity": 4,
+    "description": "Nimbus gathers cloud wisps near its favored ridge.",
+    "stats": [
+      113,
+      98,
+      82,
+      96,
+      97,
+      97
+    ],
+    "skills": [
+      "cloud-skip",
+      "nimbus-bolt",
+      "star-dive"
+    ],
+    "evolution": {
+      "forms": [
+        "Nimblet",
+        "Nimbus",
+        "Nimbusaris"
+      ],
+      "levels": [
+        1,
+        12,
+        26
+      ]
+    },
+    "behavior": "aggressive"
+  }
+]
