@@ -2,6 +2,7 @@ import * as T from "three";
 import regions from "./data/regions.json";
 import { wildlife } from "./wildlife";
 import { openDex } from "./dex";
+import { ambience, writeSave, type Save } from "./save";
 import { nearestSite, newJourney, objective, openBag, visit } from "./quests";
 import { discover, openMap, type Exploration } from "./map";
 import { battle, newParty, speciesOf, maxHp } from "./combat";
@@ -28,7 +29,7 @@ function surface(x: number, z: number, y: number) {
   return Math.hypot(x-island.x,z-island.z) < 125 && y > 86 ? 91 : Math.max(terrain(x,z), SEA - .4);
 }
 
-export function explore(host: HTMLElement, settings: {quality:string;sensitivity:number}, exit:()=>void) {
+export function explore(host: HTMLElement, settings: {quality:string;sensitivity:number;volume:number}, exit:()=>void, resume?:Save) {
   const low = settings.quality === "low" || (settings.quality === "auto" && matchMedia("(pointer:coarse)").matches);
   const renderer = new T.WebGLRenderer({antialias:!low});
   const scene = new T.Scene();
@@ -77,9 +78,11 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   actor.position.set(0,terrain(0,0)+1,12);
   scene.add(actor);
   const fauna=wildlife(scene,nearest,surface,sample);
-  const party=newParty();
-  const journey=newJourney();
-  const exploration:Exploration={discovered:[],x:actor.position.x,z:actor.position.z};
+  if(resume)actor.position.fromArray(resume.position);
+  const party=resume?.party??newParty();
+  const journey=resume?.journey??newJourney();
+  const exploration:Exploration=resume?.exploration??{discovered:[],x:actor.position.x,z:actor.position.z};
+  fauna.setCompanion(speciesOf(party.team[0]));
   let fighting=false,overlay=false,lastBattle=0;
   let target:ReturnType<typeof fauna.update>;
 
@@ -136,9 +139,9 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   <section class="world-info"><strong></strong><small></small></section>
   <button class="world-exit" aria-label="Return to title">‹</button>
   <button class="minimap" aria-label="Open world map" data-key="KeyM"><canvas width="96" height="96" aria-hidden="true"></canvas><b>N</b><span>▲</span><small></small></button><div class="minimap-zoom"><button data-key="Equal" aria-label="Minimap zoom in">+</button><button data-key="Minus" aria-label="Minimap zoom out">−</button></div>
-  <div class="discovery-note" aria-live="polite"></div><aside class="quest-track"><strong>The Call of Skyspire</strong><small></small></aside><div class="quick-items"><button data-key="KeyI" aria-label="Bag">Bag</button><button data-key="Digit1" aria-label="Use berry">Berry</button><button data-key="KeyL" aria-label="Field mail">✉</button></div>
+  <div class="discovery-note" aria-live="polite"></div><aside class="quest-track"><strong>The Call of Skyspire</strong><small></small></aside><div class="quick-items"><button data-key="KeyI" aria-label="Bag">Bag</button><button data-key="Digit1" aria-label="Use berry">Berry</button><button data-key="KeyL" aria-label="Field mail">✉</button><button data-key="KeyP" aria-label="Save game">Save</button></div>
   <section class="team-hud" aria-label="Party"><strong></strong><div class="team-slots"></div></section>
-  <label class="energy-hud"><span>⚡</span><progress max="100" value="100" aria-label="Energy"></progress></label>
+  <div class="energy-hud"><label><span>♥</span><progress class="player-hp" max="100" value="100" aria-label="Player health"></progress></label><label><span>⚡</span><progress class="player-energy" max="100" value="100" aria-label="Energy"></progress></label></div>
   <div class="stick" aria-label="Move"><i></i></div>
   <div class="world-shortcuts"><button data-key="Tab" aria-label="Creature Dex">◇</button><button data-key="KeyB" aria-label="Scan">⌕</button></div>
   <div class="world-actions"><button data-key="KeyR" aria-label="Recenter camera">⌖</button><button data-key="Space" aria-label="Jump or glide">⛯</button><button class="interact" data-key="KeyE" aria-label="Interact"><span>✧</span>Interact</button><button data-key="ShiftLeft" aria-label="Sprint">⇧</button></div>`;
@@ -146,7 +149,8 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   viewport.append(renderer.domElement);
   const info=host.querySelector(".world-info strong")!;
   const clock=host.querySelector(".world-info small")!;
-  const energyBar=host.querySelector<HTMLProgressElement>(".energy-hud progress")!;
+  const energyBar=host.querySelector<HTMLProgressElement>(".player-energy")!;
+  const healthBar=host.querySelector<HTMLProgressElement>(".player-hp")!;
   const discoveryNote=host.querySelector(".discovery-note")!;
   const compass=host.querySelector<HTMLElement>(".minimap span")!;
   const mapCount=host.querySelector(".minimap small")!;
@@ -185,13 +189,25 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     fighting=battle(host,party,opponent.species,opponent.level,remove=>{
       if(remove)fauna.remove(opponent);
       fauna.setCompanion(speciesOf(party.team[0]));
-      fighting=false;lastBattle=time+2;
+      fighting=false;lastBattle=time+2;save();
     });
   }
   const listeners=new AbortController();
   const options={signal:listeners.signal};
   const held=new Set<string>();
-  let yaw=0,pitch=.32,vertical=0,energy=100,time=0,jump=false,glide=false,raf=0;
+  let yaw=resume?.yaw??0,pitch=resume?.pitch??.32,vertical=resume?.vertical??0,energy=resume?.energy??100,time=resume?.time??0,jump=false,glide=resume?.glide??false,raf=0;
+  let nextSave=time+8;
+  let playerHp=resume?.hp??100;
+  healthBar.value=playerHp;
+  const stopSound=ambience(settings.volume);
+  function save(){
+    if(fighting)return false;
+    const p=actor.position;
+    return writeSave({version:1,party,journey,exploration,position:[p.x,p.y,p.z],yaw,pitch,vertical,energy,time,glide,hp:playerHp});
+  }
+  window.addEventListener("pagehide",save,options);
+  document.addEventListener("visibilitychange",()=>{if(document.hidden)save();},options);
+  save();
   let stickX=0,stickZ=0;
   const move=new T.Vector3();
   const focus=new T.Vector3();
@@ -212,6 +228,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
       if(site.kind==="village"){overlay=true;held.clear();openBag(host,party,journey,closeOverlay,site);}
       return;
     }
+    if(code==="KeyP"){notify(save()?"Adventure saved.":"Save unavailable.");return;}
     if(code==="KeyI"){overlay=true;held.clear();openBag(host,party,journey,closeOverlay);return;}
     if(code==="KeyL"){notify("Field mail · "+(objective(journey)?.name??"Skyspire thanks you for your service."));return;}
     if(code==="Digit1"&&party.berries){const lead=party.team[0];party.berries--;lead.hp=Math.min(maxHp(lead),lead.hp+Math.ceil(35*(lead.affinity>=25?1.05:1)));lead.affinity=Math.min(100,lead.affinity+2);notify("Berry used · "+speciesOf(lead).name);return;}
@@ -239,6 +256,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   for(const button of Array.from(host.querySelectorAll<HTMLButtonElement>("[data-key]"))){
     const code=button.dataset.key!;
     button.addEventListener("pointerdown",e=>{button.setPointerCapture(e.pointerId);press(code);},options);
+    button.addEventListener("click",e=>{if(e.detail===0){press(code);held.delete(code);}},options);
     button.addEventListener("lostpointercapture",()=>held.delete(code),options);
   }
   function resize() {
@@ -256,6 +274,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     prev=now;
     if(fighting||overlay){raf=requestAnimationFrame(frame);return;}
     time+=dt;
+    if(time>=nextSave){save();nextSave=time+8;}
     const p=actor.position;
     const floor=surface(p.x,p.z,p.y)+.9;
     const grounded=p.y<=floor+.15;
@@ -280,7 +299,13 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     vertical=Math.max(glide?-2.6:-44,vertical-24*dt);
     p.y+=vertical*dt;
     const nextFloor=surface(p.x,p.z,p.y)+.9;
-    if(p.y<nextFloor){p.y=nextFloor;vertical=0;}
+    if(p.y<nextFloor){
+      p.y=nextFloor;
+      if(vertical<-28&&!swim){playerHp=clamp(playerHp+Math.round((vertical+26)*2),0,100);notify("Hard landing");}
+      if(playerHp<=0){p.set(0,surface(0,12,0)+1,12);playerHp=100;notify("Recovered at Skyspire City");}
+      healthBar.value=playerHp;
+      vertical=0;
+    }
     focus.copy(p).y+=1;
     offset.set(0,Math.sin(pitch)*10,Math.cos(pitch)*10).applyAxisAngle(T.Object3D.DEFAULT_UP,yaw);
     camera.position.copy(focus).add(offset);
@@ -330,7 +355,9 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   raf=requestAnimationFrame(frame);
   const dispose=()=>{
     cancelAnimationFrame(raf);
+    save();
     listeners.abort();
+    stopSound();
     fauna.dispose();
     scene.traverse(node=>{if(node instanceof T.Mesh){node.geometry.dispose();const mats=Array.isArray(node.material)?node.material:[node.material];mats.forEach(mat=>mat.dispose());}});
     renderer.dispose();
