@@ -117,6 +117,27 @@ jobs:
                 return canvas && canvas.width > 0 && canvas.height > 0;
               });
               await page.screenshot({path: 'captures/streaming-' + name + '.png'});
+              await page.keyboard.down('KeyA');
+              try {
+                for (let attempt = 0; attempt < 12; attempt++) {
+                  const prompt = await page.locator('.quest-track small').textContent();
+                  const distance = Number(prompt.match(/(\d+) m/)?.[1] ?? Infinity);
+                  if (distance <= 10) break;
+                  await page.waitForTimeout(300);
+                }
+              } finally {
+                await page.keyboard.up('KeyA');
+              }
+              await page.getByRole('button', {name: 'Interact', exact: true}).click();
+              await page.getByRole('heading', {name: 'Chapitre 1 · La créature blessée'}).waitFor();
+              await page.getByRole('textbox', {name: 'Nom du héros'}).fill('Ari');
+              await capture('florix-rescue', true);
+              for (let line = 0; line < 5; line++) await page.getByRole('button', {name: 'Suivant'}).click();
+              await page.getByRole('button', {name: 'Poursuivre'}).click();
+              await page.waitForFunction(() => {
+                const state = JSON.parse(localStorage.getItem('aetheris.save')).chronicle;
+                return state.hero === 'Ari' && state.checkpoint === 'wild-mossling';
+              });
               await page.locator('.world-exit').click();
               await page.evaluate(({x, z}) => {
                 const save = JSON.parse(localStorage.getItem('aetheris.save'));
