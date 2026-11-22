@@ -9,7 +9,7 @@ const typeIcons: Record<string,string> = {Nature:"❧",Fire:"♨",Water:"◈",Wi
 const stats=["HP","ATK","DEF","SP. ATK","SP. DEF","SPD"];
 export function openDex(host:HTMLElement,party:Party|undefined,close:()=>void){
   const panel=document.createElement("section");
-  panel.className="atlas panel";
+  panel.className="atlas panel creature-dex";
   host.append(panel);
   let tab=0,filter="",query="",selected=creatures[0];
   const caught=(id:string)=>party?.caught.includes(id)??false;
@@ -36,18 +36,18 @@ export function openDex(host:HTMLElement,party:Party|undefined,close:()=>void){
     const affinity=member?.affinity??0;
     const bond=`<section><h3>Affinity · Lv.${Math.min(20,Math.floor(affinity/5))}</h3><progress max="100" value="${affinity}"></progress><p>${affinity>=25?"+10% type skill power · +5% recovery":"Lv.5 unlocks a type power and recovery bonus."}</p></section>`;
     const evolution=`<section><h3>Evolution</h3><p>${c.evolution.forms.map((form,i)=>form+" · Lv."+c.evolution.levels[i]).join(" → ")}</p></section>`;
-    return `<h2>${c.name}</h2>${portrait(c.id,c.type)}<p style="color:${typeColor(c.type)}">${c.type} · ${"★".repeat(c.rarity)}</p>
+    return `<small>No.${String(c.no).padStart(3,"0")}</small><h2>${c.name}</h2><p style="color:${typeColor(c.type)}">${c.type} · ${"★".repeat(c.rarity)}</p>
       ${tab===2?bond:tab===3?evolution:`<p>${member?`Lv.${member.level} · ${member.xp} XP · ${member.hp}/${maxHp(member)} HP`:"Unowned"}</p>
-      <p>${c.description}</p><p>${c.habitats.map(id=>regions.find(r=>r.id===id)?.name).join(" · ")}</p>
+      <p class="species-description">${c.description}</p><p>${c.habitats.map(id=>regions.find(r=>r.id===id)?.name).join(" · ")}</p>
       <h3>Base stats · ${c.stats.reduce((a,b)=>a+b,0)}</h3><div class="stat-bars">${stats.map((name,i)=>`<label>${name} <progress max="140" value="${c.stats[i]}"></progress> ${c.stats[i]}</label>`).join("")}</div>
-      <h3>Skills</h3><p>${c.skills.map(id=>moves.find(move=>move.id===id)?.name).join(" · ")}</p>${evolution}${bond}`}`;
+      <h3>Skills</h3><ul class="dex-skills">${c.skills.map(id=>moves.find(move=>move.id===id)).filter(move=>move!==undefined).map(move=>`<li><strong>${move.name}</strong><small>${move.type} · ${move.power}</small></li>`).join("")}</ul>${evolution}${bond}`}`;
   }
   function draw(){
     panel.classList.toggle("compendium",tab===4);
     panel.innerHTML=`<header class="atlas-header"><strong>Creature Dex · ${party?.caught.length??0}/${creatures.length}</strong><button data-close aria-label="Close">×</button></header>
       <div class="atlas-tabs">${tabs.map((name,i)=>`<button data-tab="${i}" aria-pressed="${i===tab}">${name}</button>`).join("")}</div>
       ${tab===4?`<div class="poster-heading"><h2>Grand Species Compendium</h2><p>${party?.seen.length??0}/${creatures.length} species discovered</p></div>`:`<div class="atlas-filters"><input type="search" placeholder="Search species" aria-label="Search species"><select aria-label="Filter by type"><option value="">All types · ${creatures.length}</option>${Object.keys(types).map(type=>`<option value="${type}">${type} · ${creatures.filter(c=>c.type===type).length}</option>`).join("")}</select></div>`}
-      <div class="atlas-body"><div class="species-grid"></div><aside class="species-detail"></aside></div>`;
+      <div class="atlas-body"><div class="species-grid"></div><div class="dex-hero"></div><aside class="species-detail"></aside></div>`;
     const search=panel.querySelector("input");
     const select=panel.querySelector("select");
     if(search)search.value=query;
@@ -58,6 +58,7 @@ export function openDex(host:HTMLElement,party:Party|undefined,close:()=>void){
     panel.querySelector(".species-grid")!.innerHTML=grid();
     panel.querySelector(".species-grid")!.classList.toggle("poster",tab===4);
     panel.querySelector(".species-detail")!.innerHTML=detail();
+    panel.querySelector(".dex-hero")!.innerHTML=`${portrait(selected.id,selected.type)}<strong>${selected.name}</strong>`;
   }
   panel.addEventListener("error",e=>{if(e.target instanceof HTMLImageElement)e.target.hidden=true;},true);
   panel.addEventListener("input",e=>{if(e.target instanceof HTMLInputElement){query=e.target.value.toLowerCase();refresh();}});
