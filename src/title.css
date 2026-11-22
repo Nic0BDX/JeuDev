@@ -45,6 +45,12 @@
   .illustrated-title [data-page="codex"] { --y: 51.4%; }
   .illustrated-title [data-page="map"] { --y: 60.4%; }
   .illustrated-title [data-page="settings"] { --y: 69.5%; }
+  .screen.illustrated-title nav button:not([data-page="characters"])::before {
+    content: none;
+  }
+  .screen.illustrated-title nav button:not([data-page="characters"]):is(:hover, :focus-visible, :first-child) {
+    color: transparent;
+  }
   .illustrated-title nav button:disabled { background: #07183170; opacity: 1; }
   .illustrated-title nav button:not(:disabled):hover,
   .illustrated-title nav button:focus-visible {
