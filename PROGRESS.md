@@ -2,7 +2,7 @@
 
 - [x] M0 · Vite, architecture et données JSON
 - [x] M1 · Interface, titre et réglages
-- [ ] M2 · Monde et déplacements
+- [x] M2 · Monde et déplacements
 - [ ] M3 · Créatures et compagnon
 - [ ] M4 · Combat et capture
 - [ ] M5 · Dex et collection
@@ -13,3 +13,5 @@
 M0 validé par [GitHub Actions](https://github.com/Nic0BDX/JeuDev/actions/runs/45011143807).
 
 M1 validé par [GitHub Actions](https://github.com/Nic0BDX/JeuDev/actions/runs/45011257456).
+
+M2 validé par [GitHub Actions](https://github.com/Nic0BDX/JeuDev/actions/runs/45011546290). Parcours WebGL et FPS à contrôler sur appareil.
