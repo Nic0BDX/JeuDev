@@ -41,3 +41,5 @@ Navigation narrative : repère 3D et losange de minimap. [Build](https://github.
 Forge du Cratère : entrée, évent et abri modélisés. L’ordre des deux actions et la reprise entre les actions sont vérifiés. [Build](https://github.com/Nic0BDX/JeuDev/actions/runs/45046357388) · [Tests et captures](https://github.com/Nic0BDX/JeuDev/actions/runs/45046357241).
 
 Outils : lanceur Windows `start-agents.ps1` ajouté à la racine. Démarrage local à vérifier : le terminal de session échoue avant l’ouverture de PowerShell.
+
+M8 : prologue jouable en trois plans sur la [PR brouillon #8](https://github.com/Nic0BDX/JeuDev/pull/8). Déploiement Vercel réussi. Contrôle visuel, autres cinématiques et mesure sur appareils réels à faire.
