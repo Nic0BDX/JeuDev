@@ -1,9 +1,12 @@
 import * as T from "three";
 import regions from "./data/regions.json";
 import { wildlife } from "./wildlife";
+import { characterAt, openCharacters } from "./characters";
+import { mountCharacterMarkers } from "./character-markers";
 import { openDex } from "./dex";
 import { ambience, writeSave, type Save } from "./save";
-import { nearestSite, newJourney, objective, openBag, visit } from "./quests";
+import { nearestSite, newJourney, openBag, visit } from "./quests";
+import { chapter, destination, restoreChronicle, playScene, siteLabel } from "./story";
 import { discover, openMap, type Exploration } from "./map";
 import { battle, newParty, speciesOf, maxHp } from "./combat";
 
@@ -16,7 +19,12 @@ function sample(x: number, z: number) {
   return n - Math.floor(n);
 }
 function nearest(x: number, z: number) {
-  return regions.reduce((best, region) => Math.hypot(x-region.x,z-region.z) < Math.hypot(x-best.x,z-best.z) ? region : best);
+  let best=regions[0], distance=Infinity;
+  for(const region of regions){
+    const squared=(x-region.x)**2+(z-region.z)**2;
+    if(squared<distance){best=region;distance=squared;}
+  }
+  return best;
 }
 function terrain(x: number, z: number) {
   const wave = 8*Math.sin(x/47)*Math.cos(z/66)+4*Math.sin((x+z)/25);
@@ -26,12 +34,14 @@ function terrain(x: number, z: number) {
 }
 function surface(x: number, z: number, y: number) {
   const island = regions.at(-1)!;
-  return Math.hypot(x-island.x,z-island.z) < 125 && y > 86 ? 91 : Math.max(terrain(x,z), SEA - .4);
+  return Math.hypot(x-island.x,z-island.z) < 155 && y > 86 ? 91 : Math.max(terrain(x,z), SEA - .4);
 }
 
-export function explore(host: HTMLElement, settings: {quality:string;sensitivity:number;volume:number}, exit:()=>void, resume?:Save) {
+export function explore(host: HTMLElement, settings: {quality:string;sensitivity:number;volume:number;language:string}, exit:()=>void, resume?:Save) {
   const low = settings.quality === "low" || (settings.quality === "auto" && matchMedia("(pointer:coarse)").matches);
-  const renderer = new T.WebGLRenderer({antialias:!low});
+  const adaptive = settings.quality === "auto";
+  const renderer = new T.WebGLRenderer({antialias:settings.quality==="high", powerPreference:low?"default":"high-performance"});
+  let renderScale=adaptive ? (low ? .95 : .85) : 1;
   const scene = new T.Scene();
   const sky = new T.Color();
   const clearSky = new T.Color(0x80c8f7);
@@ -46,21 +56,27 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   scene.add(light,sun);
   const planet = new T.Mesh(new T.SphereGeometry(135,24,16),new T.MeshBasicMaterial({color:0xc3deff,fog:false}));
   scene.add(planet);
-  const water = new T.Mesh(new T.PlaneGeometry(14000,14000),new T.MeshPhongMaterial({color:0x37a8cf,shininess:100}));
+  const water = new T.Mesh(new T.PlaneGeometry(14000,14000),new T.MeshLambertMaterial({color:0x37a8cf}));
   water.rotation.x = -Math.PI/2;
   water.position.y = SEA;
   scene.add(water);
-  const island = new T.Mesh(new T.CylinderGeometry(125,22,42,12),new T.MeshLambertMaterial({color:0x826fba}));
+  const island = new T.Mesh(new T.CylinderGeometry(155,22,42,16),new T.MeshLambertMaterial({color:0x826fba}));
   island.position.set(0,70,-750);
   scene.add(island);
   const marker = new T.CylinderGeometry(.35,1.5,8,5);
   const crystal = new T.MeshLambertMaterial({color:0xbcf3ff,emissive:0x27608b,flatShading:true});
-  for(const region of regions) for(const place of region.locations) {
-    const landmark = new T.Mesh(marker,crystal);
-    landmark.scale.setScalar(place.kind === "statue" ? 1.5 : .75);
-    landmark.position.set(place.x,(place.y ?? terrain(place.x,place.z))+3,place.z);
-    scene.add(landmark);
+  const landmarkTransform = new T.Object3D();
+  for(const region of regions){
+    const landmarks = new T.InstancedMesh(marker, crystal, region.locations.length);
+    region.locations.forEach((place,index)=>{
+      landmarkTransform.scale.setScalar(place.kind==="statue"?1.5:.75);
+      landmarkTransform.position.set(place.x,(place.y??terrain(place.x,place.z))+3,place.z);
+      landmarkTransform.updateMatrix();
+      landmarks.setMatrixAt(index,landmarkTransform.matrix);
+    });
+    scene.add(landmarks);
   }
+  const removeCharacterMarkers=mountCharacterMarkers(scene,regions.flatMap(region=>region.locations.map(place=>({id:place.id,x:place.x,y:place.y??terrain(place.x,place.z),z:place.z}))));
   const actor = new T.Group();
   const addPart=(geometry:T.BufferGeometry,color:number,x:number,y:number,z:number)=>{
     const mesh=new T.Mesh(geometry,new T.MeshLambertMaterial({color,flatShading:true}));
@@ -83,8 +99,10 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   if(resume)actor.position.fromArray(resume.position);
   const party=resume?.party??newParty();
   const journey=resume?.journey??newJourney();
+  const chronicle=restoreChronicle(resume?.chronicle);
   const exploration:Exploration=resume?.exploration??{discovered:[],x:actor.position.x,z:actor.position.z};
   fauna.setCompanion(speciesOf(party.team[0]));
+  fauna.showCompanion(chronicle.next>0);
   let fighting=false,overlay=false,lastBattle=0;
   let target:ReturnType<typeof fauna.update>;
 
@@ -93,17 +111,30 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   const leafMaterial = new T.MeshLambertMaterial({color:0xffffff,flatShading:true});
   const chunks = new Map<string,{mesh:T.Mesh;trees:T.InstancedMesh}>();
   const dummy = new T.Object3D();
+  let pendingChunks: Array<{gx:number;gz:number;segments:number;id:string}> = [];
   function stream() {
     const cx = Math.floor(actor.position.x/SIZE);
     const cz = Math.floor(actor.position.z/SIZE);
     const radius = low ? 2 : 3;
     const active = new Set<string>();
+    pendingChunks=[];
     for(let z=-radius;z<=radius;z++) for(let x=-radius;x<=radius;x++){
       const gx=cx+x,gz=cz+z;
       const segments=Math.max(Math.abs(x),Math.abs(z))<=1?16:8;
       const id = [gx,gz,segments].join(",");
       active.add(id);
-      if(chunks.has(id)) continue;
+      if(!chunks.has(id))pendingChunks.push({gx,gz,segments,id});
+    }
+    pendingChunks.sort((a,b)=>Math.max(Math.abs(a.gx-cx),Math.abs(a.gz-cz))-Math.max(Math.abs(b.gx-cx),Math.abs(b.gz-cz)));
+    for(const [id,chunk] of chunks) if(!active.has(id)){
+      scene.remove(chunk.mesh,chunk.trees);
+      chunk.mesh.geometry.dispose();
+      chunk.trees.dispose();
+      chunks.delete(id);
+    }
+  }
+  function fillChunks(budget:number){
+    for(const {gx,gz,segments,id} of pendingChunks.splice(0,budget)){
       const geometry = new T.PlaneGeometry(SIZE,SIZE,segments,segments).rotateX(-Math.PI/2).translate((gx+.5)*SIZE,0,(gz+.5)*SIZE);
       const pos=geometry.attributes.position;
       const colors=[];
@@ -129,12 +160,6 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
       }
       scene.add(mesh,trees);
       chunks.set(id,{mesh,trees});
-    }
-    for(const [id,chunk] of chunks) if(!active.has(id)){
-      scene.remove(chunk.mesh,chunk.trees);
-      chunk.mesh.geometry.dispose();
-      chunk.trees.dispose();
-      chunks.delete(id);
     }
   }
   host.innerHTML=`<div class="world"></div>
@@ -205,7 +230,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   function save(){
     if(fighting)return false;
     const p=actor.position;
-    return writeSave({version:1,party,journey,exploration,position:[p.x,p.y,p.z],yaw,pitch,vertical,energy,time,glide,hp:playerHp});
+    return writeSave({version:1,party,journey,chronicle,exploration,position:[p.x,p.y,p.z],yaw,pitch,vertical,energy,time,glide,hp:playerHp});
   }
   window.addEventListener("pagehide",save,options);
   document.addEventListener("visibilitychange",()=>{if(document.hidden)save();},options);
@@ -217,24 +242,58 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   function press(code:string) {
     if(!overlay&&!fighting&&(code==="Equal"||code==="Minus")){mapRange=clamp(mapRange*(code==="Equal"?.72:1.38),34,230);mapNext=0;return;}
     if(fighting||overlay)return;
+    if(code==="KeyC"){overlay=true;held.clear();openCharacters(host,settings.language,closeOverlay);return;}
     if(code==="KeyM"){
       overlay=true;held.clear();
+      exploration.objective=destination(chronicle)?.id??null;
       openMap(host,exploration,()=>{overlay=false;},point=>{actor.position.set(point.x,(point.y??surface(point.x,point.z,0))+1,point.z);vertical=0;});return;
     }
     if(code==="Tab"){overlay=true;held.clear();openDex(host,party,()=>{overlay=false;});return;}
     if(code==="KeyE"){
       const p=actor.position;const site=nearestSite(p.x,p.y,p.z);
       if(!site){startBattle();return;}
-      const result=visit(journey,party,site);
-      if(result)notify(result);
-      if(site.kind==="village"){overlay=true;held.clear();openBag(host,party,journey,closeOverlay,site);}
+      if(destination(chronicle)?.id===site.id){
+        overlay=true;held.clear();
+        playScene(host,chronicle,party,(scene,advanced)=>{
+          closeOverlay();
+          if(!advanced)return;
+          fauna.showCompanion(true);
+          if(scene.crystal&&!journey.looted.includes(site.id)){journey.crystals++;journey.looted.push(site.id);}
+          if(scene.travel){
+            const point=regions.flatMap<typeof regions[number]["locations"][number]>(r=>r.locations).find(place=>place.id===scene.travel);
+            if(point){actor.position.set(point.x,(point.y??terrain(point.x,point.z))+1,point.z);vertical=0;glide=false;}
+          }
+          notify(scene.shard?"Éclat d’Aether obtenu · "+chronicle.shards.length+"/4":chronicle.ending?"Épilogue terminé":"Récit mis à jour");
+          save();
+        });
+        return;
+      }
+      const interactWithSite=()=>{
+        const result=visit(journey,party,site,false);
+        if(result){notify(result);save();}
+        if(site.kind==="village"){overlay=true;held.clear();openBag(host,party,journey,closeOverlay,site);}
+        else closeOverlay();
+      };
+      const npc=characterAt.get(site.id);
+      if(npc){
+        overlay=true;held.clear();
+        openCharacters(host,settings.language,closeOverlay,npc,interactWithSite);
+      }else interactWithSite();
       return;
     }
     if(code==="KeyP"){notify(save()?"Adventure saved.":"Save unavailable.");return;}
     if(code==="KeyI"){overlay=true;held.clear();openBag(host,party,journey,closeOverlay);return;}
-    if(code==="KeyL"){notify("Field mail · "+(objective(journey)?.name??"Skyspire thanks you for your service."));return;}
+    if(code==="KeyL"){notify("Field mail · "+(destination(chronicle)?.name??"Skyspire thanks you for your service."));return;}
     if(code==="Digit1"&&party.berries){const lead=party.team[0];party.berries--;lead.hp=Math.min(maxHp(lead),lead.hp+Math.ceil(35*(lead.affinity>=25?1.05:1)));lead.affinity=Math.min(100,lead.affinity+2);notify("Berry used · "+speciesOf(lead).name);return;}
-    if(code==="KeyB"&&target&&!party.seen.includes(target.species.id))party.seen.push(target.species.id);
+    if(code==="KeyB"){
+      if(!target){notify("No creature in scanner range");return;}
+      const c=target.species;
+      const fresh=!party.seen.includes(c.id);
+      if(fresh)party.seen.push(c.id);
+      notify((fresh?"New Dex entry · ":"Scan · ")+c.name+" · Lv."+target.level+" · "+c.type+" · "+"★".repeat(c.rarity));
+      if(fresh)save();
+      return;
+    }
     if(code==="Space" && !held.has(code)) jump=true;
     if(code==="KeyR") { yaw=0;pitch=.32; }
     held.add(code);
@@ -262,7 +321,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     button.addEventListener("lostpointercapture",()=>held.delete(code),options);
   }
   function resize() {
-    renderer.setPixelRatio(Math.min(devicePixelRatio,low?1.25:1.8));
+    renderer.setPixelRatio(Math.min(devicePixelRatio,low?1.25:1.8)*renderScale);
     renderer.setSize(viewport.clientWidth,viewport.clientHeight);
     camera.aspect=viewport.clientWidth/Math.max(1,viewport.clientHeight);
     camera.updateProjectionMatrix();
@@ -270,16 +329,32 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   window.addEventListener("resize",resize,options);
   resize();
   stream();
+  fillChunks(9);
   const meter = new URLSearchParams(location.search).get("performance") === "1" ? document.createElement("output") : null;
   if(meter){meter.className="performance-meter";host.append(meter);}
   let sampleStart=0,samplePrevious=0;
   const frameIntervals:number[]=[];
   let lastObjective="",lastBerry="",lastHeading=NaN,lastEnergy=-1;
-  let prev=performance.now(),lastChunk="";
+  let prev=performance.now(),lastChunk=Math.floor(actor.position.x/SIZE)+","+Math.floor(actor.position.z/SIZE);
+  let qualityStart=0,qualityFrames=0,fastWindows=0;
   function frame(now:number) {
-    const dt=Math.min(.05,(now-prev)/1000);
+    const frameMs=now-prev;
+    const dt=Math.min(.05,frameMs/1000);
     prev=now;
-    if(fighting||overlay){sampleStart=samplePrevious=0;frameIntervals.length=0;raf=requestAnimationFrame(frame);return;}
+    if(fighting||overlay){qualityStart=qualityFrames=fastWindows=0;sampleStart=samplePrevious=0;frameIntervals.length=0;raf=requestAnimationFrame(frame);return;}
+    if(adaptive){
+      if(!qualityStart || frameMs>300){qualityStart=now;qualityFrames=0;fastWindows=0;}
+      qualityFrames++;
+      const elapsed=now-qualityStart;
+      if(elapsed>=850){
+        const mean=elapsed/qualityFrames;
+        fastWindows=mean<18?fastWindows+1:0;
+        const floor=low?.55:.4;
+        const scale=mean>(low?29:22)?Math.max(floor,renderScale*.78):fastWindows>=5?Math.min(1,renderScale+.08):renderScale;
+        if(scale!==renderScale){renderScale=scale;resize();fastWindows=0;}
+        qualityStart=now;qualityFrames=0;
+      }
+    }
     time+=dt;
     if(time>=nextSave){save();nextSave=time+8;}
     const p=actor.position;
@@ -328,21 +403,24 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     light.intensity=.55+day*1.45;
     sun.intensity=day*2;
     const chunk=Math.floor(p.x/SIZE)+","+Math.floor(p.z/SIZE);
-    if(chunk!==lastChunk){lastChunk=chunk;stream();}
+    if(chunk!==lastChunk){lastChunk=chunk;stream();fillChunks(1);}
+    if(pendingChunks.length)fillChunks(low?2:3);
     const nearby=fauna.update(p,dt,time,hour,weather);
     target=nearby;
     exploration.x=p.x;exploration.z=p.z;
     const site=discover(exploration,p.y);
     if(site)notify("Discovered · "+site.name);
-    const objectiveName=objective(journey)?.name??"Complete";
+    const storyPlace=destination(chronicle);
+    const distance=storyPlace?Math.round(Math.hypot(storyPlace.x-p.x,storyPlace.z-p.z)/5)*5:0;
+    const objectiveName=storyPlace?"Ch. "+chapter(chronicle).chapter+" · "+siteLabel(storyPlace.id,storyPlace.name)+" · "+distance+" m · "+chronicle.shards.length+"/4 Éclats":"Épilogue terminé";
     if(lastObjective!==objectiveName){lastObjective=objectiveName;questTrack.textContent=objectiveName;}
     const berryLabel="Berry ×"+party.berries;
     if(lastBerry!==berryLabel){lastBerry=berryLabel;berry.textContent=berryLabel;}
     if(discoveryNote.textContent && time>noteUntil)discoveryNote.textContent="";
     if(lastHeading!==yaw){lastHeading=yaw;compass.style.transform="rotate("+(-yaw)+"rad)";}
     if(time>=mapNext){drawMinimap(p.x,p.z);mapCount.textContent=exploration.discovered.length+"/64";mapNext=time+.2;}
-    if(nearby?.species.behavior==="aggressive" && nearby.sprite.position.distanceTo(p)<2.5)startBattle();
-    const placeName=nearest(p.x,p.z).name;
+    if(chronicle.next>0&&nearby?.species.behavior==="aggressive" && nearby.sprite.position.distanceTo(p)<2.5)startBattle();
+    const placeName=p.x<30&&p.x>-120&&p.z>0&&p.z<140?"Verdant Cascade Valley":nearest(p.x,p.z).name;
     if(placeName!==placeLabel){placeLabel=placeName;info.textContent=placeName;}
     const timeLabel=String(Math.floor(hour)).padStart(2,"0")+":"+String(Math.floor(hour%1*60)).padStart(2,"0")+" · "+weather;
     if(timeLabel!==weatherLabel){weatherLabel=timeLabel;clock.textContent=timeLabel;}
@@ -373,7 +451,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
           const p95=Number(frameIntervals[Math.ceil(count*.95)-1].toFixed(1));
           const {calls,triangles}=renderer.info.render;
           meter.value=fps+" FPS · p95 "+p95+" ms · "+calls+" draws";
-          meter.dataset.sample=JSON.stringify({fps,p95,calls,triangles,frames:count,low});
+          meter.dataset.sample=JSON.stringify({fps,p95,calls,triangles,frames:count,low,renderScale:Number(renderScale.toFixed(2))});
           sampleStart=now;
           frameIntervals.length=0;
         }
@@ -388,7 +466,8 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     listeners.abort();
     stopSound();
     fauna.dispose();
-    scene.traverse(node=>{if(node instanceof T.Mesh){node.geometry.dispose();const mats=Array.isArray(node.material)?node.material:[node.material];mats.forEach(mat=>mat.dispose());}});
+    removeCharacterMarkers();
+    scene.traverse(node=>{if(node instanceof T.InstancedMesh)node.dispose();if(node instanceof T.Mesh){node.geometry.dispose();const mats=Array.isArray(node.material)?node.material:[node.material];mats.forEach(mat=>mat.dispose());}});
     renderer.dispose();
   };
   host.querySelector(".world-exit")!.addEventListener("click",()=>{dispose();exit();},options);

@@ -1,9 +1,10 @@
 import type {Party} from "./combat";
 import type {Exploration} from "./map";
 import type {Journey} from "./quests";
+import type {Chronicle} from "./story";
 
 const KEY="aetheris.save";
-export type Save = {version:1;party:Party;exploration:Exploration;journey:Journey;position:[number,number,number];yaw:number;pitch:number;energy:number;time:number;vertical:number;glide:boolean;hp:number};
+export type Save = {version:1;party:Party;exploration:Exploration;journey:Journey;chronicle?:Chronicle;position:[number,number,number];yaw:number;pitch:number;energy:number;time:number;vertical:number;glide:boolean;hp:number};
 export function readSave():Save|undefined{
   try{
     const value=JSON.parse(localStorage.getItem(KEY)??"null");

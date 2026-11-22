@@ -43,9 +43,11 @@ function hit(attacker:Member,defender:Member,move:Skill) {
   defender.hp=Math.max(0,defender.hp-damage);
   return damage;
 }
-export function battle(host:HTMLElement, party:Party, wild:Species, level:number, finish:(remove:boolean)=>void) {
+export function battle(host:HTMLElement, party:Party, wild:Species, level:number, finish:(remove:boolean)=>void, options:{noCapture?:boolean;opponent?:string;alias?:string;mixed?:boolean}={}) {
   const enemy=createMember(wild,level);
-  const enemyMoves=moves.filter(move=>wild.skills.includes(move.id));
+  const enemyMoves=moves.filter(move=>options.mixed?move.power===55:wild.skills.includes(move.id));
+  const enemyName=options.alias??wild.name;
+  const encounterName=options.opponent?options.opponent+" · "+enemyName:enemyName;
   let active=party.team.findIndex(c=>c.hp>0);
   if(active<0)return false;
   if(!party.seen.includes(wild.id))party.seen.push(wild.id);
@@ -54,7 +56,7 @@ export function battle(host:HTMLElement, party:Party, wild:Species, level:number
   panel.className="battle panel";
   panel.setAttribute("role","dialog");
   host.append(panel);
-  let log=wild.name+" appeared!";
+  let log=encounterName+" appeared!";
   let ended=false, remove=false;
   function end(message:string,removeCreature:boolean) {log=message;ended=true;remove=removeCreature;}
   function player(){return party.team[active];}
@@ -67,7 +69,7 @@ export function battle(host:HTMLElement, party:Party, wild:Species, level:number
   function counter(){attack(enemy,player(),enemyMoves[Math.floor(Math.random()*enemyMoves.length)]);}
   function settle(){
     for(const [member,status] of statuses)if(status==="poison"||status==="burn")member.hp=Math.max(0,member.hp-Math.max(1,Math.floor(maxHp(member)*.08)));
-    if(enemy.hp<=0){gain(player(),level*11);party.coins+=level*3;end(wild.name+" was defeated. Team gained experience.",true);}
+    if(enemy.hp<=0){gain(player(),level*11);party.coins+=level*3;end(enemyName+" was defeated. Team gained experience.",true);}
     else if(player().hp<=0){
       const next=party.team.findIndex(c=>c.hp>0);
       if(next>=0){active=next;log+=speciesOf(player()).name+" takes over.";}
@@ -77,11 +79,11 @@ export function battle(host:HTMLElement, party:Party, wild:Species, level:number
   function render(){
     const current=player();
     const available=moves.filter(move=>speciesOf(current).skills.includes(move.id));
-    panel.innerHTML=`<h2>${wild.name} · Lv.${level}</h2><progress max="${maxHp(enemy)}" value="${enemy.hp}"></progress>
+    panel.innerHTML=`<h2>${encounterName} · Lv.${level}</h2><progress max="${maxHp(enemy)}" value="${enemy.hp}"></progress>
       <p>${speciesOf(current).name} · Lv.${current.level} · ${current.hp}/${maxHp(current)} HP</p><p aria-live="polite">${log}</p>
       <div class="battle-buttons">${ended?'<button data-action="close">Continue</button>':available.map(move=>`<button data-action="move:${move.id}">${move.name}</button>`).join("")+
-      `<button data-action="capsules" ${party.capsules<=0?"disabled":""}>Capsule Aether ×${party.capsules}</button>
-      <button data-action="prism" ${party.prism<=0?"disabled":""}>Capsule Prisme ×${party.prism}</button>
+      `<button data-action="capsules" ${options.noCapture||party.capsules<=0?"disabled":""}>Capsule Aether ×${party.capsules}</button>
+      <button data-action="prism" ${options.noCapture||party.prism<=0?"disabled":""}>Capsule Prisme ×${party.prism}</button>
       <button data-action="berry" ${party.berries<=0?"disabled":""}>Berry ×${party.berries}</button>
       <button data-action="flee">Flee</button>`+party.team.map((member,i)=>i===active||member.hp<=0?"":`<button data-action="switch:${i}">Switch to ${speciesOf(member).name}</button>`).join("")}</div>`;
   }
@@ -92,7 +94,7 @@ export function battle(host:HTMLElement, party:Party, wild:Species, level:number
     log="";
     if(action==="flee"){end("You escaped.",false);}
     else if(action==="capsules"||action==="prism"){
-      if(party[action]<=0)return;
+      if(options.noCapture||party[action]<=0)return;
       party[action]--;
       const chance=Math.min(.94,(.22+.75*(1-enemy.hp/maxHp(enemy)))*(action==="prism"?1.6:1)/(1+(wild.rarity-1)*.33));
       if(Math.random()<chance){

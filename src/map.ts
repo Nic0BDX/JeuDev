@@ -1,8 +1,9 @@
 import regions from "./data/regions.json";
 import quests from "./data/quests.json";
+import story from "./data/story.json";
 
 type Point={id:string;name:string;kind:string;x:number;z:number;y:number|null};
-export type Exploration={discovered:string[];x:number;z:number};
+export type Exploration={discovered:string[];x:number;z:number;objective?:string|null};
 const locations=regions.flatMap<Point>(r=>r.locations);
 const marks:Record<string,string>={statue:"✧",village:"⌂",ruin:"◇",tower:"♜",cave:"◒",resource:"◆",habitat:"✿",chest:"▣"};
 export function openMap(host:HTMLElement,world:Exploration|undefined,close:()=>void,travel?:(point:Point)=>void){
@@ -10,7 +11,7 @@ export function openMap(host:HTMLElement,world:Exploration|undefined,close:()=>v
   panel.className="atlas panel world-atlas";
   host.append(panel);
   let zoom=1,tab=0;
-  const objective=locations.find(p=>p.id===quests[0].steps[0].location);
+  const objective=locations.find(p=>p.id===(world?.objective===undefined?(story.scenes[0]?.location??quests[0].steps[0].location):world.objective));
   const known=(point:Point)=>world?.discovered.includes(point.id)??false;
   const x=(value:number)=>((value+940)/1880)*100;
   const y=(value:number)=>((value+900)/1650)*100;

@@ -15,6 +15,25 @@ jobs:
       - run: npm install
       - run: npm install --no-save --package-lock=false playwright
       - run: npx playwright install --with-deps chromium
+      - name: Validate story links and progression data
+        run: |
+          node --input-type=module <<'JS'
+          import { readFileSync } from 'node:fs';
+          const read = name => JSON.parse(readFileSync('src/data/' + name + '.json', 'utf8'));
+          const {scenes, endings, cinematics} = read('story');
+          const places = new Set(read('regions').flatMap(region => region.locations.map(place => place.id)));
+          const species = new Set(read('creatures').map(creature => creature.id));
+          const cast = new Set([...read('characters').map(character => character.id), 'narrator', 'florix', 'noctiri']);
+          if (new Set(scenes.map(scene => scene.id)).size !== scenes.length) throw new Error('Duplicate story checkpoints');
+          if (JSON.stringify([...new Set(scenes.map(scene => scene.chapter))]) !== JSON.stringify(Array.from({length:12}, (_, i) => i + 1))) throw new Error('Expected 12 ordered chapters');
+          for (const scene of scenes) {
+            if (!places.has(scene.location) || (scene.travel && !places.has(scene.travel))) throw new Error('Invalid location: ' + scene.id);
+            if (!scene.lines.length || scene.lines.some(([speaker, line]) => !cast.has(speaker) || !line)) throw new Error('Invalid dialogue: ' + scene.id);
+            if ((scene.battle && !species.has(scene.battle.id)) || (scene.gift && !species.has(scene.gift))) throw new Error('Invalid creature: ' + scene.id);
+            if (scene.puzzle && !scene.puzzle.options[scene.puzzle.answer]) throw new Error('Invalid puzzle: ' + scene.id);
+          }
+          if (new Set(scenes.flatMap(scene => scene.shard ? [scene.shard] : [])).size !== 4 || !scenes.at(-1).ending || !endings.guardian || !endings.release || cinematics.length !== 14) throw new Error('Incomplete campaign');
+          JS
       - name: Capture each screen and verify save reload
         run: |
           npm run dev -- --host 127.0.0.1 > /tmp/aetheris-vite.log 2>&1 &
@@ -41,6 +60,10 @@ jobs:
                 await cdp.detach();
               };
               await capture('title', true);
+              await page.getByRole('button', {name: 'Characters', exact: true}).click();
+              if (await page.locator('.character-cards article').count() !== 6) throw new Error('Expected six characters');
+              await capture('characters', true);
+              await page.getByRole('dialog').getByRole('button', {name: 'Close'}).click();
               await page.getByRole('button', {name: 'Creature Codex'}).click();
               await page.locator('.species-detail').getByRole('heading', {name: 'Florix'}).waitFor();
               await capture('dex');
@@ -83,6 +106,53 @@ jobs:
               const sample = JSON.parse(await page.locator('.performance-meter').getAttribute('data-sample'));
               if (!(sample.frames > 0 && sample.calls > 0)) throw new Error('No rendered frames recorded');
               console.log('AETHERIS_PERF ' + name + ' ' + JSON.stringify(sample));
+              await page.keyboard.down('KeyA');
+              await page.waitForTimeout(1100);
+              await page.keyboard.up('KeyA');
+              await page.getByRole('button', {name: 'Save game'}).click();
+              const moved = await page.evaluate(() => JSON.parse(localStorage.getItem('aetheris.save')).position);
+              if (!(moved[0] < saved.position[0] - 1)) throw new Error('Player did not cross the starting chunk boundary');
+              await page.waitForFunction(() => {
+                const canvas = document.querySelector('.world canvas');
+                return canvas && canvas.width > 0 && canvas.height > 0;
+              });
+              await page.screenshot({path: 'captures/streaming-' + name + '.png'});
+              await page.locator('.world-exit').click();
+              await page.evaluate(({x, z}) => {
+                const save = JSON.parse(localStorage.getItem('aetheris.save'));
+                save.position = [x, 5, z];
+                save.vertical = 0;
+                save.chronicle = {next: 5, hero: "Ari", shards: []};
+                save.glide = false;
+                localStorage.setItem('aetheris.save', JSON.stringify(save));
+              }, {"x":88,"z":33});
+              await page.reload();
+              await page.getByRole('button', {name: 'Continue'}).click();
+              await page.getByRole('button', {name: 'Interact', exact: true}).click();
+              await page.getByRole('dialog').getByRole('heading', {name: 'Chapitre 3 · Skyspire City'}).waitFor();
+              await page.getByRole('button', {name: 'Suivant'}).click();
+              await page.getByText('Ce cristal… Où l’as-tu trouvé ?').waitFor();
+              await capture('elara', true);
+              for (let line = 0; line < 5; line++) await page.getByRole('button', {name: 'Suivant'}).click();
+              await page.getByRole('button', {name: 'Poursuivre'}).click();
+              await page.waitForFunction(() => JSON.parse(localStorage.getItem('aetheris.save')).chronicle.next === 6);
+              await page.locator('.world-exit').click();
+              await page.evaluate(() => {
+                const save = JSON.parse(localStorage.getItem('aetheris.save'));
+                save.position = [-79, 92, -631];
+                save.chronicle = {next: 24, hero: "Ari", shards: ["fire","crystal","wind","water"]};
+                localStorage.setItem('aetheris.save', JSON.stringify(save));
+              });
+              await page.getByRole('button', {name: 'Continue'}).click();
+              await page.getByRole('button', {name: 'Interact', exact: true}).click();
+              await page.getByRole('heading', {name: 'Chapitre 12 · Le choix'}).waitFor();
+              for (let line = 0; line < 3; line++) await page.getByRole('button', {name: 'Suivant'}).click();
+              await page.getByRole('button', {name: 'Poursuivre'}).click();
+              await page.getByRole('button', {name: name === 'mobile' ? 'Libérer l’Aether' : 'Devenir le Gardien'}).click();
+              await capture('ending', true);
+              await page.getByRole('button', {name: 'Terminer le récit'}).click();
+              const outcome = await page.evaluate(() => JSON.parse(localStorage.getItem('aetheris.save')).chronicle.ending);
+              if (outcome !== (name === 'mobile' ? 'release' : 'guardian')) throw new Error('Ending was not saved');
               await page.close();
             }
           } finally {
