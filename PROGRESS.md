@@ -43,3 +43,5 @@ Forge du Cratère : entrée, évent et abri modélisés. L’ordre des deux acti
 Outils : lanceur Windows `start-agents.ps1` ajouté à la racine. Démarrage local à vérifier : le terminal de session échoue avant l’ouverture de PowerShell.
 
 M8 : prologue jouable en trois plans sur la [PR brouillon #8](https://github.com/Nic0BDX/JeuDev/pull/8). [Build](https://github.com/Nic0BDX/JeuDev/actions/runs/45050355081) et [parcours Chromium avec captures du prologue et passage à l’exploration](https://github.com/Nic0BDX/JeuDev/actions/runs/45050355071) réussis. Revue des captures, autres cinématiques et mesure sur appareils réels à faire.
+
+Fidélité visuelle (`visual-fidelity`) : références analysées et 63 WebP intégrés. Premiers écarts mesurés visuellement sur les cinq écrans, suite dans [FIDELITE.md](FIDELITE.md).

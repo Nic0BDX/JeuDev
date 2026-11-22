@@ -35,3 +35,65 @@
     min-height: 44px;
   }
 }
+
+.creature-dex .dex-catalogue {
+  display: grid;
+  grid-template-columns: minmax(6.5rem, .8fr) minmax(0, 1.2fr);
+  gap: .45rem;
+}
+.creature-dex .dex-categories {
+  display: grid;
+  align-content: start;
+  gap: .3rem;
+}
+.creature-dex .dex-categories button {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+  min-width: 0;
+  padding: .3rem .45rem;
+  font-size: clamp(.65rem, 1vw, .95rem);
+  text-align: left;
+}
+.dex-categories img { width: 1.05rem; border-radius: .2rem; }
+.dex-categories b { margin-left: auto; color: #e3f3ff; }
+.creature-dex .dex-catalogue .species-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-height: 58svh;
+  overflow-y: auto;
+  padding: .18rem;
+}
+.creature-dex .dex-catalogue .species-grid button {
+  min-width: 0;
+  padding: .2rem;
+  font-size: clamp(.58rem, .95vw, .95rem);
+  overflow-wrap: anywhere;
+}
+.dex-card-art,
+.dex-carousel img {
+  width: 100%;
+  aspect-ratio: 1.15;
+  object-fit: cover;
+  border-radius: .25rem;
+}
+.dex-carousel {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 100%;
+  gap: .35rem;
+}
+.creature-dex .dex-carousel button {
+  min-width: 0;
+  padding: .2rem;
+  font: 600 clamp(.62rem, 1.2vw, 1rem) Georgia, serif;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 920px) {
+  .creature-dex:not(.compendium) .atlas-body.dex-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .creature-dex .dex-catalogue .species-grid { max-height: 20rem; }
+  .creature-dex .dex-hero { min-height: 0; }
+  .creature-dex .dex-hero .portrait { width: min(68%, 13rem); }
+  .creature-dex .dex-carousel { max-width: 20rem; }
+}

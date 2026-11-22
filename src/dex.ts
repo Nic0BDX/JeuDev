@@ -7,6 +7,7 @@ import { maxHp, type Party } from "./combat";
 
 const tabs=["Dex","Collection","Affinity","Evolution Guide","Species Compendium"];
 const typeIcons: Record<string,string> = {Nature:"❧",Fire:"♨",Water:"◈",Wind:"≋",Earth:"▲",Light:"✦",Shadow:"☾",Crystal:"◇",Sky:"❋"};
+const catalogue=[...creatures].sort((a,b)=>a.no-b.no);
 const stats=["HP","ATK","DEF","SP. ATK","SP. DEF","SPD"];
 export function openDex(host:HTMLElement,party:Party|undefined,close:()=>void){
   const panel=document.createElement("section");
@@ -19,7 +20,7 @@ export function openDex(host:HTMLElement,party:Party|undefined,close:()=>void){
     return `<span class="portrait" style="--type:${typeColor(type)}"><span aria-hidden="true">${typeIcons[type]}</span><img src="/sprites/${id}.png" alt="" loading="lazy"></span>`;
   }
   function grid(){
-    const rows=creatures.filter(c=>(!filter||c.type===filter)&&c.name.toLowerCase().includes(query)&&(tab!==1||caught(c.id)));
+    const rows=catalogue.filter(c=>(!filter||c.type===filter)&&c.name.toLowerCase().includes(query)&&(tab!==1||caught(c.id)));
     if(tab===4)return [...new Set(creatures.map(c=>c.type))].map(type=>{
       const rows=creatures.filter(c=>c.type===type);
       const habitats=[...new Set(rows.flatMap(c=>c.habitats))].map(id=>regions.find(r=>r.id===id)?.name).filter(Boolean);
@@ -28,7 +29,7 @@ export function openDex(host:HTMLElement,party:Party|undefined,close:()=>void){
         <div>${rows.map(c=>`<button data-species="${c.id}" aria-label="${c.name}"><span class="poster-art"><img src="/assets/reference-crops/creatures/${c.id}.webp" alt="" loading="lazy"></span><span class="poster-name">${c.name}</span></button>`).join("")}</div>
       </section>`;
     }).join("");
-    return rows.map(c=>`<button data-species="${c.id}" aria-pressed="${selected.id===c.id}">${portrait(c.id,c.type)}<small>No.${String(c.no).padStart(3,"0")}</small>${c.name}${caught(c.id)?" ✓":""}</button>`).join("") || "<p>No matching creatures.</p>";
+    return rows.map(c=>`<button data-species="${c.id}" aria-pressed="${selected.id===c.id}"><img class="dex-card-art" src="/assets/reference-crops/creatures/${c.id}.webp" alt="" loading="lazy"><small>No.${String(c.no).padStart(3,"0")}</small>${c.name}${caught(c.id)?" ✓":""}</button>`).join("") || "<p>No matching creatures.</p>";
   }
   function detail(){
     const c=selected;
@@ -46,28 +47,48 @@ export function openDex(host:HTMLElement,party:Party|undefined,close:()=>void){
     panel.classList.toggle("compendium",tab===4);
     panel.innerHTML=`<header class="atlas-header"><strong>Creature Dex · ${party?.caught.length??0}/${creatures.length}</strong><button data-close aria-label="Close">×</button></header>
       <div class="atlas-tabs">${tabs.map((name,i)=>`<button data-tab="${i}" aria-pressed="${i===tab}">${name}</button>`).join("")}</div>
-      ${tab===4?`<div class="poster-heading"><h2>Grand Species Compendium</h2><p>${party?.seen.length??0}/${creatures.length} species discovered</p></div>`:`<div class="atlas-filters"><input type="search" placeholder="Search species" aria-label="Search species"><select aria-label="Filter by type"><option value="">All types · ${creatures.length}</option>${Object.keys(types).map(type=>`<option value="${type}">${type} · ${creatures.filter(c=>c.type===type).length}</option>`).join("")}</select></div>`}
-      <div class="atlas-body"><div class="species-grid"></div><div class="dex-hero"></div><aside class="species-detail"></aside></div>`;
+      ${tab===4?`<div class="poster-heading"><h2>Grand Species Compendium</h2><p>${party?.seen.length??0}/${creatures.length} species discovered</p></div><div class="species-grid"></div><div class="dex-hero" hidden></div><aside class="species-detail" hidden></aside>`:
+      `<div class="atlas-body dex-layout">
+        <section class="dex-library">
+          <div class="atlas-filters"><input type="search" placeholder="Search species" aria-label="Search species"></div>
+          <div class="dex-catalogue">
+            <div class="dex-categories" aria-label="Creature types">
+              <button data-type="" aria-pressed="${filter===""}">All Creatures <b>${catalogue.length}</b></button>
+              ${Object.keys(types).map(type=>`<button data-type="${type}" aria-pressed="${filter===type}"><img src="/assets/reference-crops/types/${type.toLowerCase()}.webp" alt="">${type} <b>${catalogue.filter(c=>c.type===type).length}</b></button>`).join("")}
+            </div>
+            <div class="species-grid"></div>
+          </div>
+        </section>
+        <div class="dex-hero"></div><aside class="species-detail"></aside>
+      </div>`}`;
+
     const search=panel.querySelector("input");
-    const select=panel.querySelector("select");
     if(search)search.value=query;
-    if(select)select.value=filter;
     refresh();
   }
   function refresh(){
     panel.querySelector(".species-grid")!.innerHTML=grid();
     panel.querySelector(".species-grid")!.classList.toggle("poster",tab===4);
     panel.querySelector(".species-detail")!.innerHTML=detail();
-    panel.querySelector(".dex-hero")!.innerHTML=`${portrait(selected.id,selected.type)}<strong>${selected.name}</strong>`;
+    const index=catalogue.indexOf(selected);
+    const neighbors=[-1,0,1].map(offset=>catalogue[(index+offset+catalogue.length)%catalogue.length]);
+    panel.querySelector(".dex-hero")!.innerHTML=`${portrait(selected.id,selected.type)}<strong>${selected.name}</strong>
+      <div class="dex-carousel" aria-label="Browse species">
+        ${neighbors.map(c=>`<button data-species="${c.id}" aria-pressed="${c===selected}"><img src="/assets/reference-crops/creatures/${c.id}.webp" alt="">${c.name}</button>`).join("")}
+      </div>`;
   }
   panel.addEventListener("error",e=>{if(e.target instanceof HTMLImageElement)e.target.hidden=true;},true);
   panel.addEventListener("input",e=>{if(e.target instanceof HTMLInputElement){query=e.target.value.toLowerCase();refresh();}});
-  panel.addEventListener("change",e=>{if(e.target instanceof HTMLSelectElement){filter=e.target.value;refresh();}});
   panel.addEventListener("click",e=>{
     const btn=(e.target as HTMLElement).closest("button");
     if(!btn)return;
     if("close" in btn.dataset){panel.remove();close();return;}
     if(btn.dataset.tab!==undefined){tab=Number(btn.dataset.tab);draw();}
+    if(btn.dataset.type!==undefined){
+      filter=btn.dataset.type;
+      panel.querySelectorAll<HTMLButtonElement>("[data-type]").forEach(choice=>choice.setAttribute("aria-pressed",String(choice===btn)));
+      refresh();
+    }
     if(btn.dataset.species){selected=creatures.find(c=>c.id===btn.dataset.species)??selected;if(tab===4){tab=0;draw();}else refresh();}
   });
   draw();
