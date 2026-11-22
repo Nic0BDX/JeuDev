@@ -1,0 +1,101 @@
+{
+  "Light": {
+    "strong": [
+      "Shadow",
+      "Water"
+    ],
+    "weak": [
+      "Shadow",
+      "Sky"
+    ],
+    "color": "#ffd66e"
+  },
+  "Shadow": {
+    "strong": [
+      "Light",
+      "Fire"
+    ],
+    "weak": [
+      "Light",
+      "Crystal"
+    ],
+    "color": "#9c82dd"
+  },
+  "Nature": {
+    "strong": [
+      "Water",
+      "Earth"
+    ],
+    "weak": [
+      "Wind",
+      "Sky"
+    ],
+    "color": "#84d36d"
+  },
+  "Water": {
+    "strong": [
+      "Fire",
+      "Wind"
+    ],
+    "weak": [
+      "Light",
+      "Nature"
+    ],
+    "color": "#59bbff"
+  },
+  "Fire": {
+    "strong": [
+      "Earth",
+      "Crystal"
+    ],
+    "weak": [
+      "Shadow",
+      "Water"
+    ],
+    "color": "#ff8468"
+  },
+  "Earth": {
+    "strong": [
+      "Wind",
+      "Sky"
+    ],
+    "weak": [
+      "Nature",
+      "Fire"
+    ],
+    "color": "#c99b63"
+  },
+  "Wind": {
+    "strong": [
+      "Crystal",
+      "Nature"
+    ],
+    "weak": [
+      "Water",
+      "Earth"
+    ],
+    "color": "#8be6d1"
+  },
+  "Crystal": {
+    "strong": [
+      "Sky",
+      "Shadow"
+    ],
+    "weak": [
+      "Fire",
+      "Wind"
+    ],
+    "color": "#b7a5ff"
+  },
+  "Sky": {
+    "strong": [
+      "Light",
+      "Nature"
+    ],
+    "weak": [
+      "Earth",
+      "Crystal"
+    ],
+    "color": "#9bcbff"
+  }
+}
