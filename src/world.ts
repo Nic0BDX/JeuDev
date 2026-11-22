@@ -77,6 +77,16 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     scene.add(landmarks);
   }
   const removeCharacterMarkers=mountCharacterMarkers(scene,regions.flatMap(region=>region.locations.map(place=>({id:place.id,x:place.x,y:place.y??terrain(place.x,place.z),z:place.z}))));
+  const markerGroup=new T.Group();
+  const questGold=new T.MeshBasicMaterial({color:0xffd784});
+  const questDiamond=new T.Mesh(new T.OctahedronGeometry(.75),questGold);
+  const questRing=new T.Mesh(new T.RingGeometry(2.2,2.4,32),new T.MeshBasicMaterial({color:0x79e9ff,side:T.DoubleSide}));
+  questRing.rotation.x=-Math.PI/2;
+  questRing.position.y=.13;
+  markerGroup.add(questDiamond,questRing);
+  markerGroup.visible=false;
+  scene.add(markerGroup);
+  let markerSite="";
   const actor = new T.Group();
   const addPart=(geometry:T.BufferGeometry,color:number,x:number,y:number,z:number)=>{
     const mesh=new T.Mesh(geometry,new T.MeshLambertMaterial({color,flatShading:true}));
@@ -200,6 +210,23 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
       mapInk.fillStyle=place.kind==="statue"?"#ffd784":"#f5faff";
       mapInk.fillRect(46+dx,46+dz,4,4);
     }
+    const point=destination(chronicle);
+    if(point){
+      let dx=(point.x-x)*size/mapRange,dz=(point.z-z)*size/mapRange;
+      const radius=Math.hypot(dx,dz);
+      if(radius>39){dx*=39/radius;dz*=39/radius;}
+      const mx=48+dx,mz=48+dz;
+      mapInk.beginPath();
+      mapInk.moveTo(mx,mz-5);
+      mapInk.lineTo(mx+5,mz);
+      mapInk.lineTo(mx,mz+5);
+      mapInk.lineTo(mx-5,mz);
+      mapInk.closePath();
+      mapInk.fillStyle="#ffd784";
+      mapInk.strokeStyle="#0b204d";
+      mapInk.lineWidth=1.4;
+      mapInk.fill();mapInk.stroke();
+    }
   }
   const team=host.querySelector(".team-hud strong")!;
   const slots=host.querySelector(".team-slots")!;
@@ -250,7 +277,10 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     }
     if(code==="Tab"){overlay=true;held.clear();openDex(host,party,()=>{overlay=false;});return;}
     if(code==="KeyE"){
-      const p=actor.position;const site=nearestSite(p.x,p.y,p.z);
+      const p=actor.position;
+      const goal=destination(chronicle);
+      const objectiveNearby=goal&&Math.hypot(goal.x-p.x,goal.z-p.z)<13&&(goal.y===null||Math.abs(goal.y-p.y)<10);
+      const site=objectiveNearby?goal:nearestSite(p.x,p.y,p.z);
       if(!site){startBattle();return;}
       if(destination(chronicle)?.id===site.id){
         overlay=true;held.clear();
@@ -411,6 +441,12 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     const site=discover(exploration,p.y);
     if(site)notify("Discovered · "+site.name);
     const storyPlace=destination(chronicle);
+    if(storyPlace?.id!==markerSite){
+      markerSite=storyPlace?.id??"";
+      markerGroup.visible=Boolean(storyPlace);
+      if(storyPlace)markerGroup.position.set(storyPlace.x,storyPlace.y===null?surface(storyPlace.x,storyPlace.z,0):storyPlace.y+1,storyPlace.z);
+    }
+    if(markerGroup.visible){questDiamond.position.y=4+Math.sin(time*2)*.55;questDiamond.rotation.y=time*.8;}
     const distance=storyPlace?Math.round(Math.hypot(storyPlace.x-p.x,storyPlace.z-p.z)/5)*5:0;
     const objectiveName=storyPlace?"Ch. "+chapter(chronicle).chapter+" · "+siteLabel(storyPlace.id,storyPlace.name)+" · "+distance+" m · "+chronicle.shards.length+"/4 Éclats":"Épilogue terminé";
     if(lastObjective!==objectiveName){lastObjective=objectiveName;questTrack.textContent=objectiveName;}
