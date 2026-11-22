@@ -253,7 +253,15 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     if(code==="KeyI"){overlay=true;held.clear();openBag(host,party,journey,closeOverlay);return;}
     if(code==="KeyL"){notify("Field mail · "+(objective(journey)?.name??"Skyspire thanks you for your service."));return;}
     if(code==="Digit1"&&party.berries){const lead=party.team[0];party.berries--;lead.hp=Math.min(maxHp(lead),lead.hp+Math.ceil(35*(lead.affinity>=25?1.05:1)));lead.affinity=Math.min(100,lead.affinity+2);notify("Berry used · "+speciesOf(lead).name);return;}
-    if(code==="KeyB"&&target&&!party.seen.includes(target.species.id))party.seen.push(target.species.id);
+    if(code==="KeyB"){
+      if(!target){notify("No creature in scanner range");return;}
+      const c=target.species;
+      const fresh=!party.seen.includes(c.id);
+      if(fresh)party.seen.push(c.id);
+      notify((fresh?"New Dex entry · ":"Scan · ")+c.name+" · Lv."+target.level+" · "+c.type+" · "+"★".repeat(c.rarity));
+      if(fresh)save();
+      return;
+    }
     if(code==="Space" && !held.has(code)) jump=true;
     if(code==="KeyR") { yaw=0;pitch=.32; }
     held.add(code);
@@ -370,7 +378,9 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     exploration.x=p.x;exploration.z=p.z;
     const site=discover(exploration,p.y);
     if(site)notify("Discovered · "+site.name);
-    const objectiveName=objective(journey)?.name??"Complete";
+    const destination=objective(journey);
+    const distance=destination?Math.round(Math.hypot(destination.x-p.x,destination.z-p.z)/5)*5:0;
+    const objectiveName=destination?destination.name+" · "+distance+" m":"Complete";
     if(lastObjective!==objectiveName){lastObjective=objectiveName;questTrack.textContent=objectiveName;}
     const berryLabel="Berry ×"+party.berries;
     if(lastBerry!==berryLabel){lastBerry=berryLabel;berry.textContent=berryLabel;}
