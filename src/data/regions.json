@@ -1,0 +1,627 @@
+[
+  {
+    "id": "skyspire",
+    "name": "Skyspire City",
+    "x": 0,
+    "z": 0,
+    "biome": "meadow",
+    "color": "#8bc669",
+    "types": [
+      "Light",
+      "Wind"
+    ],
+    "locations": [
+      {
+        "id": "skyspire-statue",
+        "name": "Skyspire City · Waystone",
+        "kind": "statue",
+        "x": 0,
+        "z": 0,
+        "y": null
+      },
+      {
+        "id": "skyspire-village",
+        "name": "Skyspire City · Settlement",
+        "kind": "village",
+        "x": 88,
+        "z": 33,
+        "y": null
+      },
+      {
+        "id": "skyspire-ruin",
+        "name": "Skyspire City · Old Ruins",
+        "kind": "ruin",
+        "x": 95,
+        "z": 102,
+        "y": null
+      },
+      {
+        "id": "skyspire-tower",
+        "name": "Skyspire City · Watchtower",
+        "kind": "tower",
+        "x": 15,
+        "z": 143,
+        "y": null
+      },
+      {
+        "id": "skyspire-cave",
+        "name": "Skyspire City · Cavern",
+        "kind": "cave",
+        "x": -79,
+        "z": 119,
+        "y": null
+      },
+      {
+        "id": "skyspire-resource",
+        "name": "Skyspire City · Deposits",
+        "kind": "resource",
+        "x": -101,
+        "z": 52,
+        "y": null
+      },
+      {
+        "id": "skyspire-habitat",
+        "name": "Skyspire City · Sanctuary",
+        "kind": "habitat",
+        "x": -29,
+        "z": 3,
+        "y": null
+      },
+      {
+        "id": "skyspire-chest",
+        "name": "Skyspire City · Hidden Cache",
+        "kind": "chest",
+        "x": 69,
+        "z": 18,
+        "y": null
+      }
+    ]
+  },
+  {
+    "id": "frostveil",
+    "name": "Frostveil Peaks",
+    "x": -520,
+    "z": -490,
+    "biome": "snow",
+    "color": "#c8edfb",
+    "types": [
+      "Crystal",
+      "Wind"
+    ],
+    "locations": [
+      {
+        "id": "frostveil-statue",
+        "name": "Frostveil Peaks · Waystone",
+        "kind": "statue",
+        "x": -520,
+        "z": -490,
+        "y": null
+      },
+      {
+        "id": "frostveil-village",
+        "name": "Frostveil Peaks · Settlement",
+        "kind": "village",
+        "x": -432,
+        "z": -457,
+        "y": null
+      },
+      {
+        "id": "frostveil-ruin",
+        "name": "Frostveil Peaks · Old Ruins",
+        "kind": "ruin",
+        "x": -425,
+        "z": -388,
+        "y": null
+      },
+      {
+        "id": "frostveil-tower",
+        "name": "Frostveil Peaks · Watchtower",
+        "kind": "tower",
+        "x": -505,
+        "z": -347,
+        "y": null
+      },
+      {
+        "id": "frostveil-cave",
+        "name": "Frostveil Peaks · Cavern",
+        "kind": "cave",
+        "x": -599,
+        "z": -371,
+        "y": null
+      },
+      {
+        "id": "frostveil-resource",
+        "name": "Frostveil Peaks · Deposits",
+        "kind": "resource",
+        "x": -621,
+        "z": -438,
+        "y": null
+      },
+      {
+        "id": "frostveil-habitat",
+        "name": "Frostveil Peaks · Sanctuary",
+        "kind": "habitat",
+        "x": -549,
+        "z": -487,
+        "y": null
+      },
+      {
+        "id": "frostveil-chest",
+        "name": "Frostveil Peaks · Hidden Cache",
+        "kind": "chest",
+        "x": -451,
+        "z": -472,
+        "y": null
+      }
+    ]
+  },
+  {
+    "id": "embercrest",
+    "name": "Embercrest",
+    "x": 550,
+    "z": -460,
+    "biome": "volcanic",
+    "color": "#b95244",
+    "types": [
+      "Fire",
+      "Earth"
+    ],
+    "locations": [
+      {
+        "id": "embercrest-statue",
+        "name": "Embercrest · Waystone",
+        "kind": "statue",
+        "x": 550,
+        "z": -460,
+        "y": null
+      },
+      {
+        "id": "embercrest-village",
+        "name": "Embercrest · Settlement",
+        "kind": "village",
+        "x": 638,
+        "z": -427,
+        "y": null
+      },
+      {
+        "id": "embercrest-ruin",
+        "name": "Embercrest · Old Ruins",
+        "kind": "ruin",
+        "x": 645,
+        "z": -358,
+        "y": null
+      },
+      {
+        "id": "embercrest-tower",
+        "name": "Embercrest · Watchtower",
+        "kind": "tower",
+        "x": 565,
+        "z": -317,
+        "y": null
+      },
+      {
+        "id": "embercrest-cave",
+        "name": "Embercrest · Cavern",
+        "kind": "cave",
+        "x": 471,
+        "z": -341,
+        "y": null
+      },
+      {
+        "id": "embercrest-resource",
+        "name": "Embercrest · Deposits",
+        "kind": "resource",
+        "x": 449,
+        "z": -408,
+        "y": null
+      },
+      {
+        "id": "embercrest-habitat",
+        "name": "Embercrest · Sanctuary",
+        "kind": "habitat",
+        "x": 521,
+        "z": -457,
+        "y": null
+      },
+      {
+        "id": "embercrest-chest",
+        "name": "Embercrest · Hidden Cache",
+        "kind": "chest",
+        "x": 619,
+        "z": -442,
+        "y": null
+      }
+    ]
+  },
+  {
+    "id": "verdalia",
+    "name": "Verdalia Woods",
+    "x": -650,
+    "z": 0,
+    "biome": "forest",
+    "color": "#398b51",
+    "types": [
+      "Nature",
+      "Shadow"
+    ],
+    "locations": [
+      {
+        "id": "verdalia-statue",
+        "name": "Verdalia Woods · Waystone",
+        "kind": "statue",
+        "x": -650,
+        "z": 0,
+        "y": null
+      },
+      {
+        "id": "verdalia-village",
+        "name": "Verdalia Woods · Settlement",
+        "kind": "village",
+        "x": -562,
+        "z": 33,
+        "y": null
+      },
+      {
+        "id": "verdalia-ruin",
+        "name": "Verdalia Woods · Old Ruins",
+        "kind": "ruin",
+        "x": -555,
+        "z": 102,
+        "y": null
+      },
+      {
+        "id": "verdalia-tower",
+        "name": "Verdalia Woods · Watchtower",
+        "kind": "tower",
+        "x": -635,
+        "z": 143,
+        "y": null
+      },
+      {
+        "id": "verdalia-cave",
+        "name": "Verdalia Woods · Cavern",
+        "kind": "cave",
+        "x": -729,
+        "z": 119,
+        "y": null
+      },
+      {
+        "id": "verdalia-resource",
+        "name": "Verdalia Woods · Deposits",
+        "kind": "resource",
+        "x": -751,
+        "z": 52,
+        "y": null
+      },
+      {
+        "id": "verdalia-habitat",
+        "name": "Verdalia Woods · Sanctuary",
+        "kind": "habitat",
+        "x": -679,
+        "z": 3,
+        "y": null
+      },
+      {
+        "id": "verdalia-chest",
+        "name": "Verdalia Woods · Hidden Cache",
+        "kind": "chest",
+        "x": -581,
+        "z": 18,
+        "y": null
+      }
+    ]
+  },
+  {
+    "id": "azuremere",
+    "name": "Azuremere",
+    "x": 620,
+    "z": 0,
+    "biome": "lakes",
+    "color": "#53bde4",
+    "types": [
+      "Water",
+      "Crystal"
+    ],
+    "locations": [
+      {
+        "id": "azuremere-statue",
+        "name": "Azuremere · Waystone",
+        "kind": "statue",
+        "x": 620,
+        "z": 0,
+        "y": null
+      },
+      {
+        "id": "azuremere-village",
+        "name": "Azuremere · Settlement",
+        "kind": "village",
+        "x": 708,
+        "z": 33,
+        "y": null
+      },
+      {
+        "id": "azuremere-ruin",
+        "name": "Azuremere · Old Ruins",
+        "kind": "ruin",
+        "x": 715,
+        "z": 102,
+        "y": null
+      },
+      {
+        "id": "azuremere-tower",
+        "name": "Azuremere · Watchtower",
+        "kind": "tower",
+        "x": 635,
+        "z": 143,
+        "y": null
+      },
+      {
+        "id": "azuremere-cave",
+        "name": "Azuremere · Cavern",
+        "kind": "cave",
+        "x": 541,
+        "z": 119,
+        "y": null
+      },
+      {
+        "id": "azuremere-resource",
+        "name": "Azuremere · Deposits",
+        "kind": "resource",
+        "x": 519,
+        "z": 52,
+        "y": null
+      },
+      {
+        "id": "azuremere-habitat",
+        "name": "Azuremere · Sanctuary",
+        "kind": "habitat",
+        "x": 591,
+        "z": 3,
+        "y": null
+      },
+      {
+        "id": "azuremere-chest",
+        "name": "Azuremere · Hidden Cache",
+        "kind": "chest",
+        "x": 689,
+        "z": 18,
+        "y": null
+      }
+    ]
+  },
+  {
+    "id": "suncrest",
+    "name": "Suncrest Plains",
+    "x": 510,
+    "z": 530,
+    "biome": "grassland",
+    "color": "#ebc166",
+    "types": [
+      "Earth",
+      "Light",
+      "Fire"
+    ],
+    "locations": [
+      {
+        "id": "suncrest-statue",
+        "name": "Suncrest Plains · Waystone",
+        "kind": "statue",
+        "x": 510,
+        "z": 530,
+        "y": null
+      },
+      {
+        "id": "suncrest-village",
+        "name": "Suncrest Plains · Settlement",
+        "kind": "village",
+        "x": 598,
+        "z": 563,
+        "y": null
+      },
+      {
+        "id": "suncrest-ruin",
+        "name": "Suncrest Plains · Old Ruins",
+        "kind": "ruin",
+        "x": 605,
+        "z": 632,
+        "y": null
+      },
+      {
+        "id": "suncrest-tower",
+        "name": "Suncrest Plains · Watchtower",
+        "kind": "tower",
+        "x": 525,
+        "z": 673,
+        "y": null
+      },
+      {
+        "id": "suncrest-cave",
+        "name": "Suncrest Plains · Cavern",
+        "kind": "cave",
+        "x": 431,
+        "z": 649,
+        "y": null
+      },
+      {
+        "id": "suncrest-resource",
+        "name": "Suncrest Plains · Deposits",
+        "kind": "resource",
+        "x": 409,
+        "z": 582,
+        "y": null
+      },
+      {
+        "id": "suncrest-habitat",
+        "name": "Suncrest Plains · Sanctuary",
+        "kind": "habitat",
+        "x": 481,
+        "z": 533,
+        "y": null
+      },
+      {
+        "id": "suncrest-chest",
+        "name": "Suncrest Plains · Hidden Cache",
+        "kind": "chest",
+        "x": 579,
+        "z": 548,
+        "y": null
+      }
+    ]
+  },
+  {
+    "id": "coralreach",
+    "name": "Coralreach Coast",
+    "x": -500,
+    "z": 540,
+    "biome": "coast",
+    "color": "#f6ca89",
+    "types": [
+      "Water",
+      "Nature"
+    ],
+    "locations": [
+      {
+        "id": "coralreach-statue",
+        "name": "Coralreach Coast · Waystone",
+        "kind": "statue",
+        "x": -500,
+        "z": 540,
+        "y": null
+      },
+      {
+        "id": "coralreach-village",
+        "name": "Coralreach Coast · Settlement",
+        "kind": "village",
+        "x": -412,
+        "z": 573,
+        "y": null
+      },
+      {
+        "id": "coralreach-ruin",
+        "name": "Coralreach Coast · Old Ruins",
+        "kind": "ruin",
+        "x": -405,
+        "z": 642,
+        "y": null
+      },
+      {
+        "id": "coralreach-tower",
+        "name": "Coralreach Coast · Watchtower",
+        "kind": "tower",
+        "x": -485,
+        "z": 683,
+        "y": null
+      },
+      {
+        "id": "coralreach-cave",
+        "name": "Coralreach Coast · Cavern",
+        "kind": "cave",
+        "x": -579,
+        "z": 659,
+        "y": null
+      },
+      {
+        "id": "coralreach-resource",
+        "name": "Coralreach Coast · Deposits",
+        "kind": "resource",
+        "x": -601,
+        "z": 592,
+        "y": null
+      },
+      {
+        "id": "coralreach-habitat",
+        "name": "Coralreach Coast · Sanctuary",
+        "kind": "habitat",
+        "x": -529,
+        "z": 543,
+        "y": null
+      },
+      {
+        "id": "coralreach-chest",
+        "name": "Coralreach Coast · Hidden Cache",
+        "kind": "chest",
+        "x": -431,
+        "z": 558,
+        "y": null
+      }
+    ]
+  },
+  {
+    "id": "celestial",
+    "name": "Celestial Ruins",
+    "x": 0,
+    "z": -750,
+    "biome": "floating",
+    "color": "#a98ce8",
+    "types": [
+      "Sky",
+      "Shadow"
+    ],
+    "locations": [
+      {
+        "id": "celestial-statue",
+        "name": "Celestial Ruins · Waystone",
+        "kind": "statue",
+        "x": 0,
+        "z": -750,
+        "y": 90
+      },
+      {
+        "id": "celestial-village",
+        "name": "Celestial Ruins · Settlement",
+        "kind": "village",
+        "x": 88,
+        "z": -717,
+        "y": 90
+      },
+      {
+        "id": "celestial-ruin",
+        "name": "Celestial Ruins · Old Ruins",
+        "kind": "ruin",
+        "x": 95,
+        "z": -648,
+        "y": 90
+      },
+      {
+        "id": "celestial-tower",
+        "name": "Celestial Ruins · Watchtower",
+        "kind": "tower",
+        "x": 15,
+        "z": -607,
+        "y": 90
+      },
+      {
+        "id": "celestial-cave",
+        "name": "Celestial Ruins · Cavern",
+        "kind": "cave",
+        "x": -79,
+        "z": -631,
+        "y": 90
+      },
+      {
+        "id": "celestial-resource",
+        "name": "Celestial Ruins · Deposits",
+        "kind": "resource",
+        "x": -101,
+        "z": -698,
+        "y": 90
+      },
+      {
+        "id": "celestial-habitat",
+        "name": "Celestial Ruins · Sanctuary",
+        "kind": "habitat",
+        "x": -29,
+        "z": -747,
+        "y": 90
+      },
+      {
+        "id": "celestial-chest",
+        "name": "Celestial Ruins · Hidden Cache",
+        "kind": "chest",
+        "x": 69,
+        "z": -732,
+        "y": 90
+      }
+    ]
+  }
+]
