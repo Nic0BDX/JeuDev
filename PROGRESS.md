@@ -4,7 +4,7 @@
 - [x] M1 · Interface, titre et réglages
 - [x] M2 · Monde et déplacements
 - [x] M3 · Créatures et compagnon
-- [ ] M4 · Combat et capture
+- [x] M4 · Combat et capture
 - [ ] M5 · Dex et collection
 - [ ] M6 · Carte et découverte
 - [ ] M7 · Quêtes et économie
@@ -17,3 +17,5 @@ M1 validé par [GitHub Actions](https://github.com/Nic0BDX/JeuDev/actions/runs/4
 M2 validé par [GitHub Actions](https://github.com/Nic0BDX/JeuDev/actions/runs/45011546290). Parcours WebGL et FPS à contrôler sur appareil.
 
 M3 validé par [GitHub Actions](https://github.com/Nic0BDX/JeuDev/actions/runs/45011697916). Sprites de remplacement générés en Canvas.
+
+M4 validé par [GitHub Actions](https://github.com/Nic0BDX/JeuDev/actions/runs/45011812804).
