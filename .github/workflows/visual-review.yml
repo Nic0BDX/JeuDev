@@ -41,6 +41,10 @@ jobs:
                 await cdp.detach();
               };
               await capture('title', true);
+              await page.getByRole('button', {name: 'Characters', exact: true}).click();
+              if (await page.locator('.character-cards article').count() !== 6) throw new Error('Expected six characters');
+              await capture('characters', true);
+              await page.getByRole('dialog').getByRole('button', {name: 'Close'}).click();
               await page.getByRole('button', {name: 'Creature Codex'}).click();
               await page.locator('.species-detail').getByRole('heading', {name: 'Florix'}).waitFor();
               await capture('dex');

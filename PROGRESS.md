@@ -29,3 +29,7 @@ M7 validé par [GitHub Actions](https://github.com/Nic0BDX/JeuDev/actions/runs/4
 M8 : [build](https://github.com/Nic0BDX/JeuDev/actions/runs/45014907681) et [reprise après rechargement](https://github.com/Nic0BDX/JeuDev/actions/runs/45014907686) validés en Chromium. Mesure des FPS sur appareil réel à faire.
 
 Mesure de référence sur GitHub Actions, Chromium headless et rendu logiciel SwiftShader, à Skyspire City pendant cinq secondes. Format desktop 1440 × 810 : 11,9 FPS, p95 100,1 ms et 66 appels de rendu. Format mobile émulé 390 × 844, qualité Auto basse : 57 FPS, p95 16,8 ms et 35 appels. Le compteur `?performance=1` est prêt pour la mesure sur appareil réel. [Build](https://github.com/Nic0BDX/JeuDev/actions/runs/45015522037) · [Mesures CI](https://github.com/Nic0BDX/JeuDev/actions/runs/45015521989).
+
+M8 : résolution Auto adaptative, repères groupés, génération des chunks répartie entre images. En CI SwiftShader, 43,7 FPS en 16:9 et 57,6 FPS en portrait ; test de traversée réussi. [Build](https://github.com/Nic0BDX/JeuDev/actions/runs/45015954707) · [Parcours](https://github.com/Nic0BDX/JeuDev/actions/runs/45015954702).
+
+Narration : planche des six personnages intégrée. Rencontres et emplacements provisoires ; scénario et dialogues à renseigner à partir du PDF. Prologue vidéo reporté.

@@ -1,6 +1,8 @@
 import * as T from "three";
 import regions from "./data/regions.json";
 import { wildlife } from "./wildlife";
+import { characterAt, openCharacters } from "./characters";
+import { mountCharacterMarkers } from "./character-markers";
 import { openDex } from "./dex";
 import { ambience, writeSave, type Save } from "./save";
 import { nearestSite, newJourney, objective, openBag, visit } from "./quests";
@@ -34,7 +36,7 @@ function surface(x: number, z: number, y: number) {
   return Math.hypot(x-island.x,z-island.z) < 125 && y > 86 ? 91 : Math.max(terrain(x,z), SEA - .4);
 }
 
-export function explore(host: HTMLElement, settings: {quality:string;sensitivity:number;volume:number}, exit:()=>void, resume?:Save) {
+export function explore(host: HTMLElement, settings: {quality:string;sensitivity:number;volume:number;language:string}, exit:()=>void, resume?:Save) {
   const low = settings.quality === "low" || (settings.quality === "auto" && matchMedia("(pointer:coarse)").matches);
   const adaptive = settings.quality === "auto";
   const renderer = new T.WebGLRenderer({antialias:settings.quality==="high", powerPreference:low?"default":"high-performance"});
@@ -73,6 +75,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     });
     scene.add(landmarks);
   }
+  const removeCharacterMarkers=mountCharacterMarkers(scene,regions.flatMap(region=>region.locations.map(place=>({id:place.id,x:place.x,y:place.y??terrain(place.x,place.z),z:place.z}))));
   const actor = new T.Group();
   const addPart=(geometry:T.BufferGeometry,color:number,x:number,y:number,z:number)=>{
     const mesh=new T.Mesh(geometry,new T.MeshLambertMaterial({color,flatShading:true}));
@@ -236,6 +239,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   function press(code:string) {
     if(!overlay&&!fighting&&(code==="Equal"||code==="Minus")){mapRange=clamp(mapRange*(code==="Equal"?.72:1.38),34,230);mapNext=0;return;}
     if(fighting||overlay)return;
+    if(code==="KeyC"){overlay=true;held.clear();openCharacters(host,settings.language,closeOverlay);return;}
     if(code==="KeyM"){
       overlay=true;held.clear();
       openMap(host,exploration,()=>{overlay=false;},point=>{actor.position.set(point.x,(point.y??surface(point.x,point.z,0))+1,point.z);vertical=0;});return;
@@ -244,9 +248,17 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     if(code==="KeyE"){
       const p=actor.position;const site=nearestSite(p.x,p.y,p.z);
       if(!site){startBattle();return;}
-      const result=visit(journey,party,site);
-      if(result)notify(result);
-      if(site.kind==="village"){overlay=true;held.clear();openBag(host,party,journey,closeOverlay,site);}
+      const interactWithSite=()=>{
+        const result=visit(journey,party,site);
+        if(result){notify(result);save();}
+        if(site.kind==="village"){overlay=true;held.clear();openBag(host,party,journey,closeOverlay,site);}
+        else closeOverlay();
+      };
+      const npc=characterAt.get(site.id);
+      if(npc){
+        overlay=true;held.clear();
+        openCharacters(host,settings.language,closeOverlay,npc,interactWithSite);
+      }else interactWithSite();
       return;
     }
     if(code==="KeyP"){notify(save()?"Adventure saved.":"Save unavailable.");return;}
@@ -434,6 +446,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     listeners.abort();
     stopSound();
     fauna.dispose();
+    removeCharacterMarkers();
     scene.traverse(node=>{if(node instanceof T.InstancedMesh)node.dispose();if(node instanceof T.Mesh){node.geometry.dispose();const mats=Array.isArray(node.material)?node.material:[node.material];mats.forEach(mat=>mat.dispose());}});
     renderer.dispose();
   };

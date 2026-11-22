@@ -1,0 +1,98 @@
+[
+  {
+    "id": "hero",
+    "name": {
+      "fr": "Le Héros",
+      "en": "The Hero"
+    },
+    "bio": {
+      "fr": "Un jeune aventurier au grand cœur.",
+      "en": "A young adventurer with a generous heart."
+    },
+    "portrait": {
+      "x": 110,
+      "y": 79
+    },
+    "location": null
+  },
+  {
+    "id": "elara",
+    "name": {
+      "fr": "Dr Elara Voss",
+      "en": "Dr Elara Voss"
+    },
+    "bio": {
+      "fr": "Une scientifique au service du monde.",
+      "en": "A scientist working for the good of the world."
+    },
+    "portrait": {
+      "x": 622,
+      "y": 83
+    },
+    "location": "skyspire-village"
+  },
+  {
+    "id": "kael",
+    "name": {
+      "fr": "Kael",
+      "en": "Kael"
+    },
+    "bio": {
+      "fr": "Un rival ambitieux et déterminé.",
+      "en": "An ambitious, determined rival."
+    },
+    "portrait": {
+      "x": 1134,
+      "y": 91
+    },
+    "location": "embercrest-village"
+  },
+  {
+    "id": "maelys",
+    "name": {
+      "fr": "Maëlys",
+      "en": "Maëlys"
+    },
+    "bio": {
+      "fr": "Une mécanicienne pleine d’énergie.",
+      "en": "An energetic mechanic."
+    },
+    "portrait": {
+      "x": 127,
+      "y": 585
+    },
+    "location": "suncrest-village"
+  },
+  {
+    "id": "vael",
+    "name": {
+      "fr": "Vael",
+      "en": "Vael"
+    },
+    "bio": {
+      "fr": "Un commandant froid et impitoyable.",
+      "en": "A cold, ruthless commander."
+    },
+    "portrait": {
+      "x": 622,
+      "y": 583
+    },
+    "location": "frostveil-ruin"
+  },
+  {
+    "id": "watcher",
+    "name": {
+      "fr": "Le Veilleur",
+      "en": "The Watcher"
+    },
+    "bio": {
+      "fr": "Un esprit ancien et bienveillant.",
+      "en": "An ancient, benevolent spirit."
+    },
+    "portrait": {
+      "x": 1128,
+      "y": 586
+    },
+    "location": "celestial-ruin"
+  }
+]
