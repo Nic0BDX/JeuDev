@@ -34,6 +34,8 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   const renderer = new T.WebGLRenderer({antialias:!low});
   const scene = new T.Scene();
   const sky = new T.Color();
+  const clearSky = new T.Color(0x80c8f7);
+  const overcastSky = new T.Color(0x9eafc7);
   const fog = new T.FogExp2(0x8bc8eb,.0024);
   scene.background = sky;
   scene.fog = fog;
@@ -268,11 +270,16 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   window.addEventListener("resize",resize,options);
   resize();
   stream();
+  const meter = new URLSearchParams(location.search).get("performance") === "1" ? document.createElement("output") : null;
+  if(meter){meter.className="performance-meter";host.append(meter);}
+  let sampleStart=0,samplePrevious=0;
+  const frameIntervals:number[]=[];
+  let lastObjective="",lastBerry="",lastHeading=NaN,lastEnergy=-1;
   let prev=performance.now(),lastChunk="";
   function frame(now:number) {
     const dt=Math.min(.05,(now-prev)/1000);
     prev=now;
-    if(fighting||overlay){raf=requestAnimationFrame(frame);return;}
+    if(fighting||overlay){sampleStart=samplePrevious=0;frameIntervals.length=0;raf=requestAnimationFrame(frame);return;}
     time+=dt;
     if(time>=nextSave){save();nextSave=time+8;}
     const p=actor.position;
@@ -315,7 +322,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     const hour=(8+time*.06)%24;
     const day=clamp(.4+.75*Math.cos((hour-12)*Math.PI/12),0,1);
     const weather=["Clear","Rain","Storm","Snow","Fog"][Math.floor(time/75)%5];
-    sky.set(0x15214e).lerp(new T.Color(weather==="Clear"?0x80c8f7:0x9eafc7),day);
+    sky.set(0x15214e).lerp(weather==="Clear"?clearSky:overcastSky,day);
     fog.color.copy(sky);
     fog.density=weather==="Fog"?.008:weather==="Storm"?.004:.0024;
     light.intensity=.55+day*1.45;
@@ -327,10 +334,12 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     exploration.x=p.x;exploration.z=p.z;
     const site=discover(exploration,p.y);
     if(site)notify("Discovered · "+site.name);
-    questTrack.textContent=objective(journey)?.name??"Complete";
-    berry.textContent="Berry ×"+party.berries;
-    if(time>noteUntil)discoveryNote.textContent="";
-    compass.style.transform="rotate("+(-yaw)+"rad)";
+    const objectiveName=objective(journey)?.name??"Complete";
+    if(lastObjective!==objectiveName){lastObjective=objectiveName;questTrack.textContent=objectiveName;}
+    const berryLabel="Berry ×"+party.berries;
+    if(lastBerry!==berryLabel){lastBerry=berryLabel;berry.textContent=berryLabel;}
+    if(discoveryNote.textContent && time>noteUntil)discoveryNote.textContent="";
+    if(lastHeading!==yaw){lastHeading=yaw;compass.style.transform="rotate("+(-yaw)+"rad)";}
     if(time>=mapNext){drawMinimap(p.x,p.z);mapCount.textContent=exploration.discovered.length+"/64";mapNext=time+.2;}
     if(nearby?.species.behavior==="aggressive" && nearby.sprite.position.distanceTo(p)<2.5)startBattle();
     const placeName=nearest(p.x,p.z).name;
@@ -348,8 +357,28 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
         return `<span class="team-member" title="${c.name}"><span class="team-portrait">${c.id==="florix"?'<img src="/sprites/florix.png" alt="Florix">':c.name.slice(0,2)}</span><small>Lv.${member.level}</small><progress value="${member.hp}" max="${maxHp(member)}" aria-label="${c.name} HP"></progress></span>`;
       }).join("");
     }
-    energyBar.value=energy;
+    const energyDisplay=Math.round(energy);
+    if(lastEnergy!==energyDisplay){lastEnergy=energyDisplay;energyBar.value=energyDisplay;}
     renderer.render(scene,camera);
+    if(meter){
+      if(!sampleStart){sampleStart=now;samplePrevious=now;}
+      else {
+        frameIntervals.push(now-samplePrevious);
+        samplePrevious=now;
+        const elapsed=now-sampleStart;
+        if(elapsed>=5000){
+          const count=frameIntervals.length;
+          frameIntervals.sort((a,b)=>a-b);
+          const fps=Number((count*1000/elapsed).toFixed(1));
+          const p95=Number(frameIntervals[Math.ceil(count*.95)-1].toFixed(1));
+          const {calls,triangles}=renderer.info.render;
+          meter.value=fps+" FPS · p95 "+p95+" ms · "+calls+" draws";
+          meter.dataset.sample=JSON.stringify({fps,p95,calls,triangles,frames:count,low});
+          sampleStart=now;
+          frameIntervals.length=0;
+        }
+      }
+    }
     raf=requestAnimationFrame(frame);
   }
   raf=requestAnimationFrame(frame);
