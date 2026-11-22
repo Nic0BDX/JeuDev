@@ -1,0 +1,218 @@
+[
+  {
+    "id": "leaf-wink",
+    "name": "Leaf Wink",
+    "type": "Nature",
+    "power": 35,
+    "category": "special",
+    "status": null
+  },
+  {
+    "id": "vine-lash",
+    "name": "Vine Lash",
+    "type": "Nature",
+    "power": 55,
+    "category": "physical",
+    "status": null
+  },
+  {
+    "id": "bloom-burst",
+    "name": "Bloom Burst",
+    "type": "Nature",
+    "power": 75,
+    "category": "special",
+    "status": "poison"
+  },
+  {
+    "id": "spark-peck",
+    "name": "Spark Peck",
+    "type": "Fire",
+    "power": 35,
+    "category": "special",
+    "status": null
+  },
+  {
+    "id": "searing-coil",
+    "name": "Searing Coil",
+    "type": "Fire",
+    "power": 55,
+    "category": "physical",
+    "status": null
+  },
+  {
+    "id": "cinderfall",
+    "name": "Cinderfall",
+    "type": "Fire",
+    "power": 75,
+    "category": "special",
+    "status": "burn"
+  },
+  {
+    "id": "bubble-shot",
+    "name": "Bubble Shot",
+    "type": "Water",
+    "power": 35,
+    "category": "special",
+    "status": null
+  },
+  {
+    "id": "tidal-arc",
+    "name": "Tidal Arc",
+    "type": "Water",
+    "power": 55,
+    "category": "physical",
+    "status": null
+  },
+  {
+    "id": "deep-surge",
+    "name": "Deep Surge",
+    "type": "Water",
+    "power": 75,
+    "category": "special",
+    "status": "slow"
+  },
+  {
+    "id": "breeze-cut",
+    "name": "Breeze Cut",
+    "type": "Wind",
+    "power": 35,
+    "category": "special",
+    "status": null
+  },
+  {
+    "id": "gust-spiral",
+    "name": "Gust Spiral",
+    "type": "Wind",
+    "power": 55,
+    "category": "physical",
+    "status": null
+  },
+  {
+    "id": "tempest-wing",
+    "name": "Tempest Wing",
+    "type": "Wind",
+    "power": 75,
+    "category": "special",
+    "status": "poison"
+  },
+  {
+    "id": "pebble-snap",
+    "name": "Pebble Snap",
+    "type": "Earth",
+    "power": 35,
+    "category": "special",
+    "status": null
+  },
+  {
+    "id": "quake-step",
+    "name": "Quake Step",
+    "type": "Earth",
+    "power": 55,
+    "category": "physical",
+    "status": null
+  },
+  {
+    "id": "stone-break",
+    "name": "Stone Break",
+    "type": "Earth",
+    "power": 75,
+    "category": "special",
+    "status": "burn"
+  },
+  {
+    "id": "gleam",
+    "name": "Gleam",
+    "type": "Light",
+    "power": 35,
+    "category": "special",
+    "status": null
+  },
+  {
+    "id": "halo-lance",
+    "name": "Halo Lance",
+    "type": "Light",
+    "power": 55,
+    "category": "physical",
+    "status": null
+  },
+  {
+    "id": "solar-flare",
+    "name": "Solar Flare",
+    "type": "Light",
+    "power": 75,
+    "category": "special",
+    "status": "slow"
+  },
+  {
+    "id": "dusk-touch",
+    "name": "Dusk Touch",
+    "type": "Shadow",
+    "power": 35,
+    "category": "special",
+    "status": null
+  },
+  {
+    "id": "night-pulse",
+    "name": "Night Pulse",
+    "type": "Shadow",
+    "power": 55,
+    "category": "physical",
+    "status": null
+  },
+  {
+    "id": "veil-rend",
+    "name": "Veil Rend",
+    "type": "Shadow",
+    "power": 75,
+    "category": "special",
+    "status": "poison"
+  },
+  {
+    "id": "shard-toss",
+    "name": "Shard Toss",
+    "type": "Crystal",
+    "power": 35,
+    "category": "special",
+    "status": null
+  },
+  {
+    "id": "prism-ray",
+    "name": "Prism Ray",
+    "type": "Crystal",
+    "power": 55,
+    "category": "physical",
+    "status": null
+  },
+  {
+    "id": "crystal-crash",
+    "name": "Crystal Crash",
+    "type": "Crystal",
+    "power": 75,
+    "category": "special",
+    "status": "burn"
+  },
+  {
+    "id": "cloud-skip",
+    "name": "Cloud Skip",
+    "type": "Sky",
+    "power": 35,
+    "category": "special",
+    "status": null
+  },
+  {
+    "id": "nimbus-bolt",
+    "name": "Nimbus Bolt",
+    "type": "Sky",
+    "power": 55,
+    "category": "physical",
+    "status": null
+  },
+  {
+    "id": "star-dive",
+    "name": "Star Dive",
+    "type": "Sky",
+    "power": 75,
+    "category": "special",
+    "status": "slow"
+  }
+]
