@@ -97,3 +97,26 @@
   .creature-dex .dex-hero .portrait { width: min(68%, 13rem); }
   .creature-dex .dex-carousel { max-width: 20rem; }
 }
+
+@media (max-width: 850px) {
+  .creature-dex:not(.compendium) .dex-layout .species-detail {
+    grid-area: auto;
+  }
+  .creature-dex:not(.compendium) .dex-catalogue .species-grid {
+    grid-area: auto;
+  }
+}
+@media (max-width: 620px) {
+  .creature-dex .dex-catalogue { grid-template-columns: minmax(0, 1fr); }
+  .creature-dex .dex-categories {
+    display: flex;
+    overflow-x: auto;
+    padding: .2rem .15rem .4rem;
+  }
+  .creature-dex .dex-categories button {
+    flex: 0 0 auto;
+    min-height: 44px;
+    font-size: .78rem;
+    white-space: nowrap;
+  }
+}
