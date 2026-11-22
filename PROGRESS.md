@@ -43,3 +43,5 @@ Forge du Cratère : entrée, évent et abri modélisés. L’ordre des deux acti
 Boucle autonome sur `auto-dev`. Hypothèse retenue : le projet est Aetheris, déjà publié sur Vercel. Priorité à la fiabilité de la partie, aux contrôles mobiles et à la cohérence visuelle. Aucun nouveau skill installé dans cette session (voir BLOCKERS.md).
 
 Démarrage : retour au titre, message FR/EN et bouton Réessayer avec focus si WebGL échoue. [Build](https://github.com/Nic0BDX/JeuDev/actions/runs/45047843093) · [Tests Chromium](https://github.com/Nic0BDX/JeuDev/actions/runs/45047843115).
+
+Sauvegarde : validation des données v1, copie locale du dernier état valide et récupération testée après corruption. Les versions plus récentes restent intactes. [Build](https://github.com/Nic0BDX/JeuDev/actions/runs/45048117369) · [Parcours](https://github.com/Nic0BDX/JeuDev/actions/runs/45048117423).
