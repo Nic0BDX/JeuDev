@@ -1,6 +1,7 @@
 import * as T from "three";
 import regions from "./data/regions.json";
 import { wildlife } from "./wildlife";
+import { battle, newParty, speciesOf, maxHp } from "./combat";
 
 const SIZE = 96;
 const SEA = -6;
@@ -58,6 +59,9 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   actor.position.set(0,terrain(0,0)+1,12);
   scene.add(actor);
   const fauna=wildlife(scene,nearest,surface,sample);
+  const party=newParty();
+  let fighting=false,lastBattle=0;
+  let target:ReturnType<typeof fauna.update>;
 
   const material = new T.MeshLambertMaterial({vertexColors:true,flatShading:true});
   const leaves = new T.ConeGeometry(1,3,5);
@@ -108,12 +112,22 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
       chunks.delete(id);
     }
   }
-  host.innerHTML='<div class="world"></div><div class="world-info"><strong></strong><small></small><progress max="100" value="100" aria-label="Energy"></progress></div><button class="world-exit">‹</button><div class="stick" aria-label="Move"><i></i></div><div class="world-actions"><button data-key="ShiftLeft" aria-label="Sprint">⇧</button><button data-key="Space" aria-label="Jump or glide">⛯</button><button data-key="KeyR" aria-label="Recenter camera">⌖</button></div>';
+  host.innerHTML='<div class="world"></div><div class="world-info"><strong></strong><small></small><progress max="100" value="100" aria-label="Energy"></progress></div><button class="world-exit">‹</button><div class="stick" aria-label="Move"><i></i></div><div class="world-actions"><button data-key="KeyE" aria-label="Interact">E</button><button data-key="KeyB" aria-label="Scan">⌕</button><button data-key="ShiftLeft" aria-label="Sprint">⇧</button><button data-key="Space" aria-label="Jump or glide">⛯</button><button data-key="KeyR" aria-label="Recenter camera">⌖</button></div>';
   const viewport=host.querySelector(".world")!;
   viewport.append(renderer.domElement);
   const info=host.querySelector(".world-info strong")!;
   const clock=host.querySelector(".world-info small")!;
   const energyBar=host.querySelector("progress")!;
+  function startBattle() {
+    if(!target||fighting||time<lastBattle)return;
+    const opponent=target;
+    held.clear();
+    fighting=battle(host,party,opponent.species,opponent.level,remove=>{
+      if(remove)fauna.remove(opponent);
+      fauna.setCompanion(speciesOf(party.team[0]));
+      fighting=false;lastBattle=time+2;
+    });
+  }
   const listeners=new AbortController();
   const options={signal:listeners.signal};
   const held=new Set<string>();
@@ -123,6 +137,9 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   const focus=new T.Vector3();
   const offset=new T.Vector3();
   function press(code:string) {
+    if(fighting)return;
+    if(code==="KeyE"){startBattle();return;}
+    if(code==="KeyB"&&target&&!party.seen.includes(target.species.id))party.seen.push(target.species.id);
     if(code==="Space" && !held.has(code)) jump=true;
     if(code==="KeyR") { yaw=0;pitch=.32; }
     held.add(code);
@@ -160,7 +177,9 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   let prev=performance.now(),lastChunk="";
   function frame(now:number) {
     const dt=Math.min(.05,(now-prev)/1000);
-    prev=now;time+=dt;
+    prev=now;
+    if(fighting){raf=requestAnimationFrame(frame);return;}
+    time+=dt;
     const p=actor.position;
     const floor=surface(p.x,p.z,p.y)+.9;
     const grounded=p.y<=floor+.15;
@@ -175,10 +194,11 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
       jump=false;
     }
     if(grounded&&vertical<=0)glide=false;
-    const speed=swim?5:glide?19:sprint?15:8;
+    const type=speciesOf(party.team[0]).type;
+    const speed=swim?(type==="Water"?9:5):glide?19:sprint?15:8;
     const step=move.multiplyScalar(speed*dt);
     p.add(step);
-    energy=clamp(energy+dt*(glide?-7:sprint&&step.lengthSq()>0?-12:14),0,100);
+    energy=clamp(energy+dt*(glide?((type==="Wind"||type==="Sky")?-4:-7):sprint&&step.lengthSq()>0?-12:14),0,100);
     if(!energy)glide=false;
     vertical=Math.max(glide?-2.6:-44,vertical-24*dt);
     p.y+=vertical*dt;
@@ -201,8 +221,10 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     const chunk=Math.floor(p.x/SIZE)+","+Math.floor(p.z/SIZE);
     if(chunk!==lastChunk){lastChunk=chunk;stream();}
     const nearby=fauna.update(p,dt,time,hour,weather);
+    target=nearby;
+    if(nearby?.species.behavior==="aggressive" && nearby.sprite.position.distanceTo(p)<2.5)startBattle();
     info.textContent=nearest(p.x,p.z).name+(nearby?' · '+nearby.species.name+' Lv.'+nearby.level:'');
-    clock.textContent=String(Math.floor(hour)).padStart(2,"0")+":"+String(Math.floor(hour%1*60)).padStart(2,"0")+" · "+weather;
+    clock.textContent=String(Math.floor(hour)).padStart(2,"0")+":"+String(Math.floor(hour%1*60)).padStart(2,"0")+" · "+weather+" · "+party.team.length+"/6 · "+party.team[0].hp+"/"+maxHp(party.team[0])+" HP";
     energyBar.value=energy;
     renderer.render(scene,camera);
     raf=requestAnimationFrame(frame);
