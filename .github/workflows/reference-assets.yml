@@ -22,3 +22,15 @@ jobs:
         with:
           name: aetheris-reference-crops
           path: reference-crops/
+      - name: Transfer reviewed draft crops
+        run: |
+          python - <<'PY'
+          from base64 import b64encode
+          from pathlib import Path
+
+          root = Path("reference-crops")
+          for file in sorted(root.rglob("*.webp")):
+              data = b64encode(file.read_bytes()).decode()
+              for offset in range(0, len(data), 5000):
+                  print(f"REF_CROP {file.relative_to(root).as_posix()} {offset} {data[offset:offset + 5000]}")
+          PY
