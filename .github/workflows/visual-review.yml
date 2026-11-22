@@ -86,6 +86,19 @@ jobs:
               await page.locator('.world canvas').waitFor();
               await page.locator('.quest-track').getByText('The Call of Skyspire').waitFor();
               await capture('hud', true);
+              await page.keyboard.down('KeyD');
+              try {
+                await page.waitForTimeout(220);
+                await page.evaluate(() => window.dispatchEvent(new Event('blur')));
+                await page.getByRole('button', {name: 'Save game'}).click();
+                const stopped = await page.evaluate(() => JSON.parse(localStorage.getItem('aetheris.save')).position[0]);
+                await page.waitForTimeout(450);
+                await page.getByRole('button', {name: 'Save game'}).click();
+                const later = await page.evaluate(() => JSON.parse(localStorage.getItem('aetheris.save')).position[0]);
+                if (later !== stopped) throw new Error('Movement key stuck after window blur');
+              } finally {
+                await page.keyboard.up('KeyD');
+              }
               await page.getByRole('button', {name: 'Bag', exact: true}).click();
               await page.getByText('Field Bag · 120 coins').waitFor();
               await capture('bag');
@@ -100,6 +113,13 @@ jobs:
               const resumed = await page.evaluate(() => JSON.parse(localStorage.getItem('aetheris.save')));
               if (JSON.stringify(resumed.position) !== JSON.stringify(saved.position)) throw new Error('Resume changed position');
               await capture('continue');
+              await page.locator('.world-exit').click();
+              await page.evaluate(() => localStorage.setItem('aetheris.save', '{broken'));
+              await page.reload();
+              await page.getByRole('button', {name: 'Continue'}).click();
+              await page.locator('.world canvas').waitFor();
+              const recovered = await page.evaluate(() => JSON.parse(localStorage.getItem('aetheris.save')));
+              if (JSON.stringify(recovered.position) !== JSON.stringify(saved.position)) throw new Error('Backup did not recover the saved position');
               await page.locator('.world-exit').click();
               await page.goto('http://127.0.0.1:5173/?performance=1');
               await page.getByRole('button', {name: 'Continue'}).click();
@@ -204,6 +224,19 @@ jobs:
                 await page.waitForFunction(() => JSON.parse(localStorage.getItem('aetheris.save')).chronicle.checkpoint === 'volflare-and-cubs');
               }
               await page.close();
+              const unsupported = await browser.newPage({viewport: {width, height}});
+              await unsupported.addInitScript(() => {
+                const original = HTMLCanvasElement.prototype.getContext;
+                HTMLCanvasElement.prototype.getContext = function(type, ...args) {
+                  return type.startsWith('webgl') ? null : original.call(this, type, ...args);
+                };
+              });
+              await unsupported.goto('http://127.0.0.1:5173/');
+              await unsupported.getByRole('button', {name: 'New Adventure'}).click();
+              await unsupported.getByRole('alert').getByRole('button', {name: 'Try again'}).waitFor();
+              if (await unsupported.evaluate(() => document.activeElement.textContent) !== 'Try again') throw new Error('Graphics fallback did not receive focus');
+              await unsupported.screenshot({path: 'captures/webgl-error-' + name + '.png'});
+              await unsupported.close();
             }
           } finally {
             await browser.close();

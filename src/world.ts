@@ -341,9 +341,9 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     if(code==="KeyR") { yaw=0;pitch=.32; }
     held.add(code);
   }
-  window.addEventListener("keydown",e=>{if(!overlay&&(e.code==="Space"||e.code==="Tab"))e.preventDefault();press(e.code);},options);
+  window.addEventListener("keydown",e=>{if(!overlay&&(e.code==="Space"||e.code==="Tab"))e.preventDefault();if(!e.repeat)press(e.code);},options);
   window.addEventListener("keyup",e=>held.delete(e.code),options);
-  window.addEventListener("blur",()=>held.clear(),options);
+
   function drag(node:Element,move:(event:PointerEvent)=>void,stop:()=>void=()=>{}) {
     node.addEventListener("pointerdown",event=>{
       const e=event as PointerEvent;
@@ -352,16 +352,26 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     },options);
     node.addEventListener("pointermove",event=>{const e=event as PointerEvent;if(node.hasPointerCapture(e.pointerId)) move(e);},options);
     node.addEventListener("lostpointercapture",stop,options);
+    node.addEventListener("pointercancel",stop,options);
   }
   drag(viewport,e=>{if(e.type==="pointermove"){yaw-=e.movementX*settings.sensitivity*.00009;pitch=clamp(pitch+e.movementY*.005,.06,1.12);}});
   const stick=host.querySelector(".stick")!;
   const knob=host.querySelector<HTMLElement>(".stick i")!;
   drag(stick,e=>{const r=stick.getBoundingClientRect();stickX=clamp((e.clientX-r.left-r.width/2)/(r.width*.34),-1,1);stickZ=clamp((e.clientY-r.top-r.height/2)/(r.height*.34),-1,1);knob.style.transform='translate('+stickX*24+'px,'+stickZ*24+'px)';},()=>{stickX=0;stickZ=0;knob.style.transform="";});
+  function resetInput(){
+    held.clear();
+    stickX=stickZ=0;
+    jump=false;
+    knob.style.transform="";
+  }
+  window.addEventListener("blur",resetInput,options);
+  document.addEventListener("visibilitychange",()=>{if(document.hidden)resetInput();},options);
   for(const button of Array.from(host.querySelectorAll<HTMLButtonElement>("[data-key]"))){
     const code=button.dataset.key!;
     button.addEventListener("pointerdown",e=>{button.setPointerCapture(e.pointerId);press(code);},options);
     button.addEventListener("click",e=>{if(e.detail===0){press(code);held.delete(code);}},options);
     button.addEventListener("lostpointercapture",()=>held.delete(code),options);
+    button.addEventListener("pointercancel",()=>held.delete(code),options);
   }
   function resize() {
     renderer.setPixelRatio(Math.min(devicePixelRatio,low?1.25:1.8)*renderScale);
