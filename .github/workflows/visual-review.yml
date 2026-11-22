@@ -198,6 +198,7 @@ jobs:
                 await seedTrial([449, 10, -408], null);
                 await page.getByRole('button', {name: 'Interact', exact: true}).click();
                 await page.locator('.quest-track small').getByText('Ouvrir l’abri des petits', {exact: false}).waitFor();
+                await capture('forge-vent', true);
                 await seedTrial([521, 10, -457], null);
                 await page.getByRole('button', {name: 'Interact', exact: true}).click();
                 await page.waitForFunction(() => JSON.parse(localStorage.getItem('aetheris.save')).chronicle.checkpoint === 'volflare-and-cubs');

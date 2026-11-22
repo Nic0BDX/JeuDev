@@ -3,6 +3,7 @@ import regions from "./data/regions.json";
 import { wildlife } from "./wildlife";
 import { characterAt, openCharacters } from "./characters";
 import { mountCharacterMarkers } from "./character-markers";
+import { mountForge } from "./forge";
 import { openDex } from "./dex";
 import { ambience, writeSave, type Save } from "./save";
 import { nearestSite, newJourney, openBag, visit } from "./quests";
@@ -87,6 +88,9 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   markerGroup.visible=false;
   scene.add(markerGroup);
   let markerSite="";
+  const embercrest=regions.find(region=>region.id==="embercrest")!;
+  const forgePlace=(kind:string)=>embercrest.locations.find(place=>place.kind===kind)!;
+  const showForgeState=mountForge(scene,{entrance:forgePlace("cave"),vent:forgePlace("resource"),shelter:forgePlace("habitat")},(x,z)=>surface(x,z,0));
   const actor = new T.Group();
   const addPart=(geometry:T.BufferGeometry,color:number,x:number,y:number,z:number)=>{
     const mesh=new T.Mesh(geometry,new T.MeshLambertMaterial({color,flatShading:true}));
@@ -110,6 +114,11 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   const party=resume?.party??newParty();
   const journey=resume?.journey??newJourney();
   const chronicle=restoreChronicle(resume?.chronicle);
+  function refreshForge(){
+    const pastTrial=chronicle.next>7;
+    showForgeState(pastTrial||chronicle.fieldStep===1,pastTrial);
+  }
+  refreshForge();
   const exploration:Exploration=resume?.exploration??{discovered:[],x:actor.position.x,z:actor.position.z};
   fauna.setCompanion(speciesOf(party.team[0]));
   fauna.showCompanion(chronicle.next>0);
@@ -284,7 +293,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
       if(!site){startBattle();return;}
       if(destination(chronicle)?.id===site.id){
         const fieldResult=resolveField(chronicle,site.id);
-        if(fieldResult){notify(fieldResult);save();return;}
+        if(fieldResult){refreshForge();notify(fieldResult);save();return;}
         overlay=true;held.clear();
         playScene(host,chronicle,party,(scene,advanced)=>{
           closeOverlay();
