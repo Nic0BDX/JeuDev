@@ -1,4 +1,5 @@
 import * as T from "three";
+import { canopyGeometry, mountValley } from "./valley-art";
 import regions from "./data/regions.json";
 import { wildlife } from "./wildlife";
 import { characterAt, openCharacters } from "./characters";
@@ -57,10 +58,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   scene.add(light,sun);
   const planet = new T.Mesh(new T.SphereGeometry(135,24,16),new T.MeshBasicMaterial({color:0xc3deff,fog:false}));
   scene.add(planet);
-  const water = new T.Mesh(new T.PlaneGeometry(14000,14000),new T.MeshLambertMaterial({color:0x37a8cf}));
-  water.rotation.x = -Math.PI/2;
-  water.position.y = SEA;
-  scene.add(water);
+  const updateValleyArt = mountValley(scene, terrain, SEA, sample);
   const island = new T.Mesh(new T.CylinderGeometry(155,22,42,16),new T.MeshLambertMaterial({color:0x826fba}));
   island.position.set(0,70,-750);
   scene.add(island);
@@ -127,9 +125,9 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   let fighting=false,overlay=false,lastBattle=0;
   let target:ReturnType<typeof fauna.update>;
 
-  const material = new T.MeshLambertMaterial({vertexColors:true,flatShading:true});
-  const leaves = new T.ConeGeometry(1,3,5);
-  const leafMaterial = new T.MeshLambertMaterial({color:0xffffff,flatShading:true});
+  const material = new T.MeshLambertMaterial({vertexColors:true});
+  const leaves = canopyGeometry();
+  const leafMaterial = new T.MeshLambertMaterial({vertexColors:true});
   const chunks = new Map<string,{mesh:T.Mesh;trees:T.InstancedMesh}>();
   const dummy = new T.Object3D();
   let pendingChunks: Array<{gx:number;gz:number;segments:number;id:string}> = [];
@@ -162,22 +160,28 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
       for(let i=0;i<pos.count;i++){
         const wx=pos.getX(i),wz=pos.getZ(i),height=terrain(wx,wz);
         pos.setY(i,height);
-        const c=new T.Color(nearest(wx,wz).color).multiplyScalar(.86+.23*sample(wx,wz));
+        const c=new T.Color(nearest(wx,wz).color);
+        const grass=c.clone().lerp(new T.Color(0x95ba57),.36);
+        const bank=clamp(1-(height-SEA)/2.4,0,1);
+        const stone=clamp((height-terrain(wx+2,wz+2))*.56,0,.7);
+        c.copy(grass).lerp(new T.Color(0xafa180),bank).lerp(new T.Color(0x83899a),stone);
+        c.multiplyScalar(.82+.25*sample(Math.floor(wx/11),Math.floor(wz/11)));
         colors.push(c.r,c.g,c.b);
       }
       geometry.setAttribute("color",new T.Float32BufferAttribute(colors,3));
       geometry.computeVertexNormals();
       const mesh=new T.Mesh(geometry,material);
-      const trees=new T.InstancedMesh(leaves,leafMaterial,low?10:22);
+      const trees=new T.InstancedMesh(leaves,leafMaterial,low?16:31);
       for(let i=0;i<trees.count;i++){
         const wx=(gx+sample(gx*31+i,gz))*SIZE,wz=(gz+sample(gx,gz*31+i))*SIZE;
         const h=terrain(wx,wz),size=1.2+sample(wx,wz)*2.8;
-        dummy.position.set(wx,h+size,wz);
-        dummy.scale.setScalar(h>SEA+1?size:0);
+        dummy.position.set(wx,h,wz);
+        const pathClear=Math.abs(wx-Math.sin((12-wz)/22)*5)>5 || wz < -58 || wz > 22;
+        dummy.scale.setScalar(h>SEA+1 && pathClear ? size : 0);
         dummy.rotation.y=i;
         dummy.updateMatrix();
         trees.setMatrixAt(i,dummy.matrix);
-        trees.setColorAt(i,new T.Color(nearest(wx,wz).color).multiplyScalar(.65));
+        trees.setColorAt(i,new T.Color(0xffffff).lerp(new T.Color(nearest(wx,wz).color),.28));
       }
       scene.add(mesh,trees);
       chunks.set(id,{mesh,trees});
@@ -486,6 +490,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     }
     const energyDisplay=Math.round(energy);
     if(lastEnergy!==energyDisplay){lastEnergy=energyDisplay;energyBar.value=energyDisplay;}
+    updateValleyArt(time);
     renderer.render(scene,camera);
     if(meter){
       if(!sampleStart){sampleStart=now;samplePrevious=now;}
@@ -517,6 +522,9 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     fauna.dispose();
     removeCharacterMarkers();
     scene.traverse(node=>{if(node instanceof T.InstancedMesh)node.dispose();if(node instanceof T.Mesh){node.geometry.dispose();const mats=Array.isArray(node.material)?node.material:[node.material];mats.forEach(mat=>mat.dispose());}});
+    leaves.dispose();
+    leafMaterial.dispose();
+    material.dispose();
     renderer.dispose();
   };
   host.querySelector(".world-exit")!.addEventListener("click",()=>{dispose();exit();},options);

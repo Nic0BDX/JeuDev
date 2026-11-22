@@ -89,6 +89,9 @@ jobs:
               await page.locator('.world canvas').waitFor();
               await page.locator('.quest-track').getByText('The Call of Skyspire').waitFor();
               await capture('hud', true);
+              const hideHud = await page.addStyleTag({content: '#app > :not(.world) { visibility: hidden !important; }'});
+              await capture('valley', true);
+              await hideHud.evaluate(node => node.remove());
               await page.getByRole('button', {name: 'Bag', exact: true}).click();
               await page.getByText('Field Bag · 120 coins').waitFor();
               await capture('bag');
