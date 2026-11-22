@@ -3,10 +3,11 @@ import regions from "./data/regions.json";
 import { wildlife } from "./wildlife";
 import { characterAt, openCharacters } from "./characters";
 import { mountCharacterMarkers } from "./character-markers";
+import { mountForge } from "./forge";
 import { openDex } from "./dex";
 import { ambience, writeSave, type Save } from "./save";
 import { nearestSite, newJourney, openBag, visit } from "./quests";
-import { chapter, destination, restoreChronicle, playScene, siteLabel } from "./story";
+import { chapter, currentField, destination, resolveField, restoreChronicle, playScene, siteLabel } from "./story";
 import { discover, openMap, type Exploration } from "./map";
 import { battle, newParty, speciesOf, maxHp } from "./combat";
 
@@ -67,8 +68,9 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   const crystal = new T.MeshLambertMaterial({color:0xbcf3ff,emissive:0x27608b,flatShading:true});
   const landmarkTransform = new T.Object3D();
   for(const region of regions){
-    const landmarks = new T.InstancedMesh(marker, crystal, region.locations.length);
-    region.locations.forEach((place,index)=>{
+    const sites=region.locations.filter(place=>region.id!=="embercrest"||!["cave","resource","habitat"].includes(place.kind));
+    const landmarks = new T.InstancedMesh(marker, crystal, sites.length);
+    sites.forEach((place,index)=>{
       landmarkTransform.scale.setScalar(place.kind==="statue"?1.5:.75);
       landmarkTransform.position.set(place.x,(place.y??terrain(place.x,place.z))+3,place.z);
       landmarkTransform.updateMatrix();
@@ -87,6 +89,9 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   markerGroup.visible=false;
   scene.add(markerGroup);
   let markerSite="";
+  const embercrest=regions.find(region=>region.id==="embercrest")!;
+  const forgePlace=(kind:string)=>embercrest.locations.find(place=>place.kind===kind)!;
+  const showForgeState=mountForge(scene,{entrance:forgePlace("cave"),vent:forgePlace("resource"),shelter:forgePlace("habitat")},(x,z)=>surface(x,z,0));
   const actor = new T.Group();
   const addPart=(geometry:T.BufferGeometry,color:number,x:number,y:number,z:number)=>{
     const mesh=new T.Mesh(geometry,new T.MeshLambertMaterial({color,flatShading:true}));
@@ -110,6 +115,12 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   const party=resume?.party??newParty();
   const journey=resume?.journey??newJourney();
   const chronicle=restoreChronicle(resume?.chronicle);
+  function refreshForge(){
+    const active=chapter(chronicle);
+    const pastTrial=!active||active.chapter>4||active.id==="volflare-and-cubs";
+    showForgeState(pastTrial||chronicle.fieldStep===1,pastTrial);
+  }
+  refreshForge();
   const exploration:Exploration=resume?.exploration??{discovered:[],x:actor.position.x,z:actor.position.z};
   fauna.setCompanion(speciesOf(party.team[0]));
   fauna.showCompanion(chronicle.next>0);
@@ -283,10 +294,12 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
       const site=objectiveNearby?goal:nearestSite(p.x,p.y,p.z);
       if(!site){startBattle();return;}
       if(destination(chronicle)?.id===site.id){
+        const fieldResult=resolveField(chronicle,site.id);
+        if(fieldResult){refreshForge();notify(fieldResult);save();return;}
         overlay=true;held.clear();
         playScene(host,chronicle,party,(scene,advanced)=>{
           closeOverlay();
-          if(!advanced)return;
+          if(!advanced){if(currentField(chronicle)){notify(currentField(chronicle)!.label);save();}return;}
           fauna.showCompanion(true);
           if(scene.crystal&&!journey.looted.includes(site.id)){journey.crystals++;journey.looted.push(site.id);}
           if(scene.travel){
@@ -448,7 +461,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     }
     if(markerGroup.visible){questDiamond.position.y=4+Math.sin(time*2)*.55;questDiamond.rotation.y=time*.8;}
     const distance=storyPlace?Math.round(Math.hypot(storyPlace.x-p.x,storyPlace.z-p.z)/5)*5:0;
-    const objectiveName=storyPlace?"Ch. "+chapter(chronicle).chapter+" · "+siteLabel(storyPlace.id,storyPlace.name)+" · "+distance+" m · "+chronicle.shards.length+"/4 Éclats":"Épilogue terminé";
+    const objectiveName=storyPlace?"Ch. "+chapter(chronicle).chapter+" · "+(currentField(chronicle)?.label??siteLabel(storyPlace.id,storyPlace.name))+" · "+distance+" m · "+chronicle.shards.length+"/4 Éclats":"Épilogue terminé";
     if(lastObjective!==objectiveName){lastObjective=objectiveName;questTrack.textContent=objectiveName;}
     const berryLabel="Berry ×"+party.berries;
     if(lastBerry!==berryLabel){lastBerry=berryLabel;berry.textContent=berryLabel;}
