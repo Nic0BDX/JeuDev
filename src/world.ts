@@ -1,6 +1,7 @@
 import * as T from "three";
 import regions from "./data/regions.json";
 import { wildlife } from "./wildlife";
+import { openDex } from "./dex";
 import { battle, newParty, speciesOf, maxHp } from "./combat";
 
 const SIZE = 96;
@@ -60,7 +61,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   scene.add(actor);
   const fauna=wildlife(scene,nearest,surface,sample);
   const party=newParty();
-  let fighting=false,lastBattle=0;
+  let fighting=false,overlay=false,lastBattle=0;
   let target:ReturnType<typeof fauna.update>;
 
   const material = new T.MeshLambertMaterial({vertexColors:true,flatShading:true});
@@ -112,7 +113,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
       chunks.delete(id);
     }
   }
-  host.innerHTML='<div class="world"></div><div class="world-info"><strong></strong><small></small><progress max="100" value="100" aria-label="Energy"></progress></div><button class="world-exit">‹</button><div class="stick" aria-label="Move"><i></i></div><div class="world-actions"><button data-key="KeyE" aria-label="Interact">E</button><button data-key="KeyB" aria-label="Scan">⌕</button><button data-key="ShiftLeft" aria-label="Sprint">⇧</button><button data-key="Space" aria-label="Jump or glide">⛯</button><button data-key="KeyR" aria-label="Recenter camera">⌖</button></div>';
+  host.innerHTML='<div class="world"></div><div class="world-info"><strong></strong><small></small><progress max="100" value="100" aria-label="Energy"></progress></div><button class="world-exit">‹</button><div class="stick" aria-label="Move"><i></i></div><div class="world-actions"><button data-key="Tab" aria-label="Creature Dex">◇</button><button data-key="KeyE" aria-label="Interact">E</button><button data-key="KeyB" aria-label="Scan">⌕</button><button data-key="ShiftLeft" aria-label="Sprint">⇧</button><button data-key="Space" aria-label="Jump or glide">⛯</button><button data-key="KeyR" aria-label="Recenter camera">⌖</button></div>';
   const viewport=host.querySelector(".world")!;
   viewport.append(renderer.domElement);
   const info=host.querySelector(".world-info strong")!;
@@ -137,14 +138,15 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   const focus=new T.Vector3();
   const offset=new T.Vector3();
   function press(code:string) {
-    if(fighting)return;
+    if(fighting||overlay)return;
+    if(code==="Tab"){overlay=true;held.clear();openDex(host,party,()=>{overlay=false;});return;}
     if(code==="KeyE"){startBattle();return;}
     if(code==="KeyB"&&target&&!party.seen.includes(target.species.id))party.seen.push(target.species.id);
     if(code==="Space" && !held.has(code)) jump=true;
     if(code==="KeyR") { yaw=0;pitch=.32; }
     held.add(code);
   }
-  window.addEventListener("keydown",e=>{if(e.code==="Space")e.preventDefault();press(e.code);},options);
+  window.addEventListener("keydown",e=>{if(!overlay&&(e.code==="Space"||e.code==="Tab"))e.preventDefault();press(e.code);},options);
   window.addEventListener("keyup",e=>held.delete(e.code),options);
   window.addEventListener("blur",()=>held.clear(),options);
   function drag(node:Element,move:(event:PointerEvent)=>void,stop:()=>void=()=>{}) {
@@ -178,7 +180,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   function frame(now:number) {
     const dt=Math.min(.05,(now-prev)/1000);
     prev=now;
-    if(fighting){raf=requestAnimationFrame(frame);return;}
+    if(fighting||overlay){raf=requestAnimationFrame(frame);return;}
     time+=dt;
     const p=actor.position;
     const floor=surface(p.x,p.z,p.y)+.9;
