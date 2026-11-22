@@ -2,6 +2,8 @@ import * as T from "three";
 import species from "./data/creatures.json";
 import types from "./data/types.json";
 
+const weatherType: Record<string,string> = {Rain:"Water",Storm:"Wind",Snow:"Crystal",Fog:"Shadow"};
+
 type Species = typeof species[number];
 type Biome = { id:string };
 type Wild = { species:Species; sprite:T.Sprite; origin:T.Vector3; level:number };
@@ -52,7 +54,7 @@ export function wildlife(scene:T.Scene, regionAt:(x:number,z:number)=>Biome, flo
         active.add(key);
         if(wild.has(key))continue;
         const pool=species.filter(c=>c.habitats.includes(regionAt((x+.5)*size,(z+.5)*size).id));
-        const preferred=pool.filter(c=>c.type===({Rain:"Water",Storm:"Wind",Snow:"Crystal",Fog:"Shadow"} as Record<string,string>)[weather]);
+        const preferred=pool.filter(c=>c.type===weatherType[weather]);
         const available=preferred.length&&random(x,z)>.45?preferred:pool;
         const group=Array.from({length:2},(_,i)=>{
           const wx=(x+.2+random(x+i,z)*.6)*size,wz=(z+.2+random(x,z+i+1)*.6)*size;
