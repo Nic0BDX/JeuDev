@@ -98,6 +98,7 @@ jobs:
                 return canvas && canvas.width > 0 && canvas.height > 0;
               });
               await page.screenshot({path: 'captures/streaming-' + name + '.png'});
+              await page.locator('.world-exit').click();
               await page.evaluate(({x, z}) => {
                 const save = JSON.parse(localStorage.getItem('aetheris.save'));
                 save.position = [x, 5, z];
