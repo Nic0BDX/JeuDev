@@ -83,6 +83,17 @@ jobs:
               const sample = JSON.parse(await page.locator('.performance-meter').getAttribute('data-sample'));
               if (!(sample.frames > 0 && sample.calls > 0)) throw new Error('No rendered frames recorded');
               console.log('AETHERIS_PERF ' + name + ' ' + JSON.stringify(sample));
+              await page.keyboard.down('KeyA');
+              await page.waitForTimeout(1100);
+              await page.keyboard.up('KeyA');
+              await page.getByRole('button', {name: 'Save game'}).click();
+              const moved = await page.evaluate(() => JSON.parse(localStorage.getItem('aetheris.save')).position);
+              if (!(moved[0] < saved.position[0] - 1)) throw new Error('Player did not cross the starting chunk boundary');
+              await page.waitForFunction(() => {
+                const canvas = document.querySelector('.world canvas');
+                return canvas && canvas.width > 0 && canvas.height > 0;
+              });
+              await page.screenshot({path: 'captures/streaming-' + name + '.png'});
               await page.close();
             }
           } finally {
