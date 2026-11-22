@@ -1,0 +1,26 @@
+[
+  {
+    "id": "capsule",
+    "name": "Capsule Aether",
+    "price": 20,
+    "capture": 1
+  },
+  {
+    "id": "prism-capsule",
+    "name": "Capsule Prisme",
+    "price": 60,
+    "capture": 1.6
+  },
+  {
+    "id": "berry",
+    "name": "Baie vitalité",
+    "price": 12,
+    "heal": 35,
+    "affinity": 2
+  },
+  {
+    "id": "crystal",
+    "name": "Cristal brut",
+    "price": 15
+  }
+]
