@@ -37,3 +37,5 @@ Narration : six personnages et trame jouable en douze chapitres. La Forge du Cra
 Récit : [build](https://github.com/Nic0BDX/JeuDev/actions/runs/45045424057) et [contrôles Chromium](https://github.com/Nic0BDX/JeuDev/actions/runs/45045424076) réussis. Validation des 25 scènes, rencontre avec Elara et sauvegarde des deux fins via des états de test. À Skyspire, SwiftShader mesure 36,3 FPS en 16:9 et 57,6 FPS en portrait ; la mesure sur appareils réels reste ouverte.
 
 Navigation narrative : repère 3D et losange de minimap. [Build](https://github.com/Nic0BDX/JeuDev/actions/runs/45045815365) et [parcours de sauvetage de Florix avec sauvegarde du nom](https://github.com/Nic0BDX/JeuDev/actions/runs/45045815306) validés en Chromium.
+
+Forge du Cratère : entrée, évent et abri modélisés. L’ordre des deux actions et la reprise entre les actions sont vérifiés. [Build](https://github.com/Nic0BDX/JeuDev/actions/runs/45046357388) · [Tests et captures](https://github.com/Nic0BDX/JeuDev/actions/runs/45046357241).
