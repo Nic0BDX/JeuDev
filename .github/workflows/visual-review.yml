@@ -83,6 +83,11 @@ jobs:
               await capture('settings', true);
               await page.getByRole('button', {name: 'Back'}).click();
               await page.getByRole('button', {name: 'New Adventure'}).click();
+              const prologue = page.getByRole('dialog', {name: 'Aetheris prologue'});
+              await prologue.getByText('The islands of Aetheris float above the clouds.').waitFor();
+              await capture('prologue');
+              await prologue.getByRole('button', {name: 'Skip'}).click();
+              await prologue.waitFor({state: 'detached'});
               await page.locator('.world canvas').waitFor();
               await page.locator('.quest-track').getByText('The Call of Skyspire').waitFor();
               await capture('hud', true);
