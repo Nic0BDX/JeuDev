@@ -57,7 +57,22 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     landmark.position.set(place.x,(place.y ?? terrain(place.x,place.z))+3,place.z);
     scene.add(landmark);
   }
-  const actor = new T.Mesh(new T.CapsuleGeometry(.43,1.02,4,8),new T.MeshLambertMaterial({color:0x5e399f}));
+  const actor = new T.Group();
+  const addPart=(geometry:T.BufferGeometry,color:number,x:number,y:number,z:number)=>{
+    const mesh=new T.Mesh(geometry,new T.MeshLambertMaterial({color,flatShading:true}));
+    mesh.position.set(x,y,z);
+    actor.add(mesh);
+    return mesh;
+  };
+  addPart(new T.SphereGeometry(.32,10,7),0xe4af88,0,.72,0);
+  addPart(new T.SphereGeometry(.34,9,6),0x3b2a44,0,.85,.04).scale.y=.68;
+  addPart(new T.CylinderGeometry(.34,.43,.74,8),0x294f9a,0,.16,0);
+  addPart(new T.CylinderGeometry(.35,.37,.14,8),0xe4bf73,0,.48,0);
+  addPart(new T.BoxGeometry(.46,.48,.2),0x62473d,.06,.14,.38);
+  for(const side of [-1,1]){
+    addPart(new T.CylinderGeometry(.12,.13,.51,7),0x1f2d52,side*.18,-.48,0);
+    addPart(new T.BoxGeometry(.26,.22,.36),0x392d42,side*.18,-.78,-.06);
+  }
   actor.position.set(0,terrain(0,0)+1,12);
   scene.add(actor);
   const fauna=wildlife(scene,nearest,surface,sample);
@@ -115,15 +130,27 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
       chunks.delete(id);
     }
   }
-  host.innerHTML='<div class="world"></div><div class="world-info"><strong></strong><small></small><progress max="100" value="100" aria-label="Energy"></progress></div><button class="world-exit">‹</button><button class="minimap" aria-label="Open world map" data-key="KeyM"><b>N</b><span>▲</span><small></small></button><div class="discovery-note" aria-live="polite"></div><div class="stick" aria-label="Move"><i></i></div><div class="world-actions"><button data-key="KeyM" aria-label="World map">⌖</button><button data-key="Tab" aria-label="Creature Dex">◇</button><button data-key="KeyE" aria-label="Interact">E</button><button data-key="KeyB" aria-label="Scan">⌕</button><button data-key="ShiftLeft" aria-label="Sprint">⇧</button><button data-key="Space" aria-label="Jump or glide">⛯</button><button data-key="KeyR" aria-label="Recenter camera">⌖</button></div>';
+  host.innerHTML=`<div class="world"></div>
+  <section class="world-info"><strong></strong><small></small></section>
+  <button class="world-exit" aria-label="Return to title">‹</button>
+  <button class="minimap" aria-label="Open world map" data-key="KeyM"><b>N</b><span>▲</span><small></small></button>
+  <div class="discovery-note" aria-live="polite"></div>
+  <section class="team-hud" aria-label="Party"><strong></strong><div class="team-slots"></div></section>
+  <label class="energy-hud"><span>⚡</span><progress max="100" value="100" aria-label="Energy"></progress></label>
+  <div class="stick" aria-label="Move"><i></i></div>
+  <div class="world-shortcuts"><button data-key="Tab" aria-label="Creature Dex">◇</button><button data-key="KeyB" aria-label="Scan">⌕</button></div>
+  <div class="world-actions"><button data-key="KeyR" aria-label="Recenter camera">⌖</button><button data-key="Space" aria-label="Jump or glide">⛯</button><button class="interact" data-key="KeyE" aria-label="Interact"><span>✧</span>Interact</button><button data-key="ShiftLeft" aria-label="Sprint">⇧</button></div>`;
   const viewport=host.querySelector(".world")!;
   viewport.append(renderer.domElement);
   const info=host.querySelector(".world-info strong")!;
   const clock=host.querySelector(".world-info small")!;
-  const energyBar=host.querySelector("progress")!;
+  const energyBar=host.querySelector<HTMLProgressElement>(".energy-hud progress")!;
   const discoveryNote=host.querySelector(".discovery-note")!;
   const compass=host.querySelector<HTMLElement>(".minimap span")!;
   const mapCount=host.querySelector(".minimap small")!;
+  const team=host.querySelector(".team-hud strong")!;
+  const slots=host.querySelector(".team-slots")!;
+  let teamKey="",placeLabel="",weatherLabel="";
   let noteUntil=0;
   function startBattle() {
     if(!target||fighting||time<lastBattle)return;
@@ -201,6 +228,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     const dz=stickZ+Number(held.has("KeyS"))-Number(held.has("KeyW")||held.has("KeyZ"));
     move.set(dx,0,dz).applyAxisAngle(T.Object3D.DEFAULT_UP,yaw);
     if(move.lengthSq()>1)move.normalize();
+    if(move.lengthSq()>.01)actor.rotation.y=Math.atan2(-move.x,-move.z);
     if(jump){
       if(grounded){vertical=11;glide=false;}else glide=!glide;
       jump=false;
@@ -241,8 +269,21 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     compass.style.transform="rotate("+(-yaw)+"rad)";
     mapCount.textContent=exploration.discovered.length+"/64";
     if(nearby?.species.behavior==="aggressive" && nearby.sprite.position.distanceTo(p)<2.5)startBattle();
-    info.textContent=nearest(p.x,p.z).name+(nearby?' · '+nearby.species.name+' Lv.'+nearby.level:'');
-    clock.textContent=String(Math.floor(hour)).padStart(2,"0")+":"+String(Math.floor(hour%1*60)).padStart(2,"0")+" · "+weather+" · "+party.team.length+"/6 · "+party.team[0].hp+"/"+maxHp(party.team[0])+" HP";
+    const placeName=nearest(p.x,p.z).name;
+    if(placeName!==placeLabel){placeLabel=placeName;info.textContent=placeName;}
+    const timeLabel=String(Math.floor(hour)).padStart(2,"0")+":"+String(Math.floor(hour%1*60)).padStart(2,"0")+" · "+weather;
+    if(timeLabel!==weatherLabel){weatherLabel=timeLabel;clock.textContent=timeLabel;}
+    const stateKey=party.team.map(m=>[m.id,m.hp,m.level].join(":")).join("|");
+    if(stateKey!==teamKey){
+      teamKey=stateKey;
+      team.textContent="Party · "+party.team.length+"/6";
+      slots.innerHTML=Array.from({length:6},(_,index)=>{
+        const member=party.team[index];
+        if(!member)return '<span class="team-empty" aria-label="Empty party slot">+</span>';
+        const c=speciesOf(member);
+        return `<span class="team-member" title="${c.name}"><span class="team-portrait">${c.id==="florix"?'<img src="/sprites/florix.png" alt="Florix">':c.name.slice(0,2)}</span><small>Lv.${member.level}</small><progress value="${member.hp}" max="${maxHp(member)}" aria-label="${c.name} HP"></progress></span>`;
+      }).join("");
+    }
     energyBar.value=energy;
     renderer.render(scene,camera);
     raf=requestAnimationFrame(frame);
