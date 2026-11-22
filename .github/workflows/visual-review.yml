@@ -76,6 +76,13 @@ jobs:
               const resumed = await page.evaluate(() => JSON.parse(localStorage.getItem('aetheris.save')));
               if (JSON.stringify(resumed.position) !== JSON.stringify(saved.position)) throw new Error('Resume changed position');
               await capture('continue');
+              await page.locator('.world-exit').click();
+              await page.goto('http://127.0.0.1:5173/?performance=1');
+              await page.getByRole('button', {name: 'Continue'}).click();
+              await page.locator('.performance-meter[data-sample]').waitFor({timeout: 25000});
+              const sample = JSON.parse(await page.locator('.performance-meter').getAttribute('data-sample'));
+              if (!(sample.frames > 0 && sample.calls > 0)) throw new Error('No rendered frames recorded');
+              console.log('AETHERIS_PERF ' + name + ' ' + JSON.stringify(sample));
               await page.close();
             }
           } finally {
