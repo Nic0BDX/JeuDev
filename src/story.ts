@@ -2,6 +2,7 @@ import creatures from "./data/creatures.json";
 import regions from "./data/regions.json";
 import narrative from "./data/story.json";
 import cast from "./data/characters.json";
+import {portrait} from "./characters";
 import {battle,createMember,maxHp,type Party} from "./combat";
 
 type Ending="guardian"|"release";
@@ -28,12 +29,16 @@ export function playScene(host:HTMLElement,state:Chronicle,party:Party,finish:(s
   const heading=document.createElement("h2");
   heading.id="story-heading";
   heading.textContent="Chapitre "+scene.chapter+" · "+scene.title;
+  const identity=document.createElement("div");
+  identity.className="story-speaker";
+  const face=document.createElement("span");
   const speaker=document.createElement("strong");
+  identity.append(face,speaker);
   const line=document.createElement("p");
   line.setAttribute("aria-live","polite");
   const actions=document.createElement("div");
   actions.className="atlas-tabs";
-  dialog.append(heading,speaker,line,actions);
+  dialog.append(heading,identity,line,actions);
   host.append(dialog);
   let index=0, handoff=false;
   let input:HTMLInputElement|undefined;
@@ -61,6 +66,7 @@ export function playScene(host:HTMLElement,state:Chronicle,party:Party,finish:(s
   function act(){
     if(input){newHero=input.value.trim();input.remove();input=undefined;}
     actions.replaceChildren();
+    face.replaceChildren();
     if(scene.puzzle){
       const puzzle=scene.puzzle;
       speaker.textContent="Épreuve";
@@ -99,6 +105,8 @@ export function playScene(host:HTMLElement,state:Chronicle,party:Party,finish:(s
   }
   function show(){
     const [id,words]=scene.lines[index];
+    const character=cast.find(c=>c.id===id);
+    face.innerHTML=character?portrait(character):"";
     speaker.textContent=id==="hero"?(newHero||"Le Héros"):id==="narrator"?"":cast.find(c=>c.id===id)?.name.fr??(id==="florix"?"Florix":"Noctiri");
     line.textContent=words;
     actions.replaceChildren();

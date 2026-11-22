@@ -117,6 +117,23 @@ jobs:
               for (let line = 0; line < 5; line++) await page.getByRole('button', {name: 'Suivant'}).click();
               await page.getByRole('button', {name: 'Poursuivre'}).click();
               await page.waitForFunction(() => JSON.parse(localStorage.getItem('aetheris.save')).chronicle.next === 6);
+              await page.locator('.world-exit').click();
+              await page.evaluate(() => {
+                const save = JSON.parse(localStorage.getItem('aetheris.save'));
+                save.position = [-79, 92, -631];
+                save.chronicle = {next: 24, hero: "Ari", shards: ["fire","crystal","wind","water"]};
+                localStorage.setItem('aetheris.save', JSON.stringify(save));
+              });
+              await page.getByRole('button', {name: 'Continue'}).click();
+              await page.getByRole('button', {name: 'Interact', exact: true}).click();
+              await page.getByRole('heading', {name: 'Chapitre 12 · Le choix'}).waitFor();
+              for (let line = 0; line < 3; line++) await page.getByRole('button', {name: 'Suivant'}).click();
+              await page.getByRole('button', {name: 'Poursuivre'}).click();
+              await page.getByRole('button', {name: name === 'mobile' ? 'Libérer l’Aether' : 'Devenir le Gardien'}).click();
+              await capture('ending', true);
+              await page.getByRole('button', {name: 'Terminer le récit'}).click();
+              const outcome = await page.evaluate(() => JSON.parse(localStorage.getItem('aetheris.save')).chronicle.ending);
+              if (outcome !== (name === 'mobile' ? 'release' : 'guardian')) throw new Error('Ending was not saved');
               await page.close();
             }
           } finally {

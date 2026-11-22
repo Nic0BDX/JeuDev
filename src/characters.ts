@@ -5,7 +5,7 @@ export const characterAt = new Map(cast.filter(c=>c.location).map(c=>[c.location
 export const language = (value: string) => value==="fr" ? "fr" : "en";
 const source = import.meta.env.BASE_URL+"characters/aetheris-cast.png";
 
-function portrait(character:Character){
+export function portrait(character:Character){
   const {x,y}=character.portrait;
   return `<span class="character-portrait" aria-hidden="true" style="background-image:url('${source}');background-position:${(x-75)/1386*100}% ${(y-75)/874*100}%"></span>`;
 }

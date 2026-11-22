@@ -99,6 +99,7 @@ export function wildlife(scene:T.Scene, regionAt:(x:number,z:number)=>Biome, flo
       companion.position.y+=(p.y+.25-companion.position.y)*Math.min(1,dt*5);
       return closest;
     },
+    showCompanion(visible:boolean){companion.visible=visible;},
     setCompanion(creature:Species){companion.material=spriteMaterial(creature);},
     remove(target:Wild){for(const group of wild.values()){const index=group.indexOf(target);if(index>=0){scene.remove(target.sprite);group.splice(index,1);break;}}},
     dispose(){for(const material of sprites.values()){material.map?.dispose();material.dispose();}sprites.clear();}

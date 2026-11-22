@@ -34,7 +34,7 @@ function terrain(x: number, z: number) {
 }
 function surface(x: number, z: number, y: number) {
   const island = regions.at(-1)!;
-  return Math.hypot(x-island.x,z-island.z) < 125 && y > 86 ? 91 : Math.max(terrain(x,z), SEA - .4);
+  return Math.hypot(x-island.x,z-island.z) < 155 && y > 86 ? 91 : Math.max(terrain(x,z), SEA - .4);
 }
 
 export function explore(host: HTMLElement, settings: {quality:string;sensitivity:number;volume:number;language:string}, exit:()=>void, resume?:Save) {
@@ -60,7 +60,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   water.rotation.x = -Math.PI/2;
   water.position.y = SEA;
   scene.add(water);
-  const island = new T.Mesh(new T.CylinderGeometry(125,22,42,12),new T.MeshLambertMaterial({color:0x826fba}));
+  const island = new T.Mesh(new T.CylinderGeometry(155,22,42,16),new T.MeshLambertMaterial({color:0x826fba}));
   island.position.set(0,70,-750);
   scene.add(island);
   const marker = new T.CylinderGeometry(.35,1.5,8,5);
@@ -102,6 +102,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   const chronicle=resume?.chronicle??newChronicle();
   const exploration:Exploration=resume?.exploration??{discovered:[],x:actor.position.x,z:actor.position.z};
   fauna.setCompanion(speciesOf(party.team[0]));
+  fauna.showCompanion(chronicle.next>0);
   let fighting=false,overlay=false,lastBattle=0;
   let target:ReturnType<typeof fauna.update>;
 
@@ -244,6 +245,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     if(code==="KeyC"){overlay=true;held.clear();openCharacters(host,settings.language,closeOverlay);return;}
     if(code==="KeyM"){
       overlay=true;held.clear();
+      exploration.objective=destination(chronicle)?.id??null;
       openMap(host,exploration,()=>{overlay=false;},point=>{actor.position.set(point.x,(point.y??surface(point.x,point.z,0))+1,point.z);vertical=0;});return;
     }
     if(code==="Tab"){overlay=true;held.clear();openDex(host,party,()=>{overlay=false;});return;}
@@ -255,6 +257,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
         playScene(host,chronicle,party,(scene,advanced)=>{
           closeOverlay();
           if(!advanced)return;
+          fauna.showCompanion(true);
           if(scene.crystal&&!journey.looted.includes(site.id)){journey.crystals++;journey.looted.push(site.id);}
           if(scene.travel){
             const point=regions.flatMap<typeof regions[number]["locations"][number]>(r=>r.locations).find(place=>place.id===scene.travel);
@@ -416,7 +419,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     if(discoveryNote.textContent && time>noteUntil)discoveryNote.textContent="";
     if(lastHeading!==yaw){lastHeading=yaw;compass.style.transform="rotate("+(-yaw)+"rad)";}
     if(time>=mapNext){drawMinimap(p.x,p.z);mapCount.textContent=exploration.discovered.length+"/64";mapNext=time+.2;}
-    if(nearby?.species.behavior==="aggressive" && nearby.sprite.position.distanceTo(p)<2.5)startBattle();
+    if(chronicle.next>0&&nearby?.species.behavior==="aggressive" && nearby.sprite.position.distanceTo(p)<2.5)startBattle();
     const placeName=p.x<30&&p.x>-120&&p.z>0&&p.z<140?"Verdant Cascade Valley":nearest(p.x,p.z).name;
     if(placeName!==placeLabel){placeLabel=placeName;info.textContent=placeName;}
     const timeLabel=String(Math.floor(hour)).padStart(2,"0")+":"+String(Math.floor(hour%1*60)).padStart(2,"0")+" · "+weather;
