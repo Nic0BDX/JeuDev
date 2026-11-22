@@ -41,3 +41,5 @@ Navigation narrative : repère 3D et losange de minimap. [Build](https://github.
 Forge du Cratère : entrée, évent et abri modélisés. L’ordre des deux actions et la reprise entre les actions sont vérifiés. [Build](https://github.com/Nic0BDX/JeuDev/actions/runs/45046357388) · [Tests et captures](https://github.com/Nic0BDX/JeuDev/actions/runs/45046357241).
 
 Boucle autonome sur `auto-dev`. Hypothèse retenue : le projet est Aetheris, déjà publié sur Vercel. Priorité à la fiabilité de la partie, aux contrôles mobiles et à la cohérence visuelle. Aucun nouveau skill installé dans cette session (voir BLOCKERS.md).
+
+Démarrage : retour au titre, message FR/EN et bouton Réessayer avec focus si WebGL échoue. [Build](https://github.com/Nic0BDX/JeuDev/actions/runs/45047843093) · [Tests Chromium](https://github.com/Nic0BDX/JeuDev/actions/runs/45047843115).
