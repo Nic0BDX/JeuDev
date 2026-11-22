@@ -6,7 +6,7 @@
 - [x] M3 · Créatures et compagnon
 - [x] M4 · Combat et capture
 - [x] M5 · Dex et collection
-- [ ] M6 · Carte et découverte
+- [x] M6 · Carte et découverte
 - [ ] M7 · Quêtes et économie
 - [ ] M8 · Sauvegarde et finition
 
@@ -21,3 +21,5 @@ M3 validé par [GitHub Actions](https://github.com/Nic0BDX/JeuDev/actions/runs/4
 M4 validé par [GitHub Actions](https://github.com/Nic0BDX/JeuDev/actions/runs/45011812804).
 
 M5 validé par [GitHub Actions](https://github.com/Nic0BDX/JeuDev/actions/runs/45012020216).
+
+M6 validé par [GitHub Actions](https://github.com/Nic0BDX/JeuDev/actions/runs/45014628519). [Carte](https://github.com/Nic0BDX/JeuDev/actions/runs/45014409308) et [minimap](https://github.com/Nic0BDX/JeuDev/actions/runs/45014628543) vérifiées en Chromium.

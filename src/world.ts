@@ -2,6 +2,7 @@ import * as T from "three";
 import regions from "./data/regions.json";
 import { wildlife } from "./wildlife";
 import { openDex } from "./dex";
+import { nearestSite, newJourney, objective, openBag, visit } from "./quests";
 import { discover, openMap, type Exploration } from "./map";
 import { battle, newParty, speciesOf, maxHp } from "./combat";
 
@@ -77,6 +78,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   scene.add(actor);
   const fauna=wildlife(scene,nearest,surface,sample);
   const party=newParty();
+  const journey=newJourney();
   const exploration:Exploration={discovered:[],x:actor.position.x,z:actor.position.z};
   let fighting=false,overlay=false,lastBattle=0;
   let target:ReturnType<typeof fauna.update>;
@@ -134,7 +136,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   <section class="world-info"><strong></strong><small></small></section>
   <button class="world-exit" aria-label="Return to title">‹</button>
   <button class="minimap" aria-label="Open world map" data-key="KeyM"><canvas width="96" height="96" aria-hidden="true"></canvas><b>N</b><span>▲</span><small></small></button><div class="minimap-zoom"><button data-key="Equal" aria-label="Minimap zoom in">+</button><button data-key="Minus" aria-label="Minimap zoom out">−</button></div>
-  <div class="discovery-note" aria-live="polite"></div>
+  <div class="discovery-note" aria-live="polite"></div><aside class="quest-track"><strong>The Call of Skyspire</strong><small></small></aside><div class="quick-items"><button data-key="KeyI" aria-label="Bag">Bag</button><button data-key="Digit1" aria-label="Use berry">Berry</button><button data-key="KeyL" aria-label="Field mail">✉</button></div>
   <section class="team-hud" aria-label="Party"><strong></strong><div class="team-slots"></div></section>
   <label class="energy-hud"><span>⚡</span><progress max="100" value="100" aria-label="Energy"></progress></label>
   <div class="stick" aria-label="Move"><i></i></div>
@@ -172,6 +174,10 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   const slots=host.querySelector(".team-slots")!;
   let teamKey="",placeLabel="",weatherLabel="";
   let noteUntil=0;
+  const questTrack=host.querySelector(".quest-track small")!;
+  const berry=host.querySelector("[data-key=Digit1]")!;
+  const closeOverlay=()=>{overlay=false;fauna.setCompanion(speciesOf(party.team[0]));};
+  function notify(message:string){discoveryNote.textContent=message;noteUntil=time+4;}
   function startBattle() {
     if(!target||fighting||time<lastBattle)return;
     const opponent=target;
@@ -198,7 +204,17 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
       openMap(host,exploration,()=>{overlay=false;},point=>{actor.position.set(point.x,(point.y??surface(point.x,point.z,0))+1,point.z);vertical=0;});return;
     }
     if(code==="Tab"){overlay=true;held.clear();openDex(host,party,()=>{overlay=false;});return;}
-    if(code==="KeyE"){startBattle();return;}
+    if(code==="KeyE"){
+      const p=actor.position;const site=nearestSite(p.x,p.y,p.z);
+      if(!site){startBattle();return;}
+      const result=visit(journey,party,site);
+      if(result)notify(result);
+      if(site.kind==="village"){overlay=true;held.clear();openBag(host,party,journey,closeOverlay,site);}
+      return;
+    }
+    if(code==="KeyI"){overlay=true;held.clear();openBag(host,party,journey,closeOverlay);return;}
+    if(code==="KeyL"){notify("Field mail · "+(objective(journey)?.name??"Skyspire thanks you for your service."));return;}
+    if(code==="Digit1"&&party.berries){const lead=party.team[0];party.berries--;lead.hp=Math.min(maxHp(lead),lead.hp+Math.ceil(35*(lead.affinity>=25?1.05:1)));lead.affinity=Math.min(100,lead.affinity+2);notify("Berry used · "+speciesOf(lead).name);return;}
     if(code==="KeyB"&&target&&!party.seen.includes(target.species.id))party.seen.push(target.species.id);
     if(code==="Space" && !held.has(code)) jump=true;
     if(code==="KeyR") { yaw=0;pitch=.32; }
@@ -285,7 +301,9 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     target=nearby;
     exploration.x=p.x;exploration.z=p.z;
     const site=discover(exploration,p.y);
-    if(site){discoveryNote.textContent="Discovered · "+site.name;noteUntil=time+4;}
+    if(site)notify("Discovered · "+site.name);
+    questTrack.textContent=objective(journey)?.name??"Complete";
+    berry.textContent="Berry ×"+party.berries;
     if(time>noteUntil)discoveryNote.textContent="";
     compass.style.transform="rotate("+(-yaw)+"rad)";
     if(time>=mapNext){drawMinimap(p.x,p.z);mapCount.textContent=exploration.discovered.length+"/64";mapNext=time+.2;}

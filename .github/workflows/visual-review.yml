@@ -15,7 +15,7 @@ jobs:
       - run: npm install
       - run: npm install --no-save --package-lock=false playwright
       - run: npx playwright install --with-deps chromium
-      - name: Capture exploration HUD with zoomable minimap
+      - name: Capture quest HUD and inventory
         run: |
           npm run dev -- --host 127.0.0.1 > /tmp/aetheris-vite.log 2>&1 &
           for attempt in {1..30}; do
@@ -33,10 +33,12 @@ jobs:
               await page.getByRole('heading', {name: 'Aetheris'}).waitFor();
               await page.getByRole('button', {name: 'New Adventure'}).click();
               await page.locator('.world canvas').waitFor();
-              await page.getByRole('button', {name: 'Minimap zoom in'}).click();
+              await page.locator('.quest-track').getByText('The Call of Skyspire').waitFor();
+              await page.getByRole('button', {name: 'Bag', exact: true}).click();
+              await page.getByText('Field Bag · 120 coins').waitFor();
               await page.locator('.team-hud').getByText('Party · 3/6').waitFor();
               await page.evaluate(() => document.fonts.ready);
-              await page.screenshot({path: 'captures/hud-' + name + '.png'});
+              await page.screenshot({path: 'captures/bag-' + name + '.png'});
               const cdp = await page.context().newCDPSession(page);
               const preview = await cdp.send('Page.captureScreenshot', {format: 'jpeg', quality: 48, clip: {x: 0, y: 0, width, height, scale: .45}});
               for (const [i, chunk] of preview.data.match(/.{1,5000}/g).entries()) console.log('AETHERIS_' + name + '_' + i + ' ' + chunk);
@@ -48,6 +50,6 @@ jobs:
           JS
       - uses: actions/upload-artifact@v4
         with:
-          name: aetheris-hud
+          name: aetheris-bag
           path: captures/
           if-no-files-found: error

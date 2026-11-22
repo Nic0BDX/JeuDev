@@ -35,3 +35,13 @@ Pour chaque écran modifié, lancer Aetheris, capturer en portrait mobile et en 
 ## Visuel du titre
 
 `public/title-landscape.png` provient d’une illustration originale générée pour Aetheris avec ImageGen. Le cadrage du menu est inspiré de la référence fournie. Les libellés et le logo sont rendus par l’interface du jeu.
+
+## Captures comparées aux références
+
+- [Titre](https://github.com/Nic0BDX/JeuDev/actions/runs/45013530328) : panorama illustré et menu à droite sur desktop, recadrage sur les actions en portrait.
+- [Compendium](https://github.com/Nic0BDX/JeuDev/actions/runs/45013681792) : neuf bandes de type et quatre emplacements. Masques actifs au départ.
+- [Dex](https://github.com/Nic0BDX/JeuDev/actions/runs/45013881226) : grille, portrait et fiche en 16:9. Grille défilante et fiche sous la sélection en portrait.
+- [HUD](https://github.com/Nic0BDX/JeuDev/actions/runs/45014628543) : boussole, équipe et contrôles. Décor 3D moins détaillé que le panorama illustré.
+- [Carte](https://github.com/Nic0BDX/JeuDev/actions/runs/45014409308) : régions, légende et bande de navigation. Légende sous le plan en portrait.
+
+`public/sprites/florix.png` et `public/world-atlas.png` proviennent d’illustrations originales générées avec ImageGen pour Aetheris. Florix est le premier portrait prêt à remplacer le rendu de secours. Les autres espèces utilisent les visuels de secours actuels.
