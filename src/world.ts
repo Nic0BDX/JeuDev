@@ -16,7 +16,12 @@ function sample(x: number, z: number) {
   return n - Math.floor(n);
 }
 function nearest(x: number, z: number) {
-  return regions.reduce((best, region) => Math.hypot(x-region.x,z-region.z) < Math.hypot(x-best.x,z-best.z) ? region : best);
+  let best=regions[0], distance=Infinity;
+  for(const region of regions){
+    const squared=(x-region.x)**2+(z-region.z)**2;
+    if(squared<distance){best=region;distance=squared;}
+  }
+  return best;
 }
 function terrain(x: number, z: number) {
   const wave = 8*Math.sin(x/47)*Math.cos(z/66)+4*Math.sin((x+z)/25);
@@ -31,7 +36,9 @@ function surface(x: number, z: number, y: number) {
 
 export function explore(host: HTMLElement, settings: {quality:string;sensitivity:number;volume:number}, exit:()=>void, resume?:Save) {
   const low = settings.quality === "low" || (settings.quality === "auto" && matchMedia("(pointer:coarse)").matches);
-  const renderer = new T.WebGLRenderer({antialias:!low});
+  const adaptive = settings.quality === "auto";
+  const renderer = new T.WebGLRenderer({antialias:settings.quality==="high", powerPreference:low?"default":"high-performance"});
+  let renderScale=adaptive ? (low ? .95 : .85) : 1;
   const scene = new T.Scene();
   const sky = new T.Color();
   const clearSky = new T.Color(0x80c8f7);
@@ -46,7 +53,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   scene.add(light,sun);
   const planet = new T.Mesh(new T.SphereGeometry(135,24,16),new T.MeshBasicMaterial({color:0xc3deff,fog:false}));
   scene.add(planet);
-  const water = new T.Mesh(new T.PlaneGeometry(14000,14000),new T.MeshPhongMaterial({color:0x37a8cf,shininess:100}));
+  const water = new T.Mesh(new T.PlaneGeometry(14000,14000),new T.MeshLambertMaterial({color:0x37a8cf}));
   water.rotation.x = -Math.PI/2;
   water.position.y = SEA;
   scene.add(water);
@@ -55,11 +62,16 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   scene.add(island);
   const marker = new T.CylinderGeometry(.35,1.5,8,5);
   const crystal = new T.MeshLambertMaterial({color:0xbcf3ff,emissive:0x27608b,flatShading:true});
-  for(const region of regions) for(const place of region.locations) {
-    const landmark = new T.Mesh(marker,crystal);
-    landmark.scale.setScalar(place.kind === "statue" ? 1.5 : .75);
-    landmark.position.set(place.x,(place.y ?? terrain(place.x,place.z))+3,place.z);
-    scene.add(landmark);
+  const landmarkTransform = new T.Object3D();
+  for(const region of regions){
+    const landmarks = new T.InstancedMesh(marker, crystal, region.locations.length);
+    region.locations.forEach((place,index)=>{
+      landmarkTransform.scale.setScalar(place.kind==="statue"?1.5:.75);
+      landmarkTransform.position.set(place.x,(place.y??terrain(place.x,place.z))+3,place.z);
+      landmarkTransform.updateMatrix();
+      landmarks.setMatrixAt(index,landmarkTransform.matrix);
+    });
+    scene.add(landmarks);
   }
   const actor = new T.Group();
   const addPart=(geometry:T.BufferGeometry,color:number,x:number,y:number,z:number)=>{
@@ -93,17 +105,30 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   const leafMaterial = new T.MeshLambertMaterial({color:0xffffff,flatShading:true});
   const chunks = new Map<string,{mesh:T.Mesh;trees:T.InstancedMesh}>();
   const dummy = new T.Object3D();
+  let pendingChunks: Array<{gx:number;gz:number;segments:number;id:string}> = [];
   function stream() {
     const cx = Math.floor(actor.position.x/SIZE);
     const cz = Math.floor(actor.position.z/SIZE);
     const radius = low ? 2 : 3;
     const active = new Set<string>();
+    pendingChunks=[];
     for(let z=-radius;z<=radius;z++) for(let x=-radius;x<=radius;x++){
       const gx=cx+x,gz=cz+z;
       const segments=Math.max(Math.abs(x),Math.abs(z))<=1?16:8;
       const id = [gx,gz,segments].join(",");
       active.add(id);
-      if(chunks.has(id)) continue;
+      if(!chunks.has(id))pendingChunks.push({gx,gz,segments,id});
+    }
+    pendingChunks.sort((a,b)=>Math.max(Math.abs(a.gx-cx),Math.abs(a.gz-cz))-Math.max(Math.abs(b.gx-cx),Math.abs(b.gz-cz)));
+    for(const [id,chunk] of chunks) if(!active.has(id)){
+      scene.remove(chunk.mesh,chunk.trees);
+      chunk.mesh.geometry.dispose();
+      chunk.trees.dispose();
+      chunks.delete(id);
+    }
+  }
+  function fillChunks(budget:number){
+    for(const {gx,gz,segments,id} of pendingChunks.splice(0,budget)){
       const geometry = new T.PlaneGeometry(SIZE,SIZE,segments,segments).rotateX(-Math.PI/2).translate((gx+.5)*SIZE,0,(gz+.5)*SIZE);
       const pos=geometry.attributes.position;
       const colors=[];
@@ -129,12 +154,6 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
       }
       scene.add(mesh,trees);
       chunks.set(id,{mesh,trees});
-    }
-    for(const [id,chunk] of chunks) if(!active.has(id)){
-      scene.remove(chunk.mesh,chunk.trees);
-      chunk.mesh.geometry.dispose();
-      chunk.trees.dispose();
-      chunks.delete(id);
     }
   }
   host.innerHTML=`<div class="world"></div>
@@ -262,7 +281,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     button.addEventListener("lostpointercapture",()=>held.delete(code),options);
   }
   function resize() {
-    renderer.setPixelRatio(Math.min(devicePixelRatio,low?1.25:1.8));
+    renderer.setPixelRatio(Math.min(devicePixelRatio,low?1.25:1.8)*renderScale);
     renderer.setSize(viewport.clientWidth,viewport.clientHeight);
     camera.aspect=viewport.clientWidth/Math.max(1,viewport.clientHeight);
     camera.updateProjectionMatrix();
@@ -270,16 +289,32 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
   window.addEventListener("resize",resize,options);
   resize();
   stream();
+  fillChunks(9);
   const meter = new URLSearchParams(location.search).get("performance") === "1" ? document.createElement("output") : null;
   if(meter){meter.className="performance-meter";host.append(meter);}
   let sampleStart=0,samplePrevious=0;
   const frameIntervals:number[]=[];
   let lastObjective="",lastBerry="",lastHeading=NaN,lastEnergy=-1;
-  let prev=performance.now(),lastChunk="";
+  let prev=performance.now(),lastChunk=Math.floor(actor.position.x/SIZE)+","+Math.floor(actor.position.z/SIZE);
+  let qualityStart=0,qualityFrames=0,fastWindows=0;
   function frame(now:number) {
-    const dt=Math.min(.05,(now-prev)/1000);
+    const frameMs=now-prev;
+    const dt=Math.min(.05,frameMs/1000);
     prev=now;
-    if(fighting||overlay){sampleStart=samplePrevious=0;frameIntervals.length=0;raf=requestAnimationFrame(frame);return;}
+    if(fighting||overlay){qualityStart=qualityFrames=fastWindows=0;sampleStart=samplePrevious=0;frameIntervals.length=0;raf=requestAnimationFrame(frame);return;}
+    if(adaptive){
+      if(!qualityStart || frameMs>300){qualityStart=now;qualityFrames=0;fastWindows=0;}
+      qualityFrames++;
+      const elapsed=now-qualityStart;
+      if(elapsed>=850){
+        const mean=elapsed/qualityFrames;
+        fastWindows=mean<18?fastWindows+1:0;
+        const floor=low?.55:.4;
+        const scale=mean>(low?29:22)?Math.max(floor,renderScale*.78):fastWindows>=5?Math.min(1,renderScale+.08):renderScale;
+        if(scale!==renderScale){renderScale=scale;resize();fastWindows=0;}
+        qualityStart=now;qualityFrames=0;
+      }
+    }
     time+=dt;
     if(time>=nextSave){save();nextSave=time+8;}
     const p=actor.position;
@@ -328,7 +363,8 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     light.intensity=.55+day*1.45;
     sun.intensity=day*2;
     const chunk=Math.floor(p.x/SIZE)+","+Math.floor(p.z/SIZE);
-    if(chunk!==lastChunk){lastChunk=chunk;stream();}
+    if(chunk!==lastChunk){lastChunk=chunk;stream();fillChunks(1);}
+    if(pendingChunks.length)fillChunks(low?2:3);
     const nearby=fauna.update(p,dt,time,hour,weather);
     target=nearby;
     exploration.x=p.x;exploration.z=p.z;
@@ -373,7 +409,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
           const p95=Number(frameIntervals[Math.ceil(count*.95)-1].toFixed(1));
           const {calls,triangles}=renderer.info.render;
           meter.value=fps+" FPS · p95 "+p95+" ms · "+calls+" draws";
-          meter.dataset.sample=JSON.stringify({fps,p95,calls,triangles,frames:count,low});
+          meter.dataset.sample=JSON.stringify({fps,p95,calls,triangles,frames:count,low,renderScale:Number(renderScale.toFixed(2))});
           sampleStart=now;
           frameIntervals.length=0;
         }
@@ -388,7 +424,7 @@ export function explore(host: HTMLElement, settings: {quality:string;sensitivity
     listeners.abort();
     stopSound();
     fauna.dispose();
-    scene.traverse(node=>{if(node instanceof T.Mesh){node.geometry.dispose();const mats=Array.isArray(node.material)?node.material:[node.material];mats.forEach(mat=>mat.dispose());}});
+    scene.traverse(node=>{if(node instanceof T.InstancedMesh)node.dispose();if(node instanceof T.Mesh){node.geometry.dispose();const mats=Array.isArray(node.material)?node.material:[node.material];mats.forEach(mat=>mat.dispose());}});
     renderer.dispose();
   };
   host.querySelector(".world-exit")!.addEventListener("click",()=>{dispose();exit();},options);
