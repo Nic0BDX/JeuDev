@@ -2,7 +2,7 @@ import regions from "./data/regions.json";
 
 type Point={id:string;name:string;kind:string;x:number;z:number;y:number|null};
 export type Exploration={discovered:string[];x:number;z:number};
-const locations=regions.flatMap(r=>r.locations);
+const locations=regions.flatMap<Point>(r=>r.locations);
 const marks:Record<string,string>={statue:"✧",village:"⌂",ruin:"◇",tower:"♜",cave:"◒",resource:"◆",habitat:"✿",chest:"▣"};
 export function openMap(host:HTMLElement,world:Exploration|undefined,close:()=>void,travel?:(point:Point)=>void){
   const panel=document.createElement("section");
