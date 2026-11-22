@@ -33,6 +33,9 @@ jobs:
               await page.getByRole('heading', {name: 'Aetheris'}).waitFor();
               await page.evaluate(() => document.fonts.ready);
               await page.screenshot({path: 'captures/title-' + name + '.png'});
+              const cdp = await page.context().newCDPSession(page);
+              const preview = await cdp.send('Page.captureScreenshot', {format: 'jpeg', quality: 48, clip: {x: 0, y: 0, width, height, scale: .45}});
+              for (const [i, chunk] of preview.data.match(/.{1,5000}/g).entries()) console.log('AETHERIS_' + name + '_' + i + ' ' + chunk);
               await page.close();
             }
           } finally {
