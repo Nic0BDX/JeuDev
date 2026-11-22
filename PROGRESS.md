@@ -5,7 +5,7 @@
 - [x] M2 · Monde et déplacements
 - [x] M3 · Créatures et compagnon
 - [x] M4 · Combat et capture
-- [ ] M5 · Dex et collection
+- [x] M5 · Dex et collection
 - [ ] M6 · Carte et découverte
 - [ ] M7 · Quêtes et économie
 - [ ] M8 · Sauvegarde et finition
@@ -19,3 +19,5 @@ M2 validé par [GitHub Actions](https://github.com/Nic0BDX/JeuDev/actions/runs/4
 M3 validé par [GitHub Actions](https://github.com/Nic0BDX/JeuDev/actions/runs/45011697916). Sprites de remplacement générés en Canvas.
 
 M4 validé par [GitHub Actions](https://github.com/Nic0BDX/JeuDev/actions/runs/45011812804).
+
+M5 validé par [GitHub Actions](https://github.com/Nic0BDX/JeuDev/actions/runs/45012020216).
