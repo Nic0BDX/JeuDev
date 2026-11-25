@@ -1,0 +1,106 @@
+.prologue {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  color: #f5faff;
+  background: #0b204d;
+}
+
+.prologue-sky {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, #0b204d44, #0b204d00 55%, #0b204d),
+    url("/title-landscape.png") center / cover;
+}
+
+.prologue-sky i {
+  position: absolute;
+  top: 40%;
+  left: 47%;
+  width: clamp(80px, 20vw, 250px);
+  aspect-ratio: 2 / 1;
+  clip-path: polygon(0 25%, 21% 5%, 64% 0, 100% 21%, 76% 64%, 57% 100%, 26% 60%);
+  background: linear-gradient(165deg, #82c46a 25%, #4c688c 28%, #243a63 80%);
+  box-shadow: inset 0 2px #f5faff;
+}
+
+.prologue-sky i:first-child {
+  left: 17%;
+  top: 28%;
+  scale: .55;
+  opacity: .66;
+}
+
+.prologue-sky i:last-child {
+  left: 74%;
+  top: 24%;
+  scale: .4;
+  opacity: .58;
+}
+
+.prologue[data-shot="0"] .prologue-sky {
+  animation: prologue-pan var(--shot-duration) ease-out both;
+}
+
+.prologue[data-shot="1"] .prologue-sky i:nth-child(2) {
+  animation: prologue-fall var(--shot-duration) ease-in both;
+}
+
+.prologue[data-shot="2"] .prologue-sky {
+  opacity: .38;
+}
+
+.prologue-caption {
+  position: absolute;
+  z-index: 1;
+  inset-inline: 1rem;
+  bottom: max(20%, calc(env(safe-area-inset-bottom) + 5rem));
+  max-width: 36rem;
+  margin: 0 auto;
+  padding: .75rem 1rem;
+  background: #0b204de6;
+  border-radius: .5rem;
+  text-align: center;
+  font-size: clamp(1.1rem, 3vw, 1.6rem);
+}
+
+.prologue[data-shot="2"] .prologue-caption {
+  top: 42%;
+  bottom: auto;
+  background: transparent;
+  color: #ffd784;
+  font: 600 clamp(2.5rem, 10vw, 6rem) Cinzel, Georgia, serif;
+}
+
+.prologue-skip {
+  position: absolute;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  min-height: 44px;
+  padding-inline: 1.5rem;
+}
+
+@keyframes prologue-pan {
+  from { transform: scale(1.18) translateX(-3%); }
+  to { transform: scale(1.05) translateX(2%); }
+}
+
+@keyframes prologue-fall {
+  from { transform: translateY(0) rotate(0); }
+  to { transform: translateY(36vh) rotate(14deg); opacity: .15; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prologue[data-shot] .prologue-sky,
+  .prologue[data-shot] .prologue-sky i {
+    animation: none;
+  }
+}

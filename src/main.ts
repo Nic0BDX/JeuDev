@@ -1,5 +1,6 @@
 import "./style.css";
 import { explore } from "./world";
+import { playPrologue } from "./prologue";
 import { readSave } from "./save";
 import { openDex } from "./dex";
 import { openMap } from "./map";
@@ -56,7 +57,13 @@ app.addEventListener("click", event => {
     const save=readSave();
     if(target.dataset.page==="continue"&&!save)return;
     if(target.dataset.page==="new"&&save&&!confirm(settings.language==="fr"?"Remplacer l’aventure sauvegardée ?":"Replace your saved adventure?"))return;
-    try { explore(app, settings, render, target.dataset.page==="continue"?save:undefined); } catch { render(); alert("WebGL is unavailable."); }
+    const continuing = target.dataset.page === "continue";
+    function enterWorld() {
+      try { explore(app, settings, render, continuing ? save : undefined); }
+      catch { render(); alert("WebGL is unavailable."); }
+    }
+    if (continuing) enterWorld();
+    else playPrologue(app, settings.language, enterWorld);
     return;
   }
   page = target.dataset.page as Page;
